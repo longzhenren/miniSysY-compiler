@@ -60,7 +60,7 @@ int main()
     }
     if (errcode==1){
       printf("Err\n");
-      return -1;
+      return 0;
     }
     if (isalpha(ch)||ch=='_')
     {
