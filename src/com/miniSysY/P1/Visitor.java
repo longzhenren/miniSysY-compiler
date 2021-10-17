@@ -60,7 +60,7 @@ public class Visitor extends P1BaseVisitor<Void> {
     public Void visitIntConst(P1Parser.IntConstContext ctx) {
         long res = 0;
         if (ctx.HexadecimalConst() != null) {
-            String hex = ctx.HexadecimalConst().getText();
+            String hex = ctx.HexadecimalConst().getText().toLowerCase().substring(2);
             res = Long.parseLong(hex, 16);
         } else if (ctx.OctalConst() != null) {
             String oct = ctx.OctalConst().getText();
