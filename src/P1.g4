@@ -49,6 +49,8 @@ FuncIdent       : 'main';
 DecimalConst      : [1-9] [0-9]*;
 OctalConst        : [0] [0-7]*;
 HexadecimalConst  : [0] [xX] [0-9a-fA-F]+;
+BlockComment      :   '/*' .*? '*/' -> skip;
+LineComment       :   '//' ~[\r\n]* -> skip;
 
 compUnit: funcDef;
 funcType: INT_KW;

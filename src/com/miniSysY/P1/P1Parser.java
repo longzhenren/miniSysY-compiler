@@ -18,7 +18,8 @@ public class P1Parser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		LParser=1, RParser=2, LBrace=3, RBrace=4, RETURN_KW=5, INT_KW=6, Semicolumn=7, 
-		WhiteSpace=8, FuncIdent=9, DecimalConst=10, OctalConst=11, HexadecimalConst=12;
+		WhiteSpace=8, FuncIdent=9, DecimalConst=10, OctalConst=11, HexadecimalConst=12, 
+		BlockComment=13, LineComment=14;
 	public static final int
 		RULE_compUnit = 0, RULE_funcType = 1, RULE_funcIdent = 2, RULE_funcDef = 3, 
 		RULE_block = 4, RULE_stmt = 5, RULE_number = 6, RULE_intConst = 7, RULE_reteurnStmt = 8;
@@ -40,7 +41,7 @@ public class P1Parser extends Parser {
 		return new String[] {
 			null, "LParser", "RParser", "LBrace", "RBrace", "RETURN_KW", "INT_KW", 
 			"Semicolumn", "WhiteSpace", "FuncIdent", "DecimalConst", "OctalConst", 
-			"HexadecimalConst"
+			"HexadecimalConst", "BlockComment", "LineComment"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -524,7 +525,7 @@ public class P1Parser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\16/\4\2\t\2\4\3\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\20/\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\3\2\3\2\3\3"+
 		"\3\3\3\4\3\4\3\5\3\5\3\5\3\5\3\5\3\5\3\6\3\6\3\6\3\6\3\7\3\7\3\b\3\b\3"+
 		"\t\3\t\3\n\3\n\3\n\3\n\3\n\2\2\13\2\4\6\b\n\f\16\20\22\2\3\3\2\f\16\2"+
