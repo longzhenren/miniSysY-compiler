@@ -83,7 +83,7 @@ public class Visitor extends P2BaseVisitor<Void> {
     public Void visitReteurnStmt(P2Parser.ReteurnStmtContext ctx) {
         System.out.print("\tret i32 ");
         visit(ctx.exp());
-        System.out.print(nodeVal);
+        System.out.print((int)nodeVal);
         assert (ctx.Semicolumn() != null);
         return null;
     }
