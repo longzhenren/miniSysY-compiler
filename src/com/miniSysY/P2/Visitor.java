@@ -1,7 +1,7 @@
 package com.miniSysY.P2;
 
 public class Visitor extends P2BaseVisitor<Void> {
-    double nodeVal = 0.0;
+    long nodeVal = 0L;
 
     @Override
     public Void visitCompUnit(P2Parser.CompUnitContext ctx) {
@@ -60,7 +60,7 @@ public class Visitor extends P2BaseVisitor<Void> {
 
     @Override
     public Void visitIntConst(P2Parser.IntConstContext ctx) {
-        Long res = 0L;
+        long res = 0L;
         if (ctx.HexadecimalConst() != null) {
             String hex = ctx.HexadecimalConst().getText().toLowerCase().substring(2);
             res = Long.parseLong(hex, 16);
@@ -83,7 +83,7 @@ public class Visitor extends P2BaseVisitor<Void> {
     public Void visitReteurnStmt(P2Parser.ReteurnStmtContext ctx) {
         System.out.print("\tret i32 ");
         visit(ctx.exp());
-        System.out.print((int)nodeVal);
+        System.out.print(nodeVal);
         assert (ctx.Semicolumn() != null);
         return null;
     }
@@ -101,7 +101,7 @@ public class Visitor extends P2BaseVisitor<Void> {
             visit(ctx.mulExp());
 //            addExpVal = mulExpVal;
         } else if (ctx.children.size() == 3) { //addExp (ADD | SUB) mulExp
-            double addExpVal = 0.0, mulExpVal = 0.0;
+            long addExpVal, mulExpVal;
             visit(ctx.addExp());
             addExpVal = nodeVal;
             visit(ctx.mulExp());
@@ -121,7 +121,7 @@ public class Visitor extends P2BaseVisitor<Void> {
             visit(ctx.unaryExp());
 //            nodeVal = unaryExpVal;
         } else if (ctx.children.size() == 3) { //mulExp (MUL|DIV|MOD) unaryExp
-            double mulExpVal = 0.0, unaryExpVal = 0.0;
+            long mulExpVal, unaryExpVal;
             visit(ctx.mulExp());
             mulExpVal = nodeVal;
             visit(ctx.unaryExp());
@@ -143,7 +143,7 @@ public class Visitor extends P2BaseVisitor<Void> {
             visit(ctx.primaryExp());
 //            nodeVal = primaryExpVal;
         } else if (ctx.children.size() == 2) { //unaryOp unaryExp
-            double unaryExpVal = 0.0;
+            long unaryExpVal;
             visit(ctx.unaryExp());
             unaryExpVal = nodeVal;
             if (ctx.ADD() != null) {
@@ -158,12 +158,12 @@ public class Visitor extends P2BaseVisitor<Void> {
     @Override
     public Void visitPrimaryExp(P2Parser.PrimaryExpContext ctx) {
         if (ctx.children.size() == 1) { //number
-            double numberVal = 0.0;
+            long numberVal;
             visit(ctx.number());
             numberVal = nodeVal;
             nodeVal = numberVal;
         } else if (ctx.children.size() == 3) { //LParser exp RParser
-            double expVal = 0.0;
+            long expVal;
             assert (ctx.LParser() != null && ctx.RParser() != null);
             visit(ctx.exp());
             expVal = nodeVal;
