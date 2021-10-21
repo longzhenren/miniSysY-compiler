@@ -1,7 +1,7 @@
 package com.miniSysY.P2;
 
 public class Visitor extends P2BaseVisitor<Void> {
-    Long addExpVal = 0L, mulExpVal = 0L, primaryExpVal = 0L, unaryExpVal = 0L, numberVal = 0L, expVal = 0L;
+    double nodeVal = 0.0;
 
     @Override
     public Void visitCompUnit(P2Parser.CompUnitContext ctx) {
@@ -74,7 +74,7 @@ public class Visitor extends P2BaseVisitor<Void> {
 //        System.out.println("RES:"+res);
         if (res <= 2147483647L && res >= 0L) {
 //            System.out.print(" "+res);
-            numberVal = res;
+            nodeVal = res;
         }
         return null;
     }
@@ -83,7 +83,7 @@ public class Visitor extends P2BaseVisitor<Void> {
     public Void visitReteurnStmt(P2Parser.ReteurnStmtContext ctx) {
         System.out.print("\tret i32 ");
         visit(ctx.exp());
-        System.out.print(expVal);
+        System.out.print(nodeVal);
         assert (ctx.Semicolumn() != null);
         return null;
     }
@@ -91,7 +91,7 @@ public class Visitor extends P2BaseVisitor<Void> {
     @Override
     public Void visitExp(P2Parser.ExpContext ctx) {
         visit(ctx.addExp());
-        expVal = addExpVal;
+//        nodeVal = nodeVal;
         return null;
     }
 
@@ -99,14 +99,17 @@ public class Visitor extends P2BaseVisitor<Void> {
     public Void visitAddExp(P2Parser.AddExpContext ctx) {
         if (ctx.children.size() == 1) { //mulExp
             visit(ctx.mulExp());
-            addExpVal = mulExpVal;
+//            addExpVal = mulExpVal;
         } else if (ctx.children.size() == 3) { //addExp (ADD | SUB) mulExp
+            double addExpVal = 0.0, mulExpVal = 0.0;
             visit(ctx.addExp());
+            addExpVal = nodeVal;
             visit(ctx.mulExp());
+            mulExpVal = nodeVal;
             if (ctx.ADD() != null) {
-                addExpVal = addExpVal + mulExpVal;
+                nodeVal = addExpVal + mulExpVal;
             } else if (ctx.SUB() != null) {
-                addExpVal = addExpVal - mulExpVal;
+                nodeVal = addExpVal - mulExpVal;
             }
         }
         return null;
@@ -116,16 +119,19 @@ public class Visitor extends P2BaseVisitor<Void> {
     public Void visitMulExp(P2Parser.MulExpContext ctx) {
         if (ctx.children.size() == 1) { //unaryExp
             visit(ctx.unaryExp());
-            mulExpVal = unaryExpVal;
+//            nodeVal = unaryExpVal;
         } else if (ctx.children.size() == 3) { //mulExp (MUL|DIV|MOD) unaryExp
+            double mulExpVal = 0.0, unaryExpVal = 0.0;
             visit(ctx.mulExp());
+            nodeVal = mulExpVal;
             visit(ctx.unaryExp());
+            nodeVal = unaryExpVal;
             if (ctx.MUL() != null) {
-                mulExpVal = mulExpVal * unaryExpVal;
+                nodeVal = mulExpVal * unaryExpVal;
             } else if (ctx.DIV() != null) {
-                mulExpVal = mulExpVal / unaryExpVal;
+                nodeVal = mulExpVal / unaryExpVal;
             } else if (ctx.MOD() != null) {
-                mulExpVal = mulExpVal % unaryExpVal;
+                nodeVal = mulExpVal % unaryExpVal;
             }
         }
         return null;
@@ -135,13 +141,15 @@ public class Visitor extends P2BaseVisitor<Void> {
     public Void visitUnaryExp(P2Parser.UnaryExpContext ctx) {
         if (ctx.children.size() == 1) { //primaryExp
             visit(ctx.primaryExp());
-            unaryExpVal = primaryExpVal;
+//            nodeVal = primaryExpVal;
         } else if (ctx.children.size() == 2) { //unaryOp unaryExp
+            double unaryExpVal = 0.0;
             visit(ctx.unaryExp());
+            unaryExpVal = nodeVal;
             if (ctx.ADD() != null) {
-                unaryExpVal = unaryExpVal;
+                nodeVal = unaryExpVal;
             } else if (ctx.SUB() != null) {
-                unaryExpVal = -unaryExpVal;
+                nodeVal = -unaryExpVal;
             }
         }
         return null;
@@ -150,15 +158,17 @@ public class Visitor extends P2BaseVisitor<Void> {
     @Override
     public Void visitPrimaryExp(P2Parser.PrimaryExpContext ctx) {
         if (ctx.children.size() == 1) { //number
+            double numberVal = 0.0;
             visit(ctx.number());
-            primaryExpVal = numberVal;
+            numberVal = nodeVal;
+            nodeVal = numberVal;
         } else if (ctx.children.size() == 3) { //LParser exp RParser
+            double expVal = 0.0;
             assert (ctx.LParser() != null && ctx.RParser() != null);
-//            System.out.print("(");
             visit(ctx.exp());
-            primaryExpVal = expVal;
-//            System.out.println(" pri: "+primaryExpVal);
-//            System.out.print(")");
+            expVal = nodeVal;
+
+            nodeVal = expVal;
         }
         return null;
     }
