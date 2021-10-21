@@ -123,9 +123,9 @@ public class Visitor extends P2BaseVisitor<Void> {
         } else if (ctx.children.size() == 3) { //mulExp (MUL|DIV|MOD) unaryExp
             double mulExpVal = 0.0, unaryExpVal = 0.0;
             visit(ctx.mulExp());
-            nodeVal = mulExpVal;
+            mulExpVal = nodeVal;
             visit(ctx.unaryExp());
-            nodeVal = unaryExpVal;
+            unaryExpVal = nodeVal;
             if (ctx.MUL() != null) {
                 nodeVal = mulExpVal * unaryExpVal;
             } else if (ctx.DIV() != null) {
