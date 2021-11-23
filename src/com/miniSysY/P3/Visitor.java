@@ -415,9 +415,9 @@ public class Visitor extends P3BaseVisitor<Void> {
                 attr_Val.put("thisReg", thisReg);
                 if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
                     if (ctx.ADD() != null) {
-                        System.out.println("\t%x" + thisReg + " = add nsw " + addExpType + addExpVal + ", %x" + mulExpReg);
+                        System.out.println("\t%x" + thisReg + " = add nsw " + addExpType +" "+ addExpVal + ", %x" + mulExpReg);
                     } else if (ctx.SUB() != null) {
-                        System.out.println("\t%x" + thisReg + " = sub nsw " + addExpType + addExpVal + ", %x" + mulExpReg);
+                        System.out.println("\t%x" + thisReg + " = sub nsw " + addExpType +" "+ addExpVal + ", %x" + mulExpReg);
                     }
                 } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
                     if (ctx.ADD() != null) {
@@ -487,11 +487,11 @@ public class Visitor extends P3BaseVisitor<Void> {
                 attr_Val.put("thisReg", thisReg);
                 if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
                     if (ctx.MUL() != null) {
-                        System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType + mulExpVal + ", %x" + unaryExpReg);
+                        System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType +" "+ mulExpVal + ", %x" + unaryExpReg);
                     } else if (ctx.DIV() != null) {
-                        System.out.println("\t%x" + thisReg + " = sdiv " + mulExpType + mulExpVal + ", %x" + unaryExpReg);
+                        System.out.println("\t%x" + thisReg + " = sdiv " + mulExpType +" "+ mulExpVal + ", %x" + unaryExpReg);
                     } else if (ctx.MOD() != null) {
-                        System.out.println("\t%x" + thisReg + " = srem " + mulExpType + mulExpVal + ", %x" + unaryExpReg);
+                        System.out.println("\t%x" + thisReg + " = srem " + mulExpType +" "+ mulExpVal + ", %x" + unaryExpReg);
                     }
                 } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
                     if (ctx.MUL() != null) {
