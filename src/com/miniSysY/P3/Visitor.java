@@ -337,11 +337,12 @@ public class Visitor extends P3BaseVisitor<Void> {
     public Void visitReteurnStmt(P3Parser.ReteurnStmtContext ctx) {
         //System.out.println(";visitReteurnStmt");
         visit(ctx.exp());
-        Integer expReg = (Integer) node_Attr_Val.get(ctx.exp()).get("thisReg");
-        String expType = "i32";
-//        Integer thisReg = currentReg++;
-//        System.out.println("\t%x" + thisReg + " = load " + expType + ", " + expType + "* %x" + expReg + ", align 4");
-        System.out.println("\tret i32 %x" + expReg);
+        if (node_Attr_Val.get(ctx.exp()).containsKey("thisReg")) {
+            Integer expReg = (Integer) node_Attr_Val.get(ctx.exp()).get("thisReg");
+            System.out.println("\tret i32 %x" + expReg);
+        } else if (node_Attr_Val.get(ctx.exp()).containsKey("numberVal")) {
+            System.out.println("\tret i32 " + node_Attr_Val.get(ctx.exp()).get("numberVal"));
+        }
         //System.out.println(";visitReteurnStmt" + " Fin");
         return null;
     }
@@ -415,9 +416,9 @@ public class Visitor extends P3BaseVisitor<Void> {
                 attr_Val.put("thisReg", thisReg);
                 if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
                     if (ctx.ADD() != null) {
-                        System.out.println("\t%x" + thisReg + " = add nsw " + addExpType +" "+ addExpVal + ", %x" + mulExpReg);
+                        System.out.println("\t%x" + thisReg + " = add nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg);
                     } else if (ctx.SUB() != null) {
-                        System.out.println("\t%x" + thisReg + " = sub nsw " + addExpType +" "+ addExpVal + ", %x" + mulExpReg);
+                        System.out.println("\t%x" + thisReg + " = sub nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg);
                     }
                 } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
                     if (ctx.ADD() != null) {
@@ -487,11 +488,11 @@ public class Visitor extends P3BaseVisitor<Void> {
                 attr_Val.put("thisReg", thisReg);
                 if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
                     if (ctx.MUL() != null) {
-                        System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType +" "+ mulExpVal + ", %x" + unaryExpReg);
+                        System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg);
                     } else if (ctx.DIV() != null) {
-                        System.out.println("\t%x" + thisReg + " = sdiv " + mulExpType +" "+ mulExpVal + ", %x" + unaryExpReg);
+                        System.out.println("\t%x" + thisReg + " = sdiv " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg);
                     } else if (ctx.MOD() != null) {
-                        System.out.println("\t%x" + thisReg + " = srem " + mulExpType +" "+ mulExpVal + ", %x" + unaryExpReg);
+                        System.out.println("\t%x" + thisReg + " = srem " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg);
                     }
                 } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
                     if (ctx.MUL() != null) {
@@ -545,7 +546,7 @@ public class Visitor extends P3BaseVisitor<Void> {
                 int thisReg = currentReg++;
                 attr_Val.put("thisReg", thisReg);
 //                System.out.println("\t%x" + unaryExpReg + " = load " + unaryExpType + ", " + unaryExpType + "* %x" + unaryExpReg + ", align 4");
-                System.out.println("\t%x" + thisReg + " = sub nsw " + unaryExpType + "0" + ", %x" + unaryExpReg);
+                System.out.println("\t%x" + thisReg + " = sub nsw " + unaryExpType + " 0" + ", %x" + unaryExpReg);
             }
         }
         node_Attr_Val.put(ctx, attr_Val);
