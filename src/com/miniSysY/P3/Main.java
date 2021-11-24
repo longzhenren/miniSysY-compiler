@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
@@ -25,15 +26,17 @@ public class Main {
         });
         ParseTree tree = parser.compUnit();
         Visitor visitor = new Visitor();
-        declaredFunc.put("getint","i32");
-        declaredFunc.put("getch","i32");
-        declaredFunc.put("getarray","i32");
-        declaredFunc.put("putint","void");
-        declaredFunc.put("putch","void");
-        declaredFunc.put("putarray","void");
+        declaredFunc.put("getint", "i32");
+        declaredFunc.put("getch", "i32");
+        declaredFunc.put("getarray", "i32");
+        declaredFunc.put("putint", "void");
+        declaredFunc.put("putch", "void");
+        declaredFunc.put("putarray", "void");
 
         visitor.visit(tree);
+        for (String Ident : funcUsed) {
 
+        }
         for (String s : Visitor.IR_List) {
             System.out.print(s);
         }
