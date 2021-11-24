@@ -18,7 +18,7 @@ public class P3Lexer extends Lexer {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, LParser=2, RParser=3, LBrace=4, RBrace=5, RETURN_KW=6, INT_KW=7, 
-		CONST_KW=8, ASSIGN=9, ADD=10, SUB=11, MUL=12, DIV=13, MOD=14, Semicolumn=15, 
+		CONST_KW=8, ASSIGN=9, ADD=10, SUB=11, MUL=12, DIV=13, MOD=14, Semicolon=15, 
 		WhiteSpace=16, FuncIdent=17, DecimalConst=18, OctalConst=19, HexadecimalConst=20, 
 		BlockComment=21, LineComment=22, Ident=23;
 	public static String[] channelNames = {
@@ -32,7 +32,7 @@ public class P3Lexer extends Lexer {
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"T__0", "LParser", "RParser", "LBrace", "RBrace", "RETURN_KW", "INT_KW", 
-			"CONST_KW", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "Semicolumn", 
+			"CONST_KW", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "Semicolon", 
 			"WhiteSpace", "FuncIdent", "DecimalConst", "OctalConst", "HexadecimalConst", 
 			"BlockComment", "LineComment", "Ident"
 		};
@@ -49,7 +49,7 @@ public class P3Lexer extends Lexer {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, "LParser", "RParser", "LBrace", "RBrace", "RETURN_KW", "INT_KW", 
-			"CONST_KW", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "Semicolumn", 
+			"CONST_KW", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "Semicolon", 
 			"WhiteSpace", "FuncIdent", "DecimalConst", "OctalConst", "HexadecimalConst", 
 			"BlockComment", "LineComment", "Ident"
 		};

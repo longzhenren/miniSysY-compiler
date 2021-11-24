@@ -87,7 +87,7 @@ public class P3BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements P3V
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitReteurnStmt(P3Parser.ReteurnStmtContext ctx) { return visitChildren(ctx); }
+	@Override public T visitReturnStmt(P3Parser.ReturnStmtContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

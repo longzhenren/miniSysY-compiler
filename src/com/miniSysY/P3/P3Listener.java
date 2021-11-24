@@ -108,15 +108,15 @@ public interface P3Listener extends ParseTreeListener {
 	 */
 	void exitIntConst(P3Parser.IntConstContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link P3Parser#reteurnStmt}.
+	 * Enter a parse tree produced by {@link P3Parser#returnStmt}.
 	 * @param ctx the parse tree
 	 */
-	void enterReteurnStmt(P3Parser.ReteurnStmtContext ctx);
+	void enterReturnStmt(P3Parser.ReturnStmtContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link P3Parser#reteurnStmt}.
+	 * Exit a parse tree produced by {@link P3Parser#returnStmt}.
 	 * @param ctx the parse tree
 	 */
-	void exitReteurnStmt(P3Parser.ReteurnStmtContext ctx);
+	void exitReturnStmt(P3Parser.ReturnStmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link P3Parser#exp}.
 	 * @param ctx the parse tree

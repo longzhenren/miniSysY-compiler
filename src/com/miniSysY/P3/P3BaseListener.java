@@ -136,13 +136,13 @@ public class P3BaseListener implements P3Listener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterReteurnStmt(P3Parser.ReteurnStmtContext ctx) { }
+	@Override public void enterReturnStmt(P3Parser.ReturnStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitReteurnStmt(P3Parser.ReteurnStmtContext ctx) { }
+	@Override public void exitReturnStmt(P3Parser.ReturnStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

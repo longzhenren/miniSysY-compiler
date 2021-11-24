@@ -2,14 +2,17 @@
 //
 //import org.antlr.v4.runtime.tree.RuleNode;
 //
+//import java.util.ArrayList;
 //import java.util.HashMap;
 //
 //public class Visitor extends P3BaseVisitor<Void> {
-//    int currentReg = 0;
+//    Integer currentReg = 0;
 //    HashMap<RuleNode, HashMap<String, Object>> node_Attr_Val = new HashMap<>(); //保存树上结点的各种属性
 //    HashMap<String, Integer> ident_Reg = new HashMap<>();    //变量名到寄存器的映射
-//    HashMap<Integer, String> identReg_Type = new HashMap<>();    //变量名到寄存器的映射
-//    HashMap<Integer, Integer> constReg_Val = new HashMap<>();//常量寄存器值表
+//    //    HashMap<Integer, String> identReg_Type = new HashMap<>();
+//    HashMap<String, Long> constIdent_Val = new HashMap<>();//常量值表
+//    ArrayList<String> functionCallList = new ArrayList<>();
+//    public static ArrayList<String> IR_List = new ArrayList<>();
 //
 //    @Override
 ////    blockItem:decl|stmt;
@@ -34,8 +37,18 @@
 //        //System.out.println(";visitLVal");
 //        HashMap<String, Object> attr_val = new HashMap<>();
 //        if (ident_Reg.containsKey(ctx.Ident().getText())) {
-//            Integer thisReg = ident_Reg.get(ctx.Ident().getText());
+//            Integer identReg = ident_Reg.get(ctx.Ident().getText());
+////            if (identReg == -1) {
+////                System.out.println("使用了未赋值的变量");
+////                System.exit(1);
+////            } else {
+//            int thisReg = currentReg++;
+//            IR_List.add("\t%x" + thisReg + " = load i32, i32* %x" + identReg + "\n");
+////            System.out.println("\t%x" + thisReg + " = load i32, i32* %x" + identReg);
 //            attr_val.put("thisReg", thisReg);
+////            }
+//        } else if (constIdent_Val.containsKey(ctx.Ident().getText())) {
+//            attr_val.put("nodeVal", constIdent_Val.get(ctx.Ident().getText()));
 //        } else {
 //            System.exit(1);
 //        }
@@ -53,50 +66,20 @@
 //    }
 //
 //    @Override
-////    constDecl:CONST_KW bType constDef (',' constDef)* Semicolumn;
+////    constDecl:CONST_KW bType constDef (',' constDef)* Semicolon;
 //    public Void visitConstDecl(P3Parser.ConstDeclContext ctx) {
-//
-//        //System.out.println(";visitVarDecl");
+//        //System.out.println(";visitConstDecl");
 //        HashMap<String, Object> attr_val = new HashMap<>();
 //        node_Attr_Val.put(ctx, attr_val);
 //        visit(ctx.bType());
-//        String initValType = (String) attr_val.get("bType");
 //        for (P3Parser.ConstDefContext cdf : ctx.constDef()) {
-//            int thisReg = currentReg++;
-//            if (ident_Reg.containsKey(cdf.Ident().getText())) {
+//            if (constIdent_Val.containsKey(cdf.Ident().getText()) || ident_Reg.containsKey(cdf.Ident().getText())) {
 //                System.exit(1);
 //            }
-//            identReg_Type.put(thisReg, initValType);
-//            System.out.println("\t%x" + thisReg + " = alloca " + initValType + ", align 4");
-//            ident_Reg.put(cdf.Ident().getText(), thisReg);
-//            if (cdf.ASSIGN().getText().equals("=")) {
-//                visit(cdf);
-//                Integer initValReg = (Integer) node_Attr_Val.get(cdf).get("constInitValReg");
-//                System.out.println("\t1store " + initValType + " %x" + initValReg + ", " + initValType + "* %x" + thisReg + ", align 4");
-//            }
+//            visit(cdf);
 //        }
-//
-//        node_Attr_Val.put(ctx, attr_val);
-//        //System.out.println(";visitVarDecl" + " Fin");
+//        //System.out.println(";visitConstDecl" + " Fin");
 //        return null;
-//
-//
-////        //System.out.println(";visitConstDecl");
-////        HashMap<String, Object> attr_val = new HashMap<>();
-////        if (ctx.bType().INT_KW() != null)
-////            attr_val.put("bType", "i32");
-////        for (P3Parser.ConstDefContext cdf : ctx.constDef()) {
-////            Integer thisReg = currentReg++;
-////            System.out.println("\t%x" + thisReg + " = alloca " + attr_val.get("bType") + ", align 4");
-////            visit(cdf);
-////            String ident = (String) node_Attr_Val.get(cdf).get("Ident");
-////            ident_Reg.put(ident, thisReg);
-////            Integer valueReg = (Integer) node_Attr_Val.get(cdf).get("constInitValReg");
-////            System.out.println("\tstore " + attr_val.get("bType") + " %x" + valueReg + ", " + attr_val.get("bType") + "* %x" + thisReg);
-////        }
-////        node_Attr_Val.put(ctx, attr_val);
-////        //System.out.println(";visitConstDecl" + " Fin");
-////        return null;
 //    }
 //
 //    @Override
@@ -114,13 +97,15 @@
 ////    constDef:Ident ASSIGN constInitVal;
 //    public Void visitConstDef(P3Parser.ConstDefContext ctx) {
 //        //System.out.println(";visitConstDef");
+////        String bType = node_Attr_Val.get(ctx.parent).get("bType");
 //        HashMap<String, Object> attr_val = new HashMap<>();
-//        Integer thisReg = currentReg++;
-//        attr_val.put("thisReg", thisReg);
-//        ident_Reg.put(ctx.Ident().getText(), thisReg);
-//        identReg_Type.put(thisReg, "i32");
-//        visit(ctx.constInitVal());
-//        attr_val.put("constInitValReg", node_Attr_Val.get(ctx.constInitVal()).get("thisReg"));
+//        if (ctx.ASSIGN() != null) {
+//            if (ctx.ASSIGN().getText().equals("=")) {
+//                visit(ctx.constInitVal());
+//                Long constExpVal = (Long) node_Attr_Val.get(ctx.constInitVal()).get("constExpVal");
+//                constIdent_Val.put(ctx.Ident().getText(), constExpVal);
+//            }
+//        }
 //        node_Attr_Val.put(ctx, attr_val);
 //        //System.out.println(";visitConstDef" + " Fin");
 //        return null;
@@ -130,14 +115,12 @@
 ////    constInitVal:constExp;
 //    public Void visitConstInitVal(P3Parser.ConstInitValContext ctx) {
 //        //System.out.println(";visitConstInitVal");
-//        //System.out.println(";visitInitVal");
 //        HashMap<String, Object> attr_val = new HashMap<>();
 //        visit(ctx.constExp());
-//        attr_val.put("thisReg", node_Attr_Val.get(ctx.constExp()).get("thisReg"));
+//        attr_val.put("constExpVal", node_Attr_Val.get(ctx.constExp()).get("constExpVal"));
 //        node_Attr_Val.put(ctx, attr_val);
-//        //System.out.println(";visitInitVal" + " Fin");
-//        return null;
 //        //System.out.println(";visitConstInitVal" + " Fin");
+//        return null;
 //    }
 //
 //    @Override
@@ -147,35 +130,26 @@
 //        HashMap<String, Object> attr_Val = new HashMap<>();
 ////        attr_Val.put("bType", node_Attr_Val.get(ctx.parent).get("bType"));
 //        visit(ctx.addExp());
-//        attr_Val.put("thisReg", node_Attr_Val.get(ctx.addExp()).get("thisReg"));
+//        attr_Val.put("constExpVal", node_Attr_Val.get(ctx.addExp()).get("numberVal"));
 //        node_Attr_Val.put(ctx, attr_Val);
-//        return null;
 //        //System.out.println(";visitConstExp" + " Fin");
+//        return null;
 //    }
 //
 //    @Override
-////    varDecl:bType varDef (',' varDef)* Semicolumn;
+////    varDecl:bType varDef (',' varDef)* Semicolon;
 //    public Void visitVarDecl(P3Parser.VarDeclContext ctx) {
 //        //System.out.println(";visitVarDecl");
 //        HashMap<String, Object> attr_val = new HashMap<>();
 //        node_Attr_Val.put(ctx, attr_val);
 //        visit(ctx.bType());
-//        String initValType = (String) attr_val.get("bType");
+////        String initValType = (String) attr_val.get("bType");
 //        for (P3Parser.VarDefContext vdf : ctx.varDef()) {
-//            int thisReg = currentReg++;
-//            if (ident_Reg.containsKey(vdf.Ident().getText())) {
+//            String Ident = vdf.Ident().getText();
+//            if (ident_Reg.containsKey(Ident) || constIdent_Val.containsKey(Ident)) {
 //                System.exit(1);
 //            }
-//            identReg_Type.put(thisReg, initValType);
-//            System.out.println("\t%x" + thisReg + " = alloca " + initValType + ", align 4");
-//            ident_Reg.put(vdf.Ident().getText(), thisReg);
-//            if (vdf.ASSIGN() != null) {
-//                if (vdf.ASSIGN().getText().equals("=")) {
-//                    visit(vdf);
-//                    Integer initValReg = (Integer) node_Attr_Val.get(vdf).get("initValReg");
-//                    System.out.println("\t3store " + initValType + " %x" + initValReg + "," + initValType + "* %x" + thisReg + ", align 4");
-//                }
-//            }
+//            visit(vdf);
 //        }
 //        node_Attr_Val.put(ctx, attr_val);
 //        //System.out.println(";visitVarDecl" + " Fin");
@@ -187,11 +161,21 @@
 //    public Void visitVarDef(P3Parser.VarDefContext ctx) {
 //        //System.out.println(";visitVarDef");
 //        HashMap<String, Object> attr_val = new HashMap<>();
-////        int thisReg = currentReg++;
+//        int thisReg = currentReg++;
+//        IR_List.add("\t%x" + thisReg + " = alloca i32, align 4" + "\n");
+//        ident_Reg.put(ctx.Ident().getText(), thisReg);
 //        if (ctx.ASSIGN() != null) {
 //            if (ctx.ASSIGN().getText().equals("=")) {
 //                visit(ctx.initVal());
-//                attr_val.put("initValReg", node_Attr_Val.get(ctx.initVal()).get("thisReg"));
+//                if (node_Attr_Val.get(ctx.initVal()).containsKey("thisReg")) {
+//                    Integer initValReg = (Integer) node_Attr_Val.get(ctx.initVal()).get("thisReg");
+////                    ident_Reg.put(ctx.Ident().getText(), initValReg);
+//                    IR_List.add("\tstore i32 %x" + initValReg + ", i32* %x" + thisReg + "\n");
+//                } else if (node_Attr_Val.get(ctx.initVal()).containsKey("numberVal")) {
+//                    Long numVal = (Long) node_Attr_Val.get(ctx.initVal()).get("numberVal");
+//                    IR_List.add("\tstore i32 " + numVal + ", i32* %x" + thisReg + "\n");
+//                }
+////                attr_val.put("initValReg", node_Attr_Val.get(ctx.initVal()).get("thisReg"));
 //            }
 //        }
 //        node_Attr_Val.put(ctx, attr_val);
@@ -205,7 +189,11 @@
 //        //System.out.println(";visitInitVal");
 //        HashMap<String, Object> attr_val = new HashMap<>();
 //        visit(ctx.exp());
-//        attr_val.put("thisReg", node_Attr_Val.get(ctx.exp()).get("thisReg"));
+//        if (node_Attr_Val.get(ctx.exp()).containsKey("thisReg")) {
+//            attr_val.put("thisReg", node_Attr_Val.get(ctx.exp()).get("thisReg"));
+//        } else if (node_Attr_Val.get(ctx.exp()).containsKey("numberVal")) {
+//            attr_val.put("numberVal", node_Attr_Val.get(ctx.exp()).get("numberVal"));
+//        }
 //        node_Attr_Val.put(ctx, attr_val);
 //        //System.out.println(";visitInitVal" + " Fin");
 //        return null;
@@ -248,12 +236,9 @@
 ////    funcDef:funcType funcIdent LParser RParser block;
 //    public Void visitFuncDef(P3Parser.FuncDefContext ctx) {
 //        //System.out.println(";visitFuncDef");
-//        System.out.print("define dso_local ");
 //        visit(ctx.funcType());
-//        System.out.print(node_Attr_Val.get(ctx.funcType()).get("funcType") + " ");
 //        visit(ctx.funcIdent());
-//        System.out.print("@" + node_Attr_Val.get(ctx.funcIdent()).get("funcIdent") + " ");
-//        System.out.print("()");
+//        IR_List.add("define dso_local " + node_Attr_Val.get(ctx.funcType()).get("funcType") + " " + "@" + node_Attr_Val.get(ctx.funcIdent()).get("funcIdent") + " ()");
 //        visit(ctx.block());
 //        //System.out.println(";visitFuncDef" + " Fin");
 //        return null;
@@ -263,32 +248,35 @@
 ////    block:LBrace (blockItem)* RBrace;
 //    public Void visitBlock(P3Parser.BlockContext ctx) {
 //        //System.out.println(";visitBlock");
-//        System.out.println("{");
+//        IR_List.add("{" + "\n");
 //        for (P3Parser.BlockItemContext bi : ctx.blockItem()) {
 //            visit(bi);
 //        }
-//        System.out.println("}");
+//        IR_List.add("}");
 //        //System.out.println(";visitBlock" + " Fin");
 //        return null;
 //    }
 //
 //    @Override
-////    stmt:lVal ASSIGN exp Semicolumn|(exp)+ Semicolumn|reteurnStmt;
+////    stmt:lVal ASSIGN exp Semicolon|(exp)+ Semicolon|returnStmt;
 //    public Void visitStmt(P3Parser.StmtContext ctx) {
 //        //System.out.println(";visitStmt");
-//        if (ctx.reteurnStmt() != null) {
-//            visit(ctx.reteurnStmt());
+//        if (ctx.returnStmt() != null) {
+//            visit(ctx.returnStmt());
 //        } else if (ctx.ASSIGN() != null) {
 //            if (ctx.ASSIGN().getText().equals("=")) {
-//                if (ident_Reg.get(ctx.lVal().Ident().getText()) == null) {
+//                String Ident = ctx.lVal().Ident().getText();
+//                Integer identReg = ident_Reg.get(Ident);
+//                if (!ident_Reg.containsKey(Ident) || constIdent_Val.containsKey(Ident)) {
 //                    System.exit(1);
 //                }
-//                Integer identReg = ident_Reg.get(ctx.lVal().Ident().getText());
-//                String identType = identReg_Type.get(identReg);
-////                String identType = "i32";
 //                visit(ctx.exp(0));
-//                Integer expReg = (Integer) node_Attr_Val.get(ctx.exp(0)).get("thisReg");
-//                System.out.println("\t4store " + identType + " %x" + expReg + ", " + identType + "* %x" + identReg + ", align 4");
+//                if (node_Attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
+//                    Integer expReg = (Integer) node_Attr_Val.get(ctx.exp(0)).get("thisReg");
+//                    IR_List.add("\tstore i32 %x" + expReg + ", i32* %x" + identReg + "\n");
+//                } else if (node_Attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
+//                    IR_List.add("\tstore i32 " + node_Attr_Val.get(ctx.exp(0)).get("numberVal") + ", i32* %x" + identReg + "\n");
+//                }
 //            }
 //        }
 //        //System.out.println(";visitStmt" + " Fin");
@@ -326,9 +314,7 @@
 //            String dec = ctx.DecimalConst().getText();
 //            res = Long.parseLong(dec, 10);
 //        }
-////        System.out.println("RES:"+res);
 //        if (res <= 2147483647L && res >= 0L) {
-////            System.out.print(" "+res);
 //            attr_Val.put("nodeVal", res);
 //        }
 //        //TODO: else?
@@ -338,17 +324,17 @@
 //    }
 //
 //    @Override
-////    reteurnStmt:RETURN_KW exp Semicolumn;
-//    public Void visitReteurnStmt(P3Parser.ReteurnStmtContext ctx) {
-//        //System.out.println(";visitReteurnStmt");
-//        Integer thisReg = currentReg++;
+////    returnStmt:RETURN_KW exp Semicolon;
+//    public Void visitReturnStmt(P3Parser.ReturnStmtContext ctx) {
+//        //System.out.println(";visitReturnStmt");
 //        visit(ctx.exp());
-//        Integer expReg = (Integer) node_Attr_Val.get(ctx.exp()).get("thisReg");
-////        String expType = identReg_Type.get(expReg);
-//        String expType = "i32";
-//        System.out.println("\t%x" + thisReg + " = load " + expType + ", " + expType + "* %x" + expReg + ", align 4");
-//        System.out.println("\tret i32 %x" + thisReg);
-//        //System.out.println(";visitReteurnStmt" + " Fin");
+//        if (node_Attr_Val.get(ctx.exp()).containsKey("thisReg")) {
+//            Integer expReg = (Integer) node_Attr_Val.get(ctx.exp()).get("thisReg");
+//            IR_List.add("\tret i32 %x" + expReg + "\n");
+//        } else if (node_Attr_Val.get(ctx.exp()).containsKey("numberVal")) {
+//            IR_List.add("\tret i32 " + node_Attr_Val.get(ctx.exp()).get("numberVal") + "\n");
+//        }
+//        //System.out.println(";visitReturnStmt" + " Fin");
 //        return null;
 //    }
 //
@@ -359,7 +345,12 @@
 //        HashMap<String, Object> attr_Val = new HashMap<>();
 ////        attr_Val.put("bType", node_Attr_Val.get(ctx.parent).get("bType"));
 //        visit(ctx.addExp());
-//        attr_Val.put("thisReg", node_Attr_Val.get(ctx.addExp()).get("thisReg"));
+////        String expType = "i32";
+//        if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg")) {
+//            attr_Val.put("thisReg", node_Attr_Val.get(ctx.addExp()).get("thisReg"));
+//        } else if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal")) {
+//            attr_Val.put("numberVal", node_Attr_Val.get(ctx.addExp()).get("numberVal"));
+//        }
 //        node_Attr_Val.put(ctx, attr_Val);
 //        //System.out.println(";visitExp" + " Fin");
 //        return null;
@@ -370,53 +361,65 @@
 //    public Void visitAddExp(P3Parser.AddExpContext ctx) {
 //        //System.out.println(";visitAddExp");
 //        HashMap<String, Object> attr_Val = new HashMap<>();
-////        String bType = (String) node_Attr_Val.get(ctx.parent).get("bType");
 //        String bType = "i32";
 //        attr_Val.put("bType", bType);
 //        node_Attr_Val.put(ctx, attr_Val);
 //        if (ctx.children.size() == 1) { //mulExp
 //            visit(ctx.mulExp());
-//            if (node_Attr_Val.get(ctx.mulExp()).get("thisReg").getClass().getName().equals("Long")) {
+//            if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
+//                attr_Val.put("numberVal", node_Attr_Val.get(ctx.mulExp()).get("numberVal"));
+//            } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
 //                attr_Val.put("thisReg", node_Attr_Val.get(ctx.mulExp()).get("thisReg"));
-//            } else if (node_Attr_Val.get(ctx.mulExp()).get("thisReg").getClass().getName().equals("Integer")) {
-//                Integer thisReg = (Integer) node_Attr_Val.get(ctx.mulExp()).get("thisReg");
-//                identReg_Type.put(thisReg, bType);
-//                attr_Val.put("thisReg", thisReg);
 //            }
-//        } else if (ctx.children.size() == 3) { //addExp (ADD | SUB) mulExp
+//        } else if (ctx.children.size() == 3) { //addExp ( ADD | SUB ) mulExp;
+//            Long addExpVal = 0L, mulExpVal = 0L;
+//            Integer addExpReg = 0, mulExpReg = 0;
+//
 //            visit(ctx.addExp());
-//            Integer addExpReg = (Integer) node_Attr_Val.get(ctx.addExp()).get("thisReg");
-//            int tmpAddExpReg = currentReg++;
-////            String addExpType = identReg_Type.get(addExpReg);
 //            String addExpType = "i32";
-//            identReg_Type.put(tmpAddExpReg, addExpType);
-//            System.out.println("\t%x" + tmpAddExpReg + " = load " + addExpType + ", " + addExpType + "* %x" + addExpReg + ", align 4");
+//            if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal")) {
+//                addExpVal = (Long) node_Attr_Val.get(ctx.addExp()).get("numberVal");
+//            } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg")) {
+//                addExpReg = (Integer) node_Attr_Val.get(ctx.addExp()).get("thisReg");
+//            }
+//
 //            visit(ctx.mulExp());
-//            String mulExpType = "i32";
-//            if (node_Attr_Val.get(ctx.mulExp()).get("thisReg").getClass().getName().equals("Long")) {
-//                Integer mulExpVal = (Integer) node_Attr_Val.get(ctx.mulExp()).get("thisReg");
-//                Integer thisReg = currentReg++;
-//                attr_Val.put("thisReg", thisReg);
+////            String mulExpType = "i32";
+//            if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
+//                mulExpVal = (Long) node_Attr_Val.get(ctx.mulExp()).get("numberVal");
+//            } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
+//                mulExpReg = (Integer) node_Attr_Val.get(ctx.mulExp()).get("thisReg");
+//            }
+//
+//            if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
 //                if (ctx.ADD() != null) {
-//                    System.out.println("\t%x" + thisReg + " = add nsw " + mulExpType + " %x" + tmpAddExpReg + ", " + mulExpVal);
+//                    attr_Val.put("numberVal", addExpVal + mulExpVal);
 //                } else if (ctx.SUB() != null) {
-//                    System.out.println("\t%x" + thisReg + " = sub nsw " + mulExpType + " %x" + tmpAddExpReg + ", " + mulExpVal);
+//                    attr_Val.put("numberVal", addExpVal - mulExpVal);
 //                }
 //            } else {
-//                Integer mulExpReg = (Integer) node_Attr_Val.get(ctx.mulExp()).get("thisReg");
-//                int tmpMulExpReg = currentReg++;
-//                identReg_Type.put(tmpMulExpReg, mulExpType);
 //                Integer thisReg = currentReg++;
 //                attr_Val.put("thisReg", thisReg);
-//                System.out.println("\t%x" + tmpMulExpReg + " = load " + mulExpType + ", " + mulExpType + "* %x" + mulExpReg + ", align 4");
-//                if (ctx.ADD() != null) {
-//                    System.out.println("\t%x" + thisReg + " = add nsw " + mulExpType + " %x" + tmpAddExpReg + ", %x" + tmpMulExpReg);
-//                } else if (ctx.SUB() != null) {
-//                    System.out.println("\t%x" + thisReg + " = sub nsw " + mulExpType + " %x" + tmpAddExpReg + ", %x" + tmpMulExpReg);
+//                if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
+//                    if (ctx.ADD() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = add nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg + "\n");
+//                    } else if (ctx.SUB() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = sub nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg + "\n");
+//                    }
+//                } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
+//                    if (ctx.ADD() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = add nsw " + addExpType + " %x" + addExpReg + ", " + mulExpVal + "\n");
+//                    } else if (ctx.SUB() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = sub nsw " + addExpType + " %x" + addExpReg + ", " + mulExpVal + "\n");
+//                    }
+//                } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
+//                    if (ctx.ADD() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = add nsw " + addExpType + " %x" + addExpReg + ", %x" + mulExpReg + "\n");
+//                    } else if (ctx.SUB() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = sub nsw " + addExpType + " %x" + addExpReg + ", %x" + mulExpReg + "\n");
+//                    }
 //                }
 //            }
-////            String mulExpType = identReg_Type.get(mulExpReg);
-////            assert (mulExpType.equals(addExpType));
 //        }
 //        node_Attr_Val.put(ctx, attr_Val);
 //        //System.out.println(";visitAddExp" + " Fin");
@@ -433,54 +436,68 @@
 //        node_Attr_Val.put(ctx, attr_Val);
 //        if (ctx.children.size() == 1) { //unaryExp
 //            visit(ctx.unaryExp());
-//            if (node_Attr_Val.get(ctx.unaryExp()).get("thisReg").getClass().getName().equals("Long")) {
+//            if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
+//                attr_Val.put("numberVal", node_Attr_Val.get(ctx.unaryExp()).get("numberVal"));
+//            } else if (node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
 //                attr_Val.put("thisReg", node_Attr_Val.get(ctx.unaryExp()).get("thisReg"));
-//            } else if (node_Attr_Val.get(ctx.unaryExp()).get("thisReg").getClass().getName().equals("Integer")) {
-//                Integer thisReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
-//                identReg_Type.put(thisReg, bType);
-//                attr_Val.put("thisReg", thisReg);
 //            }
 //        } else if (ctx.children.size() == 3) { //mulExp ( MUL | DIV | MOD ) unaryExp;
+//            Long mulExpVal = 0L, unaryExpVal = 0L;
+//            Integer mulExpReg = 0, unaryExpReg = 0;
+//
 //            visit(ctx.mulExp());
-//            Integer mulExpReg = (Integer) node_Attr_Val.get(ctx.mulExp()).get("thisReg");
-//            int tmpMulExpReg = currentReg++;
-////            String mulExpType = identReg_Type.get(mulExpReg);
 //            String mulExpType = "i32";
-//            identReg_Type.put(tmpMulExpReg, mulExpType);
-//            System.out.println("\t%x" + tmpMulExpReg + " = load " + mulExpType + ", " + mulExpType + "* %x" + mulExpReg + ", align 4");
+//            if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
+//                mulExpVal = (Long) node_Attr_Val.get(ctx.mulExp()).get("numberVal");
+//            } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
+//                mulExpReg = (Integer) node_Attr_Val.get(ctx.mulExp()).get("thisReg");
+//            }
+//
 //            visit(ctx.unaryExp());
-//            String unaryExpType = "i32";
-//            if (node_Attr_Val.get(ctx.unaryExp()).get("thisReg").getClass().getName().equals("Long")) {
-//                Integer unaryExpVal = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
-//                Integer thisReg = currentReg++;
-//                attr_Val.put("thisReg", thisReg);
+////            String unaryExpType = "i32";
+//            if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
+//                unaryExpVal = (Long) node_Attr_Val.get(ctx.unaryExp()).get("numberVal");
+//            } else if (node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
+//                unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
+//            }
+//
+//            if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
 //                if (ctx.MUL() != null) {
-//                    System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + tmpMulExpReg + ", " + unaryExpVal);
+//                    attr_Val.put("numberVal", mulExpVal * unaryExpVal);
 //                } else if (ctx.DIV() != null) {
-//                    System.out.println("\t%x" + thisReg + " = div nsw " + mulExpType + " %x" + tmpMulExpReg + ", %" + unaryExpVal);
+//                    attr_Val.put("numberVal", mulExpVal / unaryExpVal);
 //                } else if (ctx.MOD() != null) {
-//                    System.out.println("\t%x" + thisReg + " = srem " + mulExpType + " %x" + tmpMulExpReg + ", %" + unaryExpVal);
+//                    attr_Val.put("numberVal", mulExpVal % unaryExpVal);
 //                }
 //            } else {
-//                Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
-//                int tmpUnaryexpReg = currentReg++;
-////            String unaryExpType = identReg_Type.get(unaryExpReg);
-//
-//                identReg_Type.put(tmpUnaryexpReg, unaryExpType);
 //                Integer thisReg = currentReg++;
 //                attr_Val.put("thisReg", thisReg);
-//                System.out.println("\t%x" + tmpUnaryexpReg + " = load " + unaryExpType + ", " + unaryExpType + "* %x" + unaryExpReg + ", align 4");
-//                assert (mulExpType.equals(unaryExpType));
-//                if (ctx.MUL() != null) {
-//                    System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + tmpMulExpReg + ", %x" + tmpUnaryexpReg);
-//                } else if (ctx.DIV() != null) {
-//                    System.out.println("\t%x" + thisReg + " = div nsw " + mulExpType + " %x" + tmpMulExpReg + ", %x" + tmpUnaryexpReg);
-//                } else if (ctx.MOD() != null) {
-//                    System.out.println("\t%x" + thisReg + " = srem " + mulExpType + " %x" + tmpMulExpReg + ", %x" + tmpUnaryexpReg);
+//                if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
+//                    if (ctx.MUL() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = mul nsw " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg + "\n");
+//                    } else if (ctx.DIV() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = sdiv " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg + "\n");
+//                    } else if (ctx.MOD() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = srem " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg + "\n");
+//                    }
+//                } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
+//                    if (ctx.MUL() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal + "\n");
+//                    } else if (ctx.DIV() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = sdiv " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal + "\n");
+//                    } else if (ctx.MOD() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = srem " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal + "\n");
+//                    }
+//                } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
+//                    if (ctx.MUL() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg + "\n");
+//                    } else if (ctx.DIV() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = sdiv " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg + "\n");
+//                    } else if (ctx.MOD() != null) {
+//                        IR_List.add("\t%x" + thisReg + " = srem " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg + "\n");
+//                    }
 //                }
 //            }
-////            //TODO:添加判断是不是字面量的属性
-////            if (constReg_Val.get("mulExpReg") != null)//是常量，且已经赋值了
 //        }
 //        node_Attr_Val.put(ctx, attr_Val);
 //        //System.out.println(";visitMulExp" + " Fin");
@@ -488,23 +505,44 @@
 //    }
 //
 //    @Override
-////    unaryExp:primaryExp|( ADD | SUB ) unaryExp;
+////    unaryExp:primaryExp|( ADD | SUB ) unaryExp | Ident LParser (exp ( ',' exp )+)* RParser;
 //    public Void visitUnaryExp(P3Parser.UnaryExpContext ctx) {
 //        //System.out.println(";visitUnaryExp");
 //        HashMap<String, Object> attr_Val = new HashMap<>();
-//        if (ctx.children.size() == 1) { //primaryExp
+//        if (ctx.Ident() != null) { // Ident LParser (exp ( ',' exp )+)* RParser
+////            attr_Val.put("paraExpList",ctx.exp());
+//            for (P3Parser.ExpContext exp : ctx.exp()) {
+//                if (node_Attr_Val.get(exp).containsKey("thisReg")) {
+//
+//                } else if (node_Attr_Val.get(exp).containsKey("numberVal")) {
+//
+//                }
+//            }
+//
+//        } else if (ctx.SUB() == null) { // primaryExp | ADD unaryExp
 //            visit(ctx.primaryExp());
-//            attr_Val.put("thisReg", node_Attr_Val.get(ctx.primaryExp()).get("thisReg"));
-//        } else if (ctx.children.size() == 2) { // unaryExp
+//            if (node_Attr_Val.get(ctx.primaryExp()).containsKey("lValReg")) {
+//                Integer lValReg = (Integer) node_Attr_Val.get(ctx.primaryExp()).get("lValReg");
+//                attr_Val.put("thisReg", lValReg);
+//            } else if (node_Attr_Val.get(ctx.primaryExp()).containsKey("expReg")) {
+//                Integer expReg = (Integer) node_Attr_Val.get(ctx.primaryExp()).get("expReg");
+//                attr_Val.put("thisReg", expReg);
+//            } else if (node_Attr_Val.get(ctx.primaryExp()).containsKey("numberVal")) {
+//                attr_Val.put("numberVal", node_Attr_Val.get(ctx.primaryExp()).get("numberVal"));
+//            }
+//        } else { // SUB unaryExp
 //            visit(ctx.unaryExp());
-//            Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
-//            String unaryExpType = identReg_Type.get(unaryExpReg);
-//            Integer thisReg = currentReg++;
-//            attr_Val.put("thisReg", thisReg);
-//            if (ctx.SUB() != null) {
-//                int tmpUnaryexpReg = currentReg++;
-//                identReg_Type.put(tmpUnaryexpReg, unaryExpType);
-//                System.out.println("\t%x" + thisReg + " = sub nsw " + unaryExpType + "0" + ", %x" + tmpUnaryexpReg);
+//            if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
+//                Long numberVal = (Long) node_Attr_Val.get(ctx.unaryExp()).get("numberVal");
+//                attr_Val.put("numberVal", numberVal * -1);
+//            } else {
+//                String unaryExpType = "i32";
+//                Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
+////                int tmpUnaryexpReg = currentReg++;
+//                int thisReg = currentReg++;
+//                attr_Val.put("thisReg", thisReg);
+////                System.out.println("\t%x" + unaryExpReg + " = load " + unaryExpType + ", " + unaryExpType + "* %x" + unaryExpReg + ", align 4");
+//                IR_List.add("\t%x" + thisReg + " = sub nsw " + unaryExpType + " 0" + ", %x" + unaryExpReg + "\n");
 //            }
 //        }
 //        node_Attr_Val.put(ctx, attr_Val);
@@ -520,17 +558,18 @@
 //        if (ctx.number() != null) { //number
 ////            Integer thisReg = currentReg++;
 //            visit(ctx.number());
-//            attr_Val.put("thisReg", node_Attr_Val.get(ctx.number()).get("nodeVal"));
-////            attr_Val.put("thisReg", thisReg);
+//            attr_Val.put("numberVal", node_Attr_Val.get(ctx.number()).get("nodeVal"));
 //            node_Attr_Val.put(ctx, attr_Val);
-////            System.out.println("\t%x" + thisReg + " = alloca i32, align 4");
-////            System.out.println("\tstore i32 " + attr_Val.get("nodeVal") + ", i32* %x" + thisReg + ", align 4");
 //        } else if (ctx.exp() != null) { //LParser exp RParser
 //            visit(ctx.exp());
-//            attr_Val.put("thisReg", node_Attr_Val.get(ctx.exp()).get("thisReg"));
+//            attr_Val.put("expReg", node_Attr_Val.get(ctx.exp()).get("thisReg"));
 //        } else if (ctx.lVal() != null) {
 //            visit(ctx.lVal());
-//            attr_Val.put("thisReg", node_Attr_Val.get(ctx.lVal()).get("thisReg"));
+//            if (node_Attr_Val.get(ctx.lVal()).containsKey("thisReg")) {
+//                attr_Val.put("lValReg", node_Attr_Val.get(ctx.lVal()).get("thisReg"));
+//            } else if (node_Attr_Val.get(ctx.lVal()).containsKey("nodeVal")) {
+//                attr_Val.put("numberVal", node_Attr_Val.get(ctx.lVal()).get("nodeVal"));
+//            }
 //        }
 //        node_Attr_Val.put(ctx, attr_Val);
 //        //System.out.println(";visitPrimaryExp" + " Fin");

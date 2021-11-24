@@ -40,7 +40,7 @@ SUB
 MUL
 DIV
 MOD
-Semicolumn
+Semicolon
 WhiteSpace
 FuncIdent
 DecimalConst
@@ -65,7 +65,7 @@ SUB
 MUL
 DIV
 MOD
-Semicolumn
+Semicolon
 WhiteSpace
 FuncIdent
 DecimalConst

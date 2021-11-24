@@ -71,11 +71,11 @@ public interface P3Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIntConst(P3Parser.IntConstContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link P3Parser#reteurnStmt}.
+	 * Visit a parse tree produced by {@link P3Parser#returnStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitReteurnStmt(P3Parser.ReteurnStmtContext ctx);
+	T visitReturnStmt(P3Parser.ReturnStmtContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link P3Parser#exp}.
 	 * @param ctx the parse tree
