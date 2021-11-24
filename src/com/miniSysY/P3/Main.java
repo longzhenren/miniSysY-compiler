@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 public class Main {
     public static HashMap<String, String> declaredFunc = new HashMap<>();
+    public static ArrayList<String> funcUsed = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
 
