@@ -4,8 +4,11 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Main {
+    public static HashMap<String, String> declaredFunc = new HashMap<>();
+
     public static void main(String[] args) throws IOException {
 
         CharStream inputStream = CharStreams.fromStream(System.in);
@@ -21,6 +24,17 @@ public class Main {
         });
         ParseTree tree = parser.compUnit();
         Visitor visitor = new Visitor();
+        declaredFunc.put("getint","i32");
+        declaredFunc.put("getch","i32");
+        declaredFunc.put("getarray","i32");
+        declaredFunc.put("putint","void");
+        declaredFunc.put("putch","void");
+        declaredFunc.put("putarray","void");
+
         visitor.visit(tree);
+
+        for (String s : Visitor.IR_List) {
+            System.out.print(s);
+        }
     }
 }
