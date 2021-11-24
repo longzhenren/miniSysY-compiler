@@ -2,14 +2,17 @@ package com.miniSysY.P3;
 
 import org.antlr.v4.runtime.tree.RuleNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Visitor extends P3BaseVisitor<Void> {
     Integer currentReg = 0;
     HashMap<RuleNode, HashMap<String, Object>> node_Attr_Val = new HashMap<>(); //保存树上结点的各种属性
     HashMap<String, Integer> ident_Reg = new HashMap<>();    //变量名到寄存器的映射
-    HashMap<Integer, String> identReg_Type = new HashMap<>();    //变量名到寄存器的映射
+    //    HashMap<Integer, String> identReg_Type = new HashMap<>();
     HashMap<String, Long> constIdent_Val = new HashMap<>();//常量值表
+    HashMap<String, HashMap<String, Object>> funcIdent_Attr = new HashMap<>();
+    public static ArrayList<String> IR_List = new ArrayList<>();
 
     @Override
 //    blockItem:decl|stmt;
@@ -35,14 +38,9 @@ public class Visitor extends P3BaseVisitor<Void> {
         HashMap<String, Object> attr_val = new HashMap<>();
         if (ident_Reg.containsKey(ctx.Ident().getText())) {
             Integer identReg = ident_Reg.get(ctx.Ident().getText());
-//            if (identReg == -1) {
-//                System.out.println("使用了未赋值的变量");
-//                System.exit(1);
-//            } else {
             int thisReg = currentReg++;
-            System.out.println("\t%x" + thisReg + " = load i32, i32* %x" + identReg);
+            IR_List.add("\t%x" + thisReg + " = load i32, i32* %x" + identReg + "\n");
             attr_val.put("thisReg", thisReg);
-//            }
         } else if (constIdent_Val.containsKey(ctx.Ident().getText())) {
             attr_val.put("nodeVal", constIdent_Val.get(ctx.Ident().getText()));
         } else {
@@ -62,7 +60,7 @@ public class Visitor extends P3BaseVisitor<Void> {
     }
 
     @Override
-//    constDecl:CONST_KW bType constDef (',' constDef)* Semicolumn;
+//    constDecl:CONST_KW bType constDef (',' constDef)* Semicolon;
     public Void visitConstDecl(P3Parser.ConstDeclContext ctx) {
         //System.out.println(";visitConstDecl");
         HashMap<String, Object> attr_val = new HashMap<>();
@@ -126,21 +124,20 @@ public class Visitor extends P3BaseVisitor<Void> {
         HashMap<String, Object> attr_Val = new HashMap<>();
 //        attr_Val.put("bType", node_Attr_Val.get(ctx.parent).get("bType"));
         visit(ctx.addExp());
-        Long constExpVal = (Long) node_Attr_Val.get(ctx.addExp()).get("numberVal");
-        attr_Val.put("constExpVal", constExpVal);
+        attr_Val.put("constExpVal", node_Attr_Val.get(ctx.addExp()).get("numberVal"));
         node_Attr_Val.put(ctx, attr_Val);
         //System.out.println(";visitConstExp" + " Fin");
         return null;
     }
 
     @Override
-//    varDecl:bType varDef (',' varDef)* Semicolumn;
+//    varDecl:bType varDef (',' varDef)* Semicolon;
     public Void visitVarDecl(P3Parser.VarDeclContext ctx) {
         //System.out.println(";visitVarDecl");
         HashMap<String, Object> attr_val = new HashMap<>();
         node_Attr_Val.put(ctx, attr_val);
         visit(ctx.bType());
-        String initValType = (String) attr_val.get("bType");
+//        String initValType = (String) attr_val.get("bType");
         for (P3Parser.VarDefContext vdf : ctx.varDef()) {
             String Ident = vdf.Ident().getText();
             if (ident_Reg.containsKey(Ident) || constIdent_Val.containsKey(Ident)) {
@@ -159,7 +156,7 @@ public class Visitor extends P3BaseVisitor<Void> {
         //System.out.println(";visitVarDef");
         HashMap<String, Object> attr_val = new HashMap<>();
         int thisReg = currentReg++;
-        System.out.println("\t%x" + thisReg + " = alloca i32, align 4");
+        IR_List.add("\t%x" + thisReg + " = alloca i32, align 4" + "\n");
         ident_Reg.put(ctx.Ident().getText(), thisReg);
         if (ctx.ASSIGN() != null) {
             if (ctx.ASSIGN().getText().equals("=")) {
@@ -167,10 +164,10 @@ public class Visitor extends P3BaseVisitor<Void> {
                 if (node_Attr_Val.get(ctx.initVal()).containsKey("thisReg")) {
                     Integer initValReg = (Integer) node_Attr_Val.get(ctx.initVal()).get("thisReg");
 //                    ident_Reg.put(ctx.Ident().getText(), initValReg);
-                    System.out.println("\tstore i32 %x" + initValReg + ", i32* %x" + thisReg);
+                    IR_List.add("\tstore i32 %x" + initValReg + ", i32* %x" + thisReg + "\n");
                 } else if (node_Attr_Val.get(ctx.initVal()).containsKey("numberVal")) {
                     Long numVal = (Long) node_Attr_Val.get(ctx.initVal()).get("numberVal");
-                    System.out.println("\tstore i32 " + numVal + ", i32* %x" + thisReg);
+                    IR_List.add("\tstore i32 " + numVal + ", i32* %x" + thisReg + "\n");
                 }
 //                attr_val.put("initValReg", node_Attr_Val.get(ctx.initVal()).get("thisReg"));
             }
@@ -233,12 +230,9 @@ public class Visitor extends P3BaseVisitor<Void> {
 //    funcDef:funcType funcIdent LParser RParser block;
     public Void visitFuncDef(P3Parser.FuncDefContext ctx) {
         //System.out.println(";visitFuncDef");
-        System.out.print("define dso_local ");
         visit(ctx.funcType());
-        System.out.print(node_Attr_Val.get(ctx.funcType()).get("funcType") + " ");
         visit(ctx.funcIdent());
-        System.out.print("@" + node_Attr_Val.get(ctx.funcIdent()).get("funcIdent") + " ");
-        System.out.print("()");
+        IR_List.add("define dso_local " + node_Attr_Val.get(ctx.funcType()).get("funcType") + " " + "@" + node_Attr_Val.get(ctx.funcIdent()).get("funcIdent") + " ()");
         visit(ctx.block());
         //System.out.println(";visitFuncDef" + " Fin");
         return null;
@@ -248,21 +242,21 @@ public class Visitor extends P3BaseVisitor<Void> {
 //    block:LBrace (blockItem)* RBrace;
     public Void visitBlock(P3Parser.BlockContext ctx) {
         //System.out.println(";visitBlock");
-        System.out.println("{");
+        IR_List.add("{" + "\n");
         for (P3Parser.BlockItemContext bi : ctx.blockItem()) {
             visit(bi);
         }
-        System.out.println("}");
+        IR_List.add("}");
         //System.out.println(";visitBlock" + " Fin");
         return null;
     }
 
     @Override
-//    stmt:lVal ASSIGN exp Semicolumn|(exp)+ Semicolumn|reteurnStmt;
+//    stmt:lVal ASSIGN exp Semicolon|(exp)+ Semicolon|returnStmt;
     public Void visitStmt(P3Parser.StmtContext ctx) {
         //System.out.println(";visitStmt");
-        if (ctx.reteurnStmt() != null) {
-            visit(ctx.reteurnStmt());
+        if (ctx.returnStmt() != null) {
+            visit(ctx.returnStmt());
         } else if (ctx.ASSIGN() != null) {
             if (ctx.ASSIGN().getText().equals("=")) {
                 String Ident = ctx.lVal().Ident().getText();
@@ -273,17 +267,14 @@ public class Visitor extends P3BaseVisitor<Void> {
                 visit(ctx.exp(0));
                 if (node_Attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
                     Integer expReg = (Integer) node_Attr_Val.get(ctx.exp(0)).get("thisReg");
-                    System.out.println("\tstore i32 %x" + expReg + ", i32* %x" + identReg);
+                    IR_List.add("\tstore i32 %x" + expReg + ", i32* %x" + identReg + "\n");
                 } else if (node_Attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
-                    System.out.println("\tstore i32 " + node_Attr_Val.get(ctx.exp(0)).get("numberVal") + ", i32* %x" + identReg);
+                    IR_List.add("\tstore i32 " + node_Attr_Val.get(ctx.exp(0)).get("numberVal") + ", i32* %x" + identReg + "\n");
                 }
-
-//                if (identReg == -1) {
-//                    int thisReg = currentReg++;
-//                    System.out.println("\t %x" + thisReg + " = alloca i32, align 4");
-//                ident_Reg.replace(Ident, expReg);
-//                    System.out.println("\t store i32 %x" + expReg + ", i32* %x" + expReg + ", align 4");
-//                }
+            }
+        }else{
+            for(P3Parser.ExpContext exp:ctx.exp()){
+                visit(exp);
             }
         }
         //System.out.println(";visitStmt" + " Fin");
@@ -321,9 +312,7 @@ public class Visitor extends P3BaseVisitor<Void> {
             String dec = ctx.DecimalConst().getText();
             res = Long.parseLong(dec, 10);
         }
-//        System.out.println("RES:"+res);
         if (res <= 2147483647L && res >= 0L) {
-//            System.out.print(" "+res);
             attr_Val.put("nodeVal", res);
         }
         //TODO: else?
@@ -333,17 +322,17 @@ public class Visitor extends P3BaseVisitor<Void> {
     }
 
     @Override
-//    reteurnStmt:RETURN_KW exp Semicolumn;
-    public Void visitReteurnStmt(P3Parser.ReteurnStmtContext ctx) {
-        //System.out.println(";visitReteurnStmt");
+//    returnStmt:RETURN_KW exp Semicolon;
+    public Void visitReturnStmt(P3Parser.ReturnStmtContext ctx) {
+        //System.out.println(";visitReturnStmt");
         visit(ctx.exp());
         if (node_Attr_Val.get(ctx.exp()).containsKey("thisReg")) {
             Integer expReg = (Integer) node_Attr_Val.get(ctx.exp()).get("thisReg");
-            System.out.println("\tret i32 %x" + expReg);
+            IR_List.add("\tret i32 %x" + expReg + "\n");
         } else if (node_Attr_Val.get(ctx.exp()).containsKey("numberVal")) {
-            System.out.println("\tret i32 " + node_Attr_Val.get(ctx.exp()).get("numberVal"));
+            IR_List.add("\tret i32 " + node_Attr_Val.get(ctx.exp()).get("numberVal") + "\n");
         }
-        //System.out.println(";visitReteurnStmt" + " Fin");
+        //System.out.println(";visitReturnStmt" + " Fin");
         return null;
     }
 
@@ -354,15 +343,10 @@ public class Visitor extends P3BaseVisitor<Void> {
         HashMap<String, Object> attr_Val = new HashMap<>();
 //        attr_Val.put("bType", node_Attr_Val.get(ctx.parent).get("bType"));
         visit(ctx.addExp());
-        String expType = "i32";
+//        String expType = "i32";
         if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg")) {
             attr_Val.put("thisReg", node_Attr_Val.get(ctx.addExp()).get("thisReg"));
         } else if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal")) {
-//            Integer thisReg = currentReg++;
-//            //TODO:可能会炸，对于alloca
-////            System.out.println("\t%x"+thisReg+" = add i32 "+);
-//            System.out.println(("\t %x" + thisReg + " = alloca i32, align 4"));
-//            System.out.println("\t store " + expType + " " + node_Attr_Val.get(ctx.addExp()).get("numberVal") + ", " + expType + "* %x" + thisReg + ", align 4");
             attr_Val.put("numberVal", node_Attr_Val.get(ctx.addExp()).get("numberVal"));
         }
         node_Attr_Val.put(ctx, attr_Val);
@@ -398,7 +382,7 @@ public class Visitor extends P3BaseVisitor<Void> {
             }
 
             visit(ctx.mulExp());
-            String mulExpType = "i32";
+//            String mulExpType = "i32";
             if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
                 mulExpVal = (Long) node_Attr_Val.get(ctx.mulExp()).get("numberVal");
             } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
@@ -416,21 +400,21 @@ public class Visitor extends P3BaseVisitor<Void> {
                 attr_Val.put("thisReg", thisReg);
                 if (node_Attr_Val.get(ctx.addExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
                     if (ctx.ADD() != null) {
-                        System.out.println("\t%x" + thisReg + " = add nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg);
+                        IR_List.add("\t%x" + thisReg + " = add nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg + "\n");
                     } else if (ctx.SUB() != null) {
-                        System.out.println("\t%x" + thisReg + " = sub nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg);
+                        IR_List.add("\t%x" + thisReg + " = sub nsw " + addExpType + " " + addExpVal + ", %x" + mulExpReg + "\n");
                     }
                 } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
                     if (ctx.ADD() != null) {
-                        System.out.println("\t%x" + thisReg + " = add nsw " + addExpType + " %x" + addExpReg + ", " + mulExpVal);
+                        IR_List.add("\t%x" + thisReg + " = add nsw " + addExpType + " %x" + addExpReg + ", " + mulExpVal + "\n");
                     } else if (ctx.SUB() != null) {
-                        System.out.println("\t%x" + thisReg + " = sub nsw " + addExpType + " %x" + addExpReg + ", " + mulExpVal);
+                        IR_List.add("\t%x" + thisReg + " = sub nsw " + addExpType + " %x" + addExpReg + ", " + mulExpVal + "\n");
                     }
                 } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
                     if (ctx.ADD() != null) {
-                        System.out.println("\t%x" + thisReg + " = add nsw " + addExpType + " %x" + addExpReg + ", %x" + mulExpReg);
+                        IR_List.add("\t%x" + thisReg + " = add nsw " + addExpType + " %x" + addExpReg + ", %x" + mulExpReg + "\n");
                     } else if (ctx.SUB() != null) {
-                        System.out.println("\t%x" + thisReg + " = sub nsw " + addExpType + " %x" + addExpReg + ", %x" + mulExpReg);
+                        IR_List.add("\t%x" + thisReg + " = sub nsw " + addExpType + " %x" + addExpReg + ", %x" + mulExpReg + "\n");
                     }
                 }
             }
@@ -468,7 +452,7 @@ public class Visitor extends P3BaseVisitor<Void> {
             }
 
             visit(ctx.unaryExp());
-            String unaryExpType = "i32";
+//            String unaryExpType = "i32";
             if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
                 unaryExpVal = (Long) node_Attr_Val.get(ctx.unaryExp()).get("numberVal");
             } else if (node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
@@ -488,27 +472,27 @@ public class Visitor extends P3BaseVisitor<Void> {
                 attr_Val.put("thisReg", thisReg);
                 if (node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal") && node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
                     if (ctx.MUL() != null) {
-                        System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg);
+                        IR_List.add("\t%x" + thisReg + " = mul nsw " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg + "\n");
                     } else if (ctx.DIV() != null) {
-                        System.out.println("\t%x" + thisReg + " = sdiv " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg);
+                        IR_List.add("\t%x" + thisReg + " = sdiv " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg + "\n");
                     } else if (ctx.MOD() != null) {
-                        System.out.println("\t%x" + thisReg + " = srem " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg);
+                        IR_List.add("\t%x" + thisReg + " = srem " + mulExpType + " " + mulExpVal + ", %x" + unaryExpReg + "\n");
                     }
                 } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
                     if (ctx.MUL() != null) {
-                        System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal);
+                        IR_List.add("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal + "\n");
                     } else if (ctx.DIV() != null) {
-                        System.out.println("\t%x" + thisReg + " = sdiv " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal);
+                        IR_List.add("\t%x" + thisReg + " = sdiv " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal + "\n");
                     } else if (ctx.MOD() != null) {
-                        System.out.println("\t%x" + thisReg + " = srem " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal);
+                        IR_List.add("\t%x" + thisReg + " = srem " + mulExpType + " %x" + mulExpReg + ", " + unaryExpVal + "\n");
                     }
                 } else if (node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg") && node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
                     if (ctx.MUL() != null) {
-                        System.out.println("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg);
+                        IR_List.add("\t%x" + thisReg + " = mul nsw " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg + "\n");
                     } else if (ctx.DIV() != null) {
-                        System.out.println("\t%x" + thisReg + " = sdiv " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg);
+                        IR_List.add("\t%x" + thisReg + " = sdiv " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg + "\n");
                     } else if (ctx.MOD() != null) {
-                        System.out.println("\t%x" + thisReg + " = srem " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg);
+                        IR_List.add("\t%x" + thisReg + " = srem " + mulExpType + " %x" + mulExpReg + ", %x" + unaryExpReg + "\n");
                     }
                 }
             }
@@ -519,11 +503,50 @@ public class Visitor extends P3BaseVisitor<Void> {
     }
 
     @Override
-//    unaryExp:primaryExp|( ADD | SUB ) unaryExp;
+//    unaryExp:primaryExp|( ADD | SUB ) unaryExp | Ident LParser (exp ( ',' exp )+)* RParser;
     public Void visitUnaryExp(P3Parser.UnaryExpContext ctx) {
         //System.out.println(";visitUnaryExp");
         HashMap<String, Object> attr_Val = new HashMap<>();
-        if (ctx.SUB() == null) { // primaryExp | ADD unaryExp
+        if (ctx.Ident() != null) { // Ident LParser (exp ( ',' exp )+)* RParser
+//            attr_Val.put("paraExpList",ctx.exp());
+            String Ident = ctx.Ident().getText();
+            HashMap<String, Object> func_attr = new HashMap<>();
+            if (ident_Reg.containsKey(Ident) || constIdent_Val.containsKey(Ident) || !Main.declaredFunc.containsKey(Ident))
+                System.exit(1);
+            String retType = Main.declaredFunc.get(Ident);
+//            func_attr.put("rettype", retType);
+//            func_attr.put("paraCount", ctx.exp().size());
+//            int i = 0;
+//            for (P3Parser.ExpContext exp : ctx.exp()) {
+//                HashMap<String, Object> tmp = new HashMap<>();
+//                if (node_Attr_Val.get(exp).containsKey("thisReg")) {
+//                    tmp.put("thisReg", node_Attr_Val.get(exp).get("thisReg"));
+//                } else if (node_Attr_Val.get(exp).containsKey("numberVal")) {
+//                    tmp.put("numberVal", node_Attr_Val.get(exp).get("numberVal"));
+//                }
+//                func_attr.put("para" + (i++), tmp);
+//            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("\t");
+            if (!retType.equals("void")) {
+                int thisReg = currentReg++;
+                attr_Val.put("thisReg", thisReg);
+                sb.append("%x").append(thisReg).append(" = ");
+            }
+            sb.append("call ").append(retType).append(" @").append(Ident).append("(");
+            for (P3Parser.ExpContext exp : ctx.exp()) {
+                visit(exp);
+                if (node_Attr_Val.get(exp).containsKey("thisReg")) {
+                    sb.append("i32 %x").append(node_Attr_Val.get(exp).get("thisReg"));
+                } else if (node_Attr_Val.get(exp).containsKey("numberVal")) {
+                    sb.append("i32 ").append(node_Attr_Val.get(exp).get("numberVal"));
+                }
+//                    sb.append(", ");
+            }
+            sb.append(")\n");
+            IR_List.add(String.valueOf(sb));
+//            funcIdent_Attr.put(Ident, func_attr);
+        } else if (ctx.SUB() == null) { // primaryExp | ADD unaryExp
             visit(ctx.primaryExp());
             if (node_Attr_Val.get(ctx.primaryExp()).containsKey("lValReg")) {
                 Integer lValReg = (Integer) node_Attr_Val.get(ctx.primaryExp()).get("lValReg");
@@ -546,7 +569,7 @@ public class Visitor extends P3BaseVisitor<Void> {
                 int thisReg = currentReg++;
                 attr_Val.put("thisReg", thisReg);
 //                System.out.println("\t%x" + unaryExpReg + " = load " + unaryExpType + ", " + unaryExpType + "* %x" + unaryExpReg + ", align 4");
-                System.out.println("\t%x" + thisReg + " = sub nsw " + unaryExpType + " 0" + ", %x" + unaryExpReg);
+                IR_List.add("\t%x" + thisReg + " = sub nsw " + unaryExpType + " 0" + ", %x" + unaryExpReg + "\n");
             }
         }
         node_Attr_Val.put(ctx, attr_Val);
