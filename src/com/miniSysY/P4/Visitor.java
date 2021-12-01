@@ -321,7 +321,7 @@ public class Visitor extends P4BaseVisitor<Void> {
                 visit(ctx.stmt(0));
                 IR_List.add("\tbr label %x" + PassLabel + "\n");
                 IR_List.add("\nx" + FLabel + ":\n");
-                if(ctx.stmt().size()==2)
+                if (ctx.stmt().size() == 2)
                     visit(ctx.stmt(1));
                 IR_List.add("\tbr label %x" + PassLabel + "\n");
                 IR_List.add("\nx" + PassLabel + ":\n");
@@ -573,7 +573,7 @@ public class Visitor extends P4BaseVisitor<Void> {
     }
 
     @Override
-    // unaryExp:primaryExp|( ADD | SUB ) unaryExp | Ident LParser (exp ( ',' exp
+    // unaryExp:primaryExp|( ADD | SUB | NOT ) unaryExp | Ident LParser (exp ( ',' exp
     // )+)* RParser;
     public Void visitUnaryExp(P4Parser.UnaryExpContext ctx) {
         // System.out.println(";visitUnaryExp");
@@ -617,7 +617,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             }
             IR_List.add(String.valueOf(sbIR));
             // funcIdent_Attr.put(Ident, func_attr);
-        } else if (ctx.SUB() == null) { // primaryExp | ADD unaryExp
+        } else if (ctx.primaryExp() != null) { // primaryExp | ADD unaryExp
             visit(ctx.primaryExp());
             if (node_Attr_Val.get(ctx.primaryExp()).containsKey("lValReg")) {
                 Integer lValReg = (Integer) node_Attr_Val.get(ctx.primaryExp()).get("lValReg");
@@ -628,7 +628,14 @@ public class Visitor extends P4BaseVisitor<Void> {
             } else if (node_Attr_Val.get(ctx.primaryExp()).containsKey("numberVal")) {
                 attr_Val.put("numberVal", node_Attr_Val.get(ctx.primaryExp()).get("numberVal"));
             }
-        } else { // SUB unaryExp
+        } else if (ctx.ADD() != null) { // ADD unaryExp
+            visit(ctx.unaryExp());
+            if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
+                attr_Val.put("numberVal", node_Attr_Val.get(ctx.unaryExp()).get("numberVal"));
+            } else {
+                attr_Val.put("thisReg", node_Attr_Val.get(ctx.unaryExp()).get("thisReg"));
+            }
+        } else if (ctx.SUB() != null) { // SUB unaryExp
             visit(ctx.unaryExp());
             if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
                 Long numberVal = (Long) node_Attr_Val.get(ctx.unaryExp()).get("numberVal");
@@ -636,12 +643,21 @@ public class Visitor extends P4BaseVisitor<Void> {
             } else {
                 String unaryExpType = "i32";
                 Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
-                // int tmpUnaryexpReg = currentReg++;
                 int thisReg = currentReg++;
                 attr_Val.put("thisReg", thisReg);
-                // System.out.println("\t%x" + unaryExpReg + " = load " + unaryExpType + ", " +
-                // unaryExpType + "* %x" + unaryExpReg + ", align 4");
                 IR_List.add("\t%x" + thisReg + " = sub nsw " + unaryExpType + " 0" + ", %x" + unaryExpReg + "\n");
+            }
+        } else if (ctx.NOT() != null) {
+            visit(ctx.unaryExp());
+            if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
+                attr_Val.put("numberVal", node_Attr_Val.get(ctx.unaryExp()).get("numberVal"));
+            } else if (node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
+                int cmpReg = currentReg++;
+                Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
+                IR_List.add("\t%x" + cmpReg + " = icmp eq i1 %x" + unaryExpReg + ", 0\n");
+                int thisReg = currentReg++;
+                attr_Val.put("thisReg", thisReg);
+                IR_List.add("\t%x" + thisReg + " = zext i1 %x" + cmpReg + " to i32\n");
             }
         }
         node_Attr_Val.put(ctx, attr_Val);
@@ -681,12 +697,14 @@ public class Visitor extends P4BaseVisitor<Void> {
         HashMap<String, Object> attr_Val = new HashMap<>();
         visit(ctx.lOrExp());
         if (node_Attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
-            attr_Val.put("numberVal", node_Attr_Val.get(ctx.lOrExp()).get("numberVal"));
+            Integer numberVal = (Integer) node_Attr_Val.get(ctx.lOrExp()).get("numberVal");
         } else if (node_Attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
             Integer lOrExpReg = (Integer) node_Attr_Val.get(ctx.lOrExp()).get("thisReg");
+            int thisReg = currentReg++;
             int trueLabel = currentReg++;
             int falseLabel = currentReg++;
-            IR_List.add("\tbr i1 %x" + lOrExpReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+            IR_List.add("\t%x" + thisReg + " = icmp ne i32 %x" + lOrExpReg + ", 0\n");
+            IR_List.add("\tbr i1 %x" + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
             attr_Val.put("TLabel", trueLabel);
             attr_Val.put("FLabel", falseLabel);
         } else if (node_Attr_Val.get(ctx.lOrExp()).containsKey("TLabel") && node_Attr_Val.get(ctx.lOrExp()).containsKey("FLabel")) {
@@ -847,7 +865,6 @@ public class Visitor extends P4BaseVisitor<Void> {
             } else if (node_Attr_Val.get(ctx.eqExp()).containsKey("thisReg")) {
                 attr_Val.put("thisReg", node_Attr_Val.get(ctx.eqExp()).get("thisReg"));
             }
-            // 添加TLabel和FLabel判断，应该在cond中还是在这里？
         } else { // lAndExp LAND_KW eqExp
             int lAndTrueLabel = 0, falseLabel = 0, trueLabel = 0;
             Integer lAndExpReg = null, eqExpReg = null;
