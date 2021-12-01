@@ -467,10 +467,10 @@ public class Visitor extends P4BaseVisitor<Void> {
                     sb.append(addExpVal).append(", %x").append(mulExpReg);
                 } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg")
                         && node_Attr_Val.get(ctx.mulExp()).containsKey("numberVal")) {
-                    sb.append(" %x").append(addExpReg).append(", ").append(mulExpVal);
+                    sb.append("%x").append(addExpReg).append(", ").append(mulExpVal);
                 } else if (node_Attr_Val.get(ctx.addExp()).containsKey("thisReg")
                         && node_Attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
-                    sb.append(" %x").append(addExpReg).append(", %x").append(mulExpReg);
+                    sb.append("%x").append(addExpReg).append(", %x").append(mulExpReg);
                 }
                 IR_List.add(sb + "\n");
             }
@@ -825,6 +825,7 @@ public class Visitor extends P4BaseVisitor<Void> {
                 sb.append("%x").append(eqExpReg);
                 sb.append(", %x").append(relExpReg);
             }
+            sb.append("\n");
             IR_List.add(String.valueOf(sb));
         }
         node_Attr_Val.put(ctx, attr_Val);
