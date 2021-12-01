@@ -206,7 +206,7 @@ public class Visitor extends P4BaseVisitor<Void> {
                     IR_List.add("\tstore " + bType + " %x" + initValReg + ", " + bType + "* %x" + thisReg + "\n");
                 } else if (node_Attr_Val.get(ctx.initVal()).containsKey("numberVal")) {
                     Long numVal = (Long) node_Attr_Val.get(ctx.initVal()).get("numberVal");
-                    IR_List.add("\tstore " + bType + numVal + ", " + bType + "* %x" + thisReg + "\n");
+                    IR_List.add("\tstore i32 "+ numVal + ", " + bType + "* %x" + thisReg + "\n");
                 }
             }
         }
@@ -849,7 +849,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             if (ctx.EQ_KW() != null) {
                 sb.append("eq i32 ");
             } else if (ctx.NEQ_KW() != null) {
-                sb.append("neq i32 ");
+                sb.append("ne i32 ");
             }
             if (node_Attr_Val.get(ctx.eqExp()).containsKey("numberVal")
                     && node_Attr_Val.get(ctx.relExp()).containsKey("numberVal")) {
