@@ -321,7 +321,8 @@ public class Visitor extends P4BaseVisitor<Void> {
                 visit(ctx.stmt(0));
                 IR_List.add("\tbr label %x" + PassLabel + "\n");
                 IR_List.add("\nx" + FLabel + ":\n");
-                visit(ctx.stmt(1));
+                if(ctx.stmt().size()==2)
+                    visit(ctx.stmt(1));
                 IR_List.add("\tbr label %x" + PassLabel + "\n");
                 IR_List.add("\nx" + PassLabel + ":\n");
             }
