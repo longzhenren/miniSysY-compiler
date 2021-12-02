@@ -1,6 +1,5 @@
 package com.miniSysY.P4;
 
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
 
 import java.util.ArrayList;
@@ -10,10 +9,10 @@ public class Visitor extends P4BaseVisitor<Void> {
     Integer currentReg = 0;
     public static HashMap<RuleNode, HashMap<String, Object>> node_Attr_Val = new HashMap<>(); // 保存树上结点的各种属性
     public static HashMap<String, Integer> ident_Reg = new HashMap<>(); // 变量名到寄存器的映射
-    public static HashMap<RuleContext, HashMap<String, Integer>> block_ident_Reg = new HashMap<>();
+//    public static HashMap<RuleContext, HashMap<String, Integer>> block_ident_Reg = new HashMap<>();
     public static HashMap<Integer, String> reg_Type = new HashMap<>();
     public static HashMap<String, Long> constIdent_Val = new HashMap<>();// 常量值表
-    public static HashMap<String, HashMap<String, Object>> funcIdent_Attr = new HashMap<>();
+//    public static HashMap<String, HashMap<String, Object>> funcIdent_Attr = new HashMap<>();
     public static ArrayList<String> IR_List = new ArrayList<>();
 
 //    public boolean ident_check_Reg(RuleContext ctx, String Ident) {
@@ -188,7 +187,7 @@ public class Visitor extends P4BaseVisitor<Void> {
         reg_Type.put(thisReg, "i32");
         String bType = (String) node_Attr_Val.get(ctx.parent).get("bType");
         reg_Type.put(thisReg, bType);
-        IR_List.add("\t%x" + thisReg + " = alloca " + bType + " , align 4" + "\n");
+        IR_List.add("\t%x" + thisReg + " = alloca " + bType + ", align 4" + "\n");
         ident_Reg.put(ctx.Ident().getText(), thisReg);
 //        ident_Put_Reg(ctx, ctx.Ident().getText(), thisReg);
         if (ctx.ASSIGN() != null) {
@@ -711,40 +710,27 @@ public class Visitor extends P4BaseVisitor<Void> {
     public Void visitCond(P4Parser.CondContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         visit(ctx.lOrExp());
+        int thisReg = currentReg++;
+        reg_Type.put(thisReg, "i1");
+        int trueLabel = currentReg++;
+        int falseLabel = currentReg++;
         if (node_Attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
             Integer numberVal = (Integer) node_Attr_Val.get(ctx.lOrExp()).get("numberVal");
-            int thisReg = currentReg++;
-            reg_Type.put(thisReg, "i1");
             IR_List.add("\t%x" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
-            int trueLabel = currentReg++;
-            int falseLabel = currentReg++;
             IR_List.add("\tbr i1 %x" + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
-            attr_Val.put("TLabel", trueLabel);
-            attr_Val.put("FLabel", falseLabel);
         } else if (node_Attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
             Integer lOrExpReg = (Integer) node_Attr_Val.get(ctx.lOrExp()).get("thisReg");
             if (reg_Type.get(lOrExpReg).equals("i32")) {
-                int thisReg = currentReg++;
-                reg_Type.put(thisReg, "i1");
-                int trueLabel = currentReg++;
-                int falseLabel = currentReg++;
                 IR_List.add("\t%x" + thisReg + " = icmp ne i32 %x" + lOrExpReg + ", 0\n");
                 IR_List.add("\tbr i1 %x" + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
-                attr_Val.put("TLabel", trueLabel);
-                attr_Val.put("FLabel", falseLabel);
             } else if (reg_Type.get(lOrExpReg).equals("i1")) {
-                int thisReg = currentReg++;
-                reg_Type.put(thisReg, "i1");
-                int trueLabel = currentReg++;
-                int falseLabel = currentReg++;
                 IR_List.add("\tbr i1 %x" + lOrExpReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
-                attr_Val.put("TLabel", trueLabel);
-                attr_Val.put("FLabel", falseLabel);
             }
-        } else if (node_Attr_Val.get(ctx.lOrExp()).containsKey("TLabel") && node_Attr_Val.get(ctx.lOrExp()).containsKey("FLabel")) {
-            attr_Val.put("TLabel", node_Attr_Val.get(ctx.lOrExp()).get("TLabel"));
-            attr_Val.put("FLabel", node_Attr_Val.get(ctx.lOrExp()).get("FLabel"));
         }
+
+        attr_Val.put("TLabel", trueLabel);
+        attr_Val.put("FLabel", falseLabel);
+
         node_Attr_Val.put(ctx, attr_Val);
         return null;
     }
@@ -779,7 +765,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             }
 
             Integer thisReg = currentReg++;
-            reg_Type.put(thisReg, "i32");
+            reg_Type.put(thisReg, "i1");
             attr_Val.put("thisReg", thisReg);
             StringBuilder sb = new StringBuilder();
             sb.append("\t%x").append(thisReg).append(" = icmp ");
@@ -904,7 +890,7 @@ public class Visitor extends P4BaseVisitor<Void> {
                 } else if (reg_Type.get(lAndExpReg).equals("i32")) {
                     reg1 = currentReg++;
                     reg_Type.put(reg1, "i1");
-                    IR_List.add("\t%x" + reg1 + " = icmp ne i32 %x" + lAndExpReg + ", 0"+"\n");
+                    IR_List.add("\t%x" + reg1 + " = icmp ne i32 %x" + lAndExpReg + ", 0" + "\n");
                 }
             }
             visit(ctx.eqExp());
@@ -915,13 +901,13 @@ public class Visitor extends P4BaseVisitor<Void> {
                 } else if (reg_Type.get(eqExpReg).equals("i32")) {
                     reg2 = currentReg++;
                     reg_Type.put(reg2, "i1");
-                    IR_List.add("\t%x" + reg2 + " = icmp ne i32 %x" + eqExpReg + ", 0"+"\n");
+                    IR_List.add("\t%x" + reg2 + " = icmp ne i32 %x" + eqExpReg + ", 0" + "\n");
                 }
             }
             Integer thisReg = currentReg++;
             reg_Type.put(thisReg, "i1");
             attr_Val.put("thisReg", thisReg);
-            IR_List.add("\t%x" + thisReg + " = and i1 %x" + reg1 + ", " + reg2+"\n");
+            IR_List.add("\t%x" + thisReg + " = and i1 %x" + reg1 + ", " + reg2 + "\n");
         }
         node_Attr_Val.put(ctx, attr_Val);
         return null;
@@ -939,7 +925,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             } else if (node_Attr_Val.get(ctx.lAndExp()).containsKey("thisReg")) {
                 attr_Val.put("thisReg", node_Attr_Val.get(ctx.lAndExp()).get("thisReg"));
             }
-        } else { // lAndExp LAND_KW eqExp
+        } else { // lOrExp LOR_KW lAndExp
             visit(ctx.lOrExp());
             Integer lOrExpReg, lAndExpReg, reg1 = null, reg2 = null;
             if (node_Attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
@@ -949,7 +935,7 @@ public class Visitor extends P4BaseVisitor<Void> {
                 } else if (reg_Type.get(lOrExpReg).equals("i32")) {
                     reg1 = currentReg++;
                     reg_Type.put(reg1, "i1");
-                    IR_List.add("\t%x" + reg1 + " = icmp ne i32 %x" + lOrExpReg + ", 0"+"\n");
+                    IR_List.add("\t%x" + reg1 + " = icmp ne i32 %x" + lOrExpReg + ", 0" + "\n");
                 }
             }
             visit(ctx.lAndExp());
@@ -960,13 +946,13 @@ public class Visitor extends P4BaseVisitor<Void> {
                 } else if (reg_Type.get(lAndExpReg).equals("i32")) {
                     reg2 = currentReg++;
                     reg_Type.put(reg2, "i1");
-                    IR_List.add("\t%x" + reg2 + " = icmp ne i32 %x" + lAndExpReg + ", 0"+"\n");
+                    IR_List.add("\t%x" + reg2 + " = icmp ne i32 %x" + lAndExpReg + ", 0" + "\n");
                 }
             }
             Integer thisReg = currentReg++;
             reg_Type.put(thisReg, "i1");
             attr_Val.put("thisReg", thisReg);
-            IR_List.add("\t%x" + thisReg + " = or i1 %x" + reg1 + ", " + reg2+"\n");
+            IR_List.add("\t%x" + thisReg + " = or i1 %x" + reg1 + ", " + reg2 + "\n");
         }
         node_Attr_Val.put(ctx, attr_Val);
         return null;
