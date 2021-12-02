@@ -658,16 +658,16 @@ public class Visitor extends P4BaseVisitor<Void> {
                 attr_Val.put("numberVal", numberVal);
                 int cmpReg = currentReg++;
                 reg_Type.put(cmpReg, "i1");
-                IR_List.add("\t%x" + cmpReg + " = icmp eq i32 " + numberVal + ", 0\n");
+                IR_List.add("\t%x" + cmpReg + " = icmp ne i32 " + numberVal + ", 0\n");
             } else if (node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
                 Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
                 int cmpReg = currentReg++;
                 reg_Type.put(cmpReg, "i1");
                 if (reg_Type.get(unaryExpReg).equals("i32")) {
                     attr_Val.put("thisReg", unaryExpReg);
-                    IR_List.add("\t%x" + cmpReg + " = icmp eq i32 %x" + unaryExpReg + ", 0\n");
+                    IR_List.add("\t%x" + cmpReg + " = icmp ne i32 %x" + unaryExpReg + ", 0\n");
                 } else if (reg_Type.get(unaryExpReg).equals("i1")) {
-                    IR_List.add("\t%x" + cmpReg + " = icmp eq i1 %x" + unaryExpReg + ", 0\n");
+                    IR_List.add("\t%x" + cmpReg + " = icmp ne i1 %x" + unaryExpReg + ", 0\n");
                 }
                 int thisReg = currentReg++;
                 reg_Type.put(thisReg, "i32");
