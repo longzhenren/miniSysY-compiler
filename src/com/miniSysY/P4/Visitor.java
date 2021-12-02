@@ -907,7 +907,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             Integer thisReg = currentReg++;
             reg_Type.put(thisReg, "i1");
             attr_Val.put("thisReg", thisReg);
-            IR_List.add("\t%x" + thisReg + " = and i1 %x" + reg1 + ", " + reg2 + "\n");
+            IR_List.add("\t%x" + thisReg + " = and i1 %x" + reg1 + ", %x" + reg2 + "\n");
         }
         node_Attr_Val.put(ctx, attr_Val);
         return null;
@@ -952,7 +952,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             Integer thisReg = currentReg++;
             reg_Type.put(thisReg, "i1");
             attr_Val.put("thisReg", thisReg);
-            IR_List.add("\t%x" + thisReg + " = or i1 %x" + reg1 + ", " + reg2 + "\n");
+            IR_List.add("\t%x" + thisReg + " = or i1 %x" + reg1 + ", %x" + reg2 + "\n");
         }
         node_Attr_Val.put(ctx, attr_Val);
         return null;
