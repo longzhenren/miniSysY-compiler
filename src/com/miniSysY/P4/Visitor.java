@@ -8,13 +8,12 @@ import java.util.HashMap;
 
 public class Visitor extends P4BaseVisitor<Void> {
     Integer currentReg = 0;
-    HashMap<RuleNode, HashMap<String, Object>> node_Attr_Val = new HashMap<>(); // 保存树上结点的各种属性
-    HashMap<String, Integer> ident_Reg = new HashMap<>(); // 变量名到寄存器的映射
-    HashMap<RuleContext, HashMap<String, Integer>> block_ident_Reg = new HashMap<>();
-    HashMap<Integer, String> reg_Type = new HashMap<>();
-    HashMap<String, Long> constIdent_Val = new HashMap<>();// 常量值表
-    HashMap<String, HashMap<String, Object>> funcIdent_Attr = new HashMap<>();
-    public static HashMap<Integer, ArrayList<String>> block_IR = new HashMap<>();
+    public static HashMap<RuleNode, HashMap<String, Object>> node_Attr_Val = new HashMap<>(); // 保存树上结点的各种属性
+    public static HashMap<String, Integer> ident_Reg = new HashMap<>(); // 变量名到寄存器的映射
+    public static HashMap<RuleContext, HashMap<String, Integer>> block_ident_Reg = new HashMap<>();
+    public static HashMap<Integer, String> reg_Type = new HashMap<>();
+    public static HashMap<String, Long> constIdent_Val = new HashMap<>();// 常量值表
+    public static HashMap<String, HashMap<String, Object>> funcIdent_Attr = new HashMap<>();
     public static ArrayList<String> IR_List = new ArrayList<>();
 
 //    public boolean ident_check_Reg(RuleContext ctx, String Ident) {
@@ -54,8 +53,6 @@ public class Visitor extends P4BaseVisitor<Void> {
             visit(ctx.decl());
         }
         if (ctx.parent instanceof P4Parser.StmtContext) {
-            Integer blockID = (Integer) node_Attr_Val.get(ctx.parent).get("blockID");
-            attr_val.put("blockID", blockID);
             visit(ctx.stmt());
         }
         node_Attr_Val.put(ctx, attr_val);
@@ -71,7 +68,7 @@ public class Visitor extends P4BaseVisitor<Void> {
         if (ident_Reg.containsKey(ctx.Ident().getText())) {
             Integer identReg = ident_Reg.get(ctx.Ident().getText());
             int thisReg = currentReg++;
-            reg_Type.put(thisReg,"i32");
+            reg_Type.put(thisReg, "i32");
             IR_List.add("\t%x" + thisReg + " = load i32, i32* %x" + identReg + "\n");
             attr_val.put("thisReg", thisReg);
         } else if (constIdent_Val.containsKey(ctx.Ident().getText())) {
@@ -188,7 +185,7 @@ public class Visitor extends P4BaseVisitor<Void> {
         // System.out.println(";visitVarDef");
         HashMap<String, Object> attr_val = new HashMap<>();
         int thisReg = currentReg++;
-        reg_Type.put(thisReg,"i32");
+        reg_Type.put(thisReg, "i32");
         String bType = (String) node_Attr_Val.get(ctx.parent).get("bType");
         reg_Type.put(thisReg, bType);
         IR_List.add("\t%x" + thisReg + " = alloca " + bType + " , align 4" + "\n");
@@ -206,7 +203,7 @@ public class Visitor extends P4BaseVisitor<Void> {
                     IR_List.add("\tstore " + bType + " %x" + initValReg + ", " + bType + "* %x" + thisReg + "\n");
                 } else if (node_Attr_Val.get(ctx.initVal()).containsKey("numberVal")) {
                     Long numVal = (Long) node_Attr_Val.get(ctx.initVal()).get("numberVal");
-                    IR_List.add("\tstore i32 "+ numVal + ", " + bType + "* %x" + thisReg + "\n");
+                    IR_List.add("\tstore i32 " + numVal + ", " + bType + "* %x" + thisReg + "\n");
                 }
             }
         }
@@ -319,7 +316,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             Integer TLabel = (Integer) node_Attr_Val.get(ctx.cond()).get("TLabel");
             Integer FLabel = (Integer) node_Attr_Val.get(ctx.cond()).get("FLabel");
             Integer PassLabel = currentReg++;
-            reg_Type.put(PassLabel,"i32");
+            reg_Type.put(PassLabel, "i32");
             if (ctx.ELSE_KW() == null) {
                 IR_List.add("\nx" + TLabel + ":\n");
                 visit(ctx.stmt(0));
@@ -624,7 +621,7 @@ public class Visitor extends P4BaseVisitor<Void> {
             }
             IR_List.add(String.valueOf(sbIR));
             // funcIdent_Attr.put(Ident, func_attr);
-        } else if (ctx.primaryExp() != null) { // primaryExp | ADD unaryExp
+        } else if (ctx.primaryExp() != null) { // primaryExp
             visit(ctx.primaryExp());
             if (node_Attr_Val.get(ctx.primaryExp()).containsKey("lValReg")) {
                 Integer lValReg = (Integer) node_Attr_Val.get(ctx.primaryExp()).get("lValReg");
@@ -660,11 +657,15 @@ public class Visitor extends P4BaseVisitor<Void> {
             if (node_Attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
                 attr_Val.put("numberVal", node_Attr_Val.get(ctx.unaryExp()).get("numberVal"));
             } else if (node_Attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
-                // TODO: Type i1 and i32
+                Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
                 int cmpReg = currentReg++;
                 reg_Type.put(cmpReg, "i1");
-                Integer unaryExpReg = (Integer) node_Attr_Val.get(ctx.unaryExp()).get("thisReg");
-                IR_List.add("\t%x" + cmpReg + " = icmp eq i1 %x" + unaryExpReg + ", 0\n");
+                if (reg_Type.get(unaryExpReg).equals("i32")) {
+                    attr_Val.put("thisReg", unaryExpReg);
+                    IR_List.add("\t%x" + cmpReg + " = icmp eq i32 %x" + unaryExpReg + ", 0\n");
+                } else if (reg_Type.get(unaryExpReg).equals("i1")) {
+                    IR_List.add("\t%x" + cmpReg + " = icmp eq i1 %x" + unaryExpReg + ", 0\n");
+                }
                 int thisReg = currentReg++;
                 reg_Type.put(thisReg, "i32");
                 attr_Val.put("thisReg", thisReg);
@@ -708,20 +709,29 @@ public class Visitor extends P4BaseVisitor<Void> {
         visit(ctx.lOrExp());
         if (node_Attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
             Integer numberVal = (Integer) node_Attr_Val.get(ctx.lOrExp()).get("numberVal");
+            int thisReg = currentReg++;
+            reg_Type.put(thisReg, "i1");
+            IR_List.add("\t%x" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
+            int trueLabel = currentReg++;
+            int falseLabel = currentReg++;
+            IR_List.add("\tbr i1 %x" + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+            attr_Val.put("TLabel", trueLabel);
+            attr_Val.put("FLabel", falseLabel);
         } else if (node_Attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
             Integer lOrExpReg = (Integer) node_Attr_Val.get(ctx.lOrExp()).get("thisReg");
-            if(reg_Type.get(lOrExpReg).equals("i32")){
+            if (reg_Type.get(lOrExpReg).equals("i32")) {
                 int thisReg = currentReg++;
                 reg_Type.put(thisReg, "i1");
                 int trueLabel = currentReg++;
                 reg_Type.put(trueLabel, "i32");
                 int falseLabel = currentReg++;
                 reg_Type.put(falseLabel, "i32");
-                IR_List.add("\t%x" + thisReg + " = icmp ne i1 %x" + lOrExpReg + ", 0\n");
+//                IR_List.add("\t%x" + thisReg + " = icmp ne i1 %x" + lOrExpReg + ", 0\n");
+                IR_List.add("\t%x" + thisReg + " = icmp ne i32 %x" + lOrExpReg + ", 0\n");
                 IR_List.add("\tbr i1 %x" + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
                 attr_Val.put("TLabel", trueLabel);
                 attr_Val.put("FLabel", falseLabel);
-            }else if(reg_Type.get(lOrExpReg).equals("i1")){
+            } else if (reg_Type.get(lOrExpReg).equals("i1")) {
                 int trueLabel = currentReg++;
                 reg_Type.put(trueLabel, "i32");
                 int falseLabel = currentReg++;
@@ -834,7 +844,6 @@ public class Visitor extends P4BaseVisitor<Void> {
                 eqExpReg = (Integer) node_Attr_Val.get(ctx.eqExp()).get("thisReg");
             }
             visit(ctx.relExp());
-            // String unaryExpType = "i32";
             if (node_Attr_Val.get(ctx.relExp()).containsKey("numberVal")) {
                 relExpVal = (Long) node_Attr_Val.get(ctx.relExp()).get("numberVal");
             } else if (node_Attr_Val.get(ctx.relExp()).containsKey("thisReg")) {
@@ -907,8 +916,13 @@ public class Visitor extends P4BaseVisitor<Void> {
                 falseLabel = currentReg++;
                 reg_Type.put(falseLabel, "i32");
             }
-            // TODO:??
-            IR_List.add("\tbr i1 %x" + lAndExpReg + ", label %x" + lAndTrueLabel + ", label %x" + falseLabel + "\n");
+            if (reg_Type.get(lAndExpReg).equals("i32")) {
+
+                IR_List.add("\tbr i1 %x" + lAndExpReg + ", label %x" + lAndTrueLabel + ", label %x" + falseLabel + "\n");
+            } else if (reg_Type.get(lAndExpReg).equals("i1")) {
+
+                IR_List.add("\tbr i1 %x" + lAndExpReg + ", label %x" + lAndTrueLabel + ", label %x" + falseLabel + "\n");
+            }
             IR_List.add("\nx" + lAndTrueLabel + ":\n");
             IR_List.add("\tbr i1 %x" + eqExpReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
             attr_Val.put("TLabel", trueLabel);
