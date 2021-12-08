@@ -10,6 +10,8 @@ CONST_KW: 'const';
 WHILE_KW: 'while';
 IF_KW: 'if';
 ELSE_KW: 'else';
+BREAK_KW: 'break';
+CONTINUE_KW: 'continue';
 LT_KW: '<';
 GT_KW: '>';
 LE_KW: '<=';
@@ -55,9 +57,11 @@ blockItem: decl | stmt;
 stmt:
 	lVal ASSIGN exp Semicolon
 	| block
-	| (exp)+ Semicolon
-	| IF_KW LParser cond RParser stmt ( ELSE_KW stmt)*
+	| (exp)* Semicolon
+	| IF_KW LParser cond RParser stmt (ELSE_KW stmt)*
 	| WHILE_KW LParser cond RParser stmt
+	| BREAK_KW Semicolon
+    | CONTINUE_KW Semicolon
 	| returnStmt;
 lVal: Ident;
 number: intConst;

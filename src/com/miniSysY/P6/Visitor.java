@@ -452,6 +452,10 @@ public class Visitor extends P6BaseVisitor<Void> {
             visit(ctx.stmt(0));
             IR_List.add("\tbr label %x" + StartLabel + "\n");
             IR_List.add("\nx" + FLabel + ":\n");
+        } else if (ctx.BREAK_KW() != null) {
+
+        } else if (ctx.CONTINUE_KW() != null) {
+
         } else {
             for (P6Parser.ExpContext exp : ctx.exp()) {
                 visit(exp);
