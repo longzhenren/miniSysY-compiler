@@ -13,22 +13,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-//        CharStream inputStream = CharStreams.fromStream(System.in);
-        CharStream inputStream = CharStreams.fromString("int main() {\n" +
-                "    int n = getint();\n" +
-                "    int i = 0, sum = 0;\n" +
-                "    while (i < n) {\n" +
-                "        if (i % 2 == 0) {\n" +
-                "            i = i + 1;\n" +
-                "            continue;\n" +
-                "        }\n" +
-                "        i = i + 1;\n" +
-                "        sum = sum + i;\n" +
-                "        putint(sum);\n" +
-                "        putch(10);\n" +
-                "    }\n" +
-                "    return 0;\n" +
-                "}");
+        CharStream inputStream = CharStreams.fromStream(System.in);
+        //CharStream inputStream = CharStreams.fromString("");
         P6Lexer lexer = new P6Lexer(inputStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         P6Parser parser = new P6Parser(tokenStream);
