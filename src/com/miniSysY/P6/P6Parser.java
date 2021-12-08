@@ -364,7 +364,7 @@ public class P6Parser extends Parser {
 			setState(82);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LParser) | (1L << LBrace) | (1L << RETURN_KW) | (1L << INT_KW) | (1L << CONST_KW) | (1L << WHILE_KW) | (1L << IF_KW) | (1L << BREAK_KW) | (1L << CONTINUE_KW) | (1L << ADD) | (1L << SUB) | (1L << NOT) | (1L << DecimalConst) | (1L << OctalConst) | (1L << HexadecimalConst) | (1L << Ident))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LParser) | (1L << LBrace) | (1L << RETURN_KW) | (1L << INT_KW) | (1L << CONST_KW) | (1L << WHILE_KW) | (1L << IF_KW) | (1L << BREAK_KW) | (1L << CONTINUE_KW) | (1L << ADD) | (1L << SUB) | (1L << NOT) | (1L << Semicolon) | (1L << DecimalConst) | (1L << OctalConst) | (1L << HexadecimalConst) | (1L << Ident))) != 0)) {
 				{
 				{
 				setState(79);
@@ -441,6 +441,7 @@ public class P6Parser extends Parser {
 			case ADD:
 			case SUB:
 			case NOT:
+			case Semicolon:
 			case DecimalConst:
 			case OctalConst:
 			case HexadecimalConst:
@@ -554,21 +555,21 @@ public class P6Parser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(98); 
+				setState(100);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				do {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LParser) | (1L << ADD) | (1L << SUB) | (1L << NOT) | (1L << DecimalConst) | (1L << OctalConst) | (1L << HexadecimalConst) | (1L << Ident))) != 0)) {
 					{
 					{
 					setState(97);
 					exp();
 					}
 					}
-					setState(100); 
+					setState(102);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LParser) | (1L << ADD) | (1L << SUB) | (1L << NOT) | (1L << DecimalConst) | (1L << OctalConst) | (1L << HexadecimalConst) | (1L << Ident))) != 0) );
-				setState(102);
+				}
+				setState(103);
 				match(Semicolon);
 				}
 				break;
@@ -2250,7 +2251,7 @@ public class P6Parser extends Parser {
 		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\4\37\t\37\3\2\7\2@"+
 		"\n\2\f\2\16\2C\13\2\3\2\3\2\3\3\3\3\3\4\3\4\3\5\3\5\3\5\3\5\3\5\3\5\3"+
 		"\6\3\6\7\6S\n\6\f\6\16\6V\13\6\3\6\3\6\3\7\3\7\5\7\\\n\7\3\b\3\b\3\b\3"+
-		"\b\3\b\3\b\3\b\6\be\n\b\r\b\16\bf\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b"+
+		"\b\3\b\3\b\3\b\7\be\n\b\f\b\16\bh\13\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b"+
 		"\7\br\n\b\f\b\16\bu\13\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\5"+
 		"\b\u0082\n\b\3\t\3\t\3\n\3\n\3\13\3\13\3\f\3\f\3\f\3\f\3\r\3\r\3\16\3"+
 		"\16\3\17\3\17\3\17\3\17\3\17\3\17\7\17\u0098\n\17\f\17\16\17\u009b\13"+
@@ -2280,13 +2281,13 @@ public class P6Parser extends Parser {
 		"\2PT\7\6\2\2QS\5\f\7\2RQ\3\2\2\2SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2UW\3\2\2"+
 		"\2VT\3\2\2\2WX\7\7\2\2X\13\3\2\2\2Y\\\5,\27\2Z\\\5\16\b\2[Y\3\2\2\2[Z"+
 		"\3\2\2\2\\\r\3\2\2\2]^\5\20\t\2^_\7\30\2\2_`\5\30\r\2`a\7\37\2\2a\u0082"+
-		"\3\2\2\2b\u0082\5\n\6\2ce\5\30\r\2dc\3\2\2\2ef\3\2\2\2fd\3\2\2\2fg\3\2"+
-		"\2\2gh\3\2\2\2hi\7\37\2\2i\u0082\3\2\2\2jk\7\f\2\2kl\7\4\2\2lm\5\32\16"+
+		"\3\2\2\2b\u0082\5\n\6\2ce\5\30\r\2dc\3\2\2\2eh\3\2\2\2fd\3\2\2\2fg\3\2"+
+		"\2\2gi\3\2\2\2hf\3\2\2\2i\u0082\7\37\2\2jk\7\f\2\2kl\7\4\2\2lm\5\32\16"+
 		"\2mn\7\5\2\2ns\5\16\b\2op\7\r\2\2pr\5\16\b\2qo\3\2\2\2ru\3\2\2\2sq\3\2"+
 		"\2\2st\3\2\2\2t\u0082\3\2\2\2us\3\2\2\2vw\7\13\2\2wx\7\4\2\2xy\5\32\16"+
 		"\2yz\7\5\2\2z{\5\16\b\2{\u0082\3\2\2\2|}\7\16\2\2}\u0082\7\37\2\2~\177"+
 		"\7\17\2\2\177\u0082\7\37\2\2\u0080\u0082\5\26\f\2\u0081]\3\2\2\2\u0081"+
-		"b\3\2\2\2\u0081d\3\2\2\2\u0081j\3\2\2\2\u0081v\3\2\2\2\u0081|\3\2\2\2"+
+		"b\3\2\2\2\u0081f\3\2\2\2\u0081j\3\2\2\2\u0081v\3\2\2\2\u0081|\3\2\2\2"+
 		"\u0081~\3\2\2\2\u0081\u0080\3\2\2\2\u0082\17\3\2\2\2\u0083\u0084\7\'\2"+
 		"\2\u0084\21\3\2\2\2\u0085\u0086\5\24\13\2\u0086\23\3\2\2\2\u0087\u0088"+
 		"\t\2\2\2\u0088\25\3\2\2\2\u0089\u008a\7\b\2\2\u008a\u008b\5\30\r\2\u008b"+

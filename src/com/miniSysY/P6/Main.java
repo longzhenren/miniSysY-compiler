@@ -14,7 +14,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         CharStream inputStream = CharStreams.fromStream(System.in);
-        //CharStream inputStream = CharStreams.fromString("");
+//        CharStream inputStream = CharStreams.fromString("");
         P6Lexer lexer = new P6Lexer(inputStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         P6Parser parser = new P6Parser(tokenStream);
