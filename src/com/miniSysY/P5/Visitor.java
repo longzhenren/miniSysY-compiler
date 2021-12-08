@@ -822,7 +822,7 @@ public class Visitor extends P5BaseVisitor<Void> {
         int trueLabel = currentReg++;
         int falseLabel = currentReg++;
         if (node_attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
-            Integer numberVal = (Integer) node_attr_Val.get(ctx.lOrExp()).get("numberVal");
+            String numberVal = (String) node_attr_Val.get(ctx.lOrExp()).get("numberVal");
             IR_List.add("\t" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
             IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
         } else if (node_attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
@@ -854,19 +854,19 @@ public class Visitor extends P5BaseVisitor<Void> {
             }
         } else if (ctx.children.size() == 3) { // relExp ( LT_KW | GT_KW | LE_KW | GE_KW ) addExp
             Long relExpVal = 0L, addExpVal = 0L;
-            Integer relExpReg = 0, addExpReg = 0;
+            String relExpReg = null, addExpReg = null;
 
             visit(ctx.relExp());
             if (node_attr_Val.get(ctx.relExp()).containsKey("numberVal")) {
                 relExpVal = Long.parseLong((String) (node_attr_Val.get(ctx.relExp()).get("numberVal")));
             } else if (node_attr_Val.get(ctx.relExp()).containsKey("thisReg")) {
-                relExpReg = (Integer) node_attr_Val.get(ctx.relExp()).get("thisReg");
+                relExpReg = (String) node_attr_Val.get(ctx.relExp()).get("thisReg");
             }
             visit(ctx.addExp());
             if (node_attr_Val.get(ctx.addExp()).containsKey("numberVal")) {
                 addExpVal = Long.parseLong((String) (node_attr_Val.get(ctx.addExp()).get("numberVal")));
             } else if (node_attr_Val.get(ctx.addExp()).containsKey("thisReg")) {
-                addExpReg = (Integer) node_attr_Val.get(ctx.addExp()).get("thisReg");
+                addExpReg = (String) node_attr_Val.get(ctx.addExp()).get("thisReg");
             }
 
             String thisReg = "%x" + currentReg++;
@@ -921,19 +921,19 @@ public class Visitor extends P5BaseVisitor<Void> {
             }
         } else if (ctx.children.size() == 3) { // eqExp (EQ_KW | NEQ_KW) relExp
             Long eqExpVal = 0L, relExpVal = 0L;
-            Integer eqExpReg = 0, relExpReg = 0;
+            String eqExpReg = null, relExpReg = null;
 
             visit(ctx.eqExp());
             if (node_attr_Val.get(ctx.eqExp()).containsKey("numberVal")) {
                 eqExpVal = Long.parseLong((String) (node_attr_Val.get(ctx.eqExp()).get("numberVal")));
             } else if (node_attr_Val.get(ctx.eqExp()).containsKey("thisReg")) {
-                eqExpReg = (Integer) node_attr_Val.get(ctx.eqExp()).get("thisReg");
+                eqExpReg = (String) node_attr_Val.get(ctx.eqExp()).get("thisReg");
             }
             visit(ctx.relExp());
             if (node_attr_Val.get(ctx.relExp()).containsKey("numberVal")) {
                 relExpVal = Long.parseLong((String) (node_attr_Val.get(ctx.relExp()).get("numberVal")));
             } else if (node_attr_Val.get(ctx.relExp()).containsKey("thisReg")) {
-                relExpReg = (Integer) node_attr_Val.get(ctx.relExp()).get("thisReg");
+                relExpReg = (String) node_attr_Val.get(ctx.relExp()).get("thisReg");
             }
 
             String thisReg = "%x" + currentReg++;
