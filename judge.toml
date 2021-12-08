@@ -3,5 +3,5 @@
 image = { source = "dockerfile", path = "." }
 
 run = [
-  "java -cp .:../lib/* com.miniSysY.P5.Main < $input > $ir"
+  "java -cp .:../lib/* com.miniSysY.P6.Main < $input > $ir"
 ]
