@@ -45,7 +45,7 @@ BlockComment: '/*' .*? '*/' -> skip;
 LineComment: '//' ~[\r\n]* -> skip;
 Ident: [_a-zA-Z][_a-zA-Z0-9]*;
 
-compUnit: funcDef;
+compUnit: (decl)* funcDef;
 funcType: INT_KW;
 funcIdent: FuncIdent;
 funcDef: funcType funcIdent LParser RParser block;
