@@ -399,12 +399,10 @@ public class Visitor extends P6BaseVisitor<Void> {
         } else if (ctx.ASSIGN() != null) {
             if (ctx.ASSIGN().getText().equals("=")) {
                 String Ident = ctx.lVal().Ident().getText();
-//                if (!ident_Reg.containsKey(Ident) || constIdent_Val.containsKey(Ident)) {
                 if (!ident_Check_Reg(ctx, Ident)) {
                     System.err.println("Undeclared Ident:" + Ident);
                     System.exit(1);
                 }
-//                Integer identReg = ident_Reg.get(Ident);
                 String identReg = ident_Get_Reg(ctx, Ident);
                 String bType = reg_Type.get(identReg);
                 visit(ctx.exp(0));
@@ -448,14 +446,53 @@ public class Visitor extends P6BaseVisitor<Void> {
             visit(ctx.cond());
             Integer TLabel = (Integer) node_attr_Val.get(ctx.cond()).get("TLabel");
             Integer FLabel = (Integer) node_attr_Val.get(ctx.cond()).get("FLabel");
+            attr_Val.put("StartLabel", StartLabel);
+            attr_Val.put("FLabel", FLabel);
+            attr_Val.put("TLabel", TLabel);
             IR_List.add("\nx" + TLabel + ":\n");
             visit(ctx.stmt(0));
             IR_List.add("\tbr label %x" + StartLabel + "\n");
             IR_List.add("\nx" + FLabel + ":\n");
         } else if (ctx.BREAK_KW() != null) {
-
+            RuleContext parent = ctx;
+            String StartLabel = null;
+            Integer TLabel = null, FLabel = null;
+            while (!(parent instanceof P6Parser.CompUnitContext)) {
+                if (parent instanceof P6Parser.StmtContext) {
+                    if (((P6Parser.StmtContext) parent).WHILE_KW() != null) {
+                        StartLabel = (String) node_attr_Val.get(parent).get("StartLabel");
+                        TLabel = (Integer) node_attr_Val.get(parent).get("TLabel");
+                        FLabel = (Integer) node_attr_Val.get(parent).get("FLabel");
+                        break;
+                    }
+                }
+                parent = parent.parent;
+            }
+            IR_List.add("\tbr label %x" + FLabel+"\n");
+            if (StartLabel == null || TLabel == null || FLabel == null) {
+                System.err.println("Separate BREAK");
+                System.exit(-1);
+            }
         } else if (ctx.CONTINUE_KW() != null) {
-
+            RuleContext parent = ctx;
+            String StartLabel = null;
+            Integer TLabel = null, FLabel = null;
+            while (!(parent instanceof P6Parser.CompUnitContext)) {
+                if (parent instanceof P6Parser.StmtContext) {
+                    if (((P6Parser.StmtContext) parent).WHILE_KW() != null) {
+                        StartLabel = (String) node_attr_Val.get(parent).get("StartLabel");
+                        TLabel = (Integer) node_attr_Val.get(parent).get("TLabel");
+                        FLabel = (Integer) node_attr_Val.get(parent).get("FLabel");
+                        break;
+                    }
+                }
+                parent = parent.parent;
+            }
+            IR_List.add("\tbr label %x" + StartLabel+"\n");
+            if (StartLabel == null || TLabel == null || FLabel == null) {
+                System.err.println("Separate CONTINUE");
+                System.exit(-1);
+            }
         } else {
             for (P6Parser.ExpContext exp : ctx.exp()) {
                 visit(exp);
