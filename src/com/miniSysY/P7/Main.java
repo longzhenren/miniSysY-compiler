@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -15,9 +14,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        Scanner sc = new Scanner(System.in);
-        while (sc.hasNextLine()){
-            System.err.println(sc.nextLine());
+        Scanner s = new Scanner(System.in);
+        while (s.hasNextLine()){
+            System.err.println(s.nextLine());
         }
         CharStream inputStream = CharStreams.fromStream(System.in);
 
