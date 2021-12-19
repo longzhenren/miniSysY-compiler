@@ -675,6 +675,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 arr_pos_val = new HashMap<>();
                 arrsize = (ArrayList<Integer>) node_attr_Val.get(ctx.parent).get("size");
                 attr_Val.put("arr_pos_val", arr_pos_val);
+                pos = 0;
             }
             int cnt = pos;
             boolean bottom = false;
