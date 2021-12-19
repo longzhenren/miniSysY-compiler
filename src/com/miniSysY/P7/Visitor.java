@@ -359,9 +359,9 @@ public class Visitor extends P7BaseVisitor<Void> {
                 if (size.size() == 2) {
                     String baselineptr = "%x" + currentReg++;
                     colptr = "%x" + currentReg++;
-                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(1) + " x [" + size.get(0) + " x i32]]\n");
-                    IR_List.add("\t" + baselineptr + " = getelementptr " + "[" + size.get(1) + " x [" + size.get(0) + " x i32]]" + ", " + "[" + size.get(1) + " x [" + size.get(0) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
-                    IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + baselineptr + ", i32 0, i32 0\n");
+                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(0) + " x [" + size.get(1) + " x i32]]\n");
+                    IR_List.add("\t" + baselineptr + " = getelementptr " + "[" + size.get(0) + " x [" + size.get(1) + " x i32]]" + ", " + "[" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
+                    IR_List.add("\t" + colptr + " = getelementptr [" + size.get(1) + " x i32], [" + size.get(1) + " x i32]* " + baselineptr + ", i32 0, i32 0\n");
                     IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(1) * size.get(0) + ")\n");
                 } else if (size.size() == 1) {
                     colptr = "%x" + currentReg++;
@@ -589,8 +589,8 @@ public class Visitor extends P7BaseVisitor<Void> {
                 if (size.size() == 2) {
                     String baselineptr = "%x" + currentReg++;
                     colptr = "%x" + currentReg++;
-                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(1) + " x [" + size.get(0) + " x i32]]\n");
-                    IR_List.add("\t" + baselineptr + " = getelementptr " + "[" + size.get(1) + " x [" + size.get(0) + " x i32]]" + ", " + "[" + size.get(1) + " x [" + size.get(0) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
+                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(0) + " x [" + size.get(1) + " x i32]]\n");
+                    IR_List.add("\t" + baselineptr + " = getelementptr " + "[" + size.get(0) + " x [" + size.get(1) + " x i32]]" + ", " + "[" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
                     IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + baselineptr + ", i32 0, i32 0\n");
                     IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(1) * size.get(0) + ")\n");
                 } else if (size.size() == 1) {
