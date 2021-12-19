@@ -151,18 +151,18 @@ public class Visitor extends P7BaseVisitor<Void> {
                     } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
                         e0val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
                     }
-                    IR_List.add("\t" + rowReg + " = add 0, " + e0val + "\n");
+                    IR_List.add("\t" + rowReg + " = add i32 0, " + e0val + "\n");
                     visit(ctx.exp(1));
                     if (node_attr_Val.get(ctx.exp(1)).containsKey("numberVal")) {
                         e1val = (String) node_attr_Val.get(ctx.exp(1)).get("numberVal");
                     } else if (node_attr_Val.get(ctx.exp(1)).containsKey("thisReg")) {
                         e1val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
                     }
-                    IR_List.add("\t" + mulReg + " = mul " + rowReg + ", " + size.get(1) + "\n");
+                    IR_List.add("\t" + mulReg + " = mul i32 " + rowReg + ", " + size.get(1) + "\n");
                     String baselineptr = "%x" + (currentReg++);
                     IR_List.add("\t" + baselineptr + " = getelementptr [" + size.get(1) + " x i32], [" + size.get(1) + " x i32]* " + baseptr + ", i32 0, i32 0\n");
                     String colReg = "%x" + currentReg++;
-                    IR_List.add("\t" + colReg + " = add " + mulReg + ", " + e1val + "\n");
+                    IR_List.add("\t" + colReg + " = add i32 " + mulReg + ", " + e1val + "\n");
                     String valReg = "%x" + currentReg++;
                     IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baselineptr + ", i32 " + colReg + "\n");
                     String thisReg = "%x" + currentReg++;
@@ -179,7 +179,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                         e0val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
                     }
                     String colReg = "%x" + currentReg++;
-                    IR_List.add("\t" + colReg + " = add 0, " + e0val + "\n");
+                    IR_List.add("\t" + colReg + " = add i32 0, " + e0val + "\n");
                     String valReg = "%x" + currentReg++;
                     IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baseptr + ", i32 " + colReg + "\n");
                     String thisReg = "%x" + currentReg++;
