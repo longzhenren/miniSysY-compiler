@@ -17,12 +17,12 @@ public class P7Lexer extends Lexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, LParser=4, RParser=5, LBrace=6, RBrace=7, RETURN_KW=8, 
-		INT_KW=9, CONST_KW=10, WHILE_KW=11, IF_KW=12, ELSE_KW=13, BREAK_KW=14, 
-		CONTINUE_KW=15, LT_KW=16, GT_KW=17, LE_KW=18, GE_KW=19, EQ_KW=20, NEQ_KW=21, 
-		LAND_KW=22, LOR_KW=23, ASSIGN=24, ADD=25, SUB=26, MUL=27, DIV=28, MOD=29, 
-		NOT=30, Semicolon=31, WhiteSpace=32, FuncIdent=33, DecimalConst=34, OctalConst=35, 
-		HexadecimalConst=36, BlockComment=37, LineComment=38, Ident=39;
+		T__0=1, LParser=2, RParser=3, LBrace=4, RBrace=5, LBracket=6, RBracket=7, 
+		RETURN_KW=8, INT_KW=9, CONST_KW=10, WHILE_KW=11, IF_KW=12, ELSE_KW=13, 
+		BREAK_KW=14, CONTINUE_KW=15, LT_KW=16, GT_KW=17, LE_KW=18, GE_KW=19, EQ_KW=20, 
+		NEQ_KW=21, LAND_KW=22, LOR_KW=23, ASSIGN=24, ADD=25, SUB=26, MUL=27, DIV=28, 
+		MOD=29, NOT=30, Semicolon=31, WhiteSpace=32, FuncIdent=33, DecimalConst=34, 
+		OctalConst=35, HexadecimalConst=36, BlockComment=37, LineComment=38, Ident=39;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -33,19 +33,19 @@ public class P7Lexer extends Lexer {
 
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"T__0", "T__1", "T__2", "LParser", "RParser", "LBrace", "RBrace", "RETURN_KW", 
-			"INT_KW", "CONST_KW", "WHILE_KW", "IF_KW", "ELSE_KW", "BREAK_KW", "CONTINUE_KW", 
-			"LT_KW", "GT_KW", "LE_KW", "GE_KW", "EQ_KW", "NEQ_KW", "LAND_KW", "LOR_KW", 
-			"ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "NOT", "Semicolon", "WhiteSpace", 
-			"FuncIdent", "DecimalConst", "OctalConst", "HexadecimalConst", "BlockComment", 
-			"LineComment", "Ident"
+			"T__0", "LParser", "RParser", "LBrace", "RBrace", "LBracket", "RBracket", 
+			"RETURN_KW", "INT_KW", "CONST_KW", "WHILE_KW", "IF_KW", "ELSE_KW", "BREAK_KW", 
+			"CONTINUE_KW", "LT_KW", "GT_KW", "LE_KW", "GE_KW", "EQ_KW", "NEQ_KW", 
+			"LAND_KW", "LOR_KW", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "NOT", 
+			"Semicolon", "WhiteSpace", "FuncIdent", "DecimalConst", "OctalConst", 
+			"HexadecimalConst", "BlockComment", "LineComment", "Ident"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'['", "']'", "','", "'('", "')'", "'{'", "'}'", "'return'", "'int'", 
+			null, "','", "'('", "')'", "'{'", "'}'", "'['", "']'", "'return'", "'int'", 
 			"'const'", "'while'", "'if'", "'else'", "'break'", "'continue'", "'<'", 
 			"'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'", null, "'+'", "'-'", 
 			"'*'", "'/'", "'%'", "'!'", "';'", null, "'main'"
@@ -54,12 +54,12 @@ public class P7Lexer extends Lexer {
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, "LParser", "RParser", "LBrace", "RBrace", "RETURN_KW", 
-			"INT_KW", "CONST_KW", "WHILE_KW", "IF_KW", "ELSE_KW", "BREAK_KW", "CONTINUE_KW", 
-			"LT_KW", "GT_KW", "LE_KW", "GE_KW", "EQ_KW", "NEQ_KW", "LAND_KW", "LOR_KW", 
-			"ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "NOT", "Semicolon", "WhiteSpace", 
-			"FuncIdent", "DecimalConst", "OctalConst", "HexadecimalConst", "BlockComment", 
-			"LineComment", "Ident"
+			null, null, "LParser", "RParser", "LBrace", "RBrace", "LBracket", "RBracket", 
+			"RETURN_KW", "INT_KW", "CONST_KW", "WHILE_KW", "IF_KW", "ELSE_KW", "BREAK_KW", 
+			"CONTINUE_KW", "LT_KW", "GT_KW", "LE_KW", "GE_KW", "EQ_KW", "NEQ_KW", 
+			"LAND_KW", "LOR_KW", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "NOT", 
+			"Semicolon", "WhiteSpace", "FuncIdent", "DecimalConst", "OctalConst", 
+			"HexadecimalConst", "BlockComment", "LineComment", "Ident"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -157,21 +157,21 @@ public class P7Lexer extends Lexer {
 		"\3\2\2\2\61\u00ba\3\2\2\2\63\u00bc\3\2\2\2\65\u00be\3\2\2\2\67\u00c0\3"+
 		"\2\2\29\u00c2\3\2\2\2;\u00c4\3\2\2\2=\u00c6\3\2\2\2?\u00c8\3\2\2\2A\u00ca"+
 		"\3\2\2\2C\u00ce\3\2\2\2E\u00d3\3\2\2\2G\u00da\3\2\2\2I\u00e1\3\2\2\2K"+
-		"\u00e8\3\2\2\2M\u00f6\3\2\2\2O\u0101\3\2\2\2QR\7]\2\2R\4\3\2\2\2ST\7_"+
-		"\2\2T\6\3\2\2\2UV\7.\2\2V\b\3\2\2\2WX\7*\2\2X\n\3\2\2\2YZ\7+\2\2Z\f\3"+
-		"\2\2\2[\\\7}\2\2\\\16\3\2\2\2]^\7\177\2\2^\20\3\2\2\2_`\7t\2\2`a\7g\2"+
-		"\2ab\7v\2\2bc\7w\2\2cd\7t\2\2de\7p\2\2e\22\3\2\2\2fg\7k\2\2gh\7p\2\2h"+
-		"i\7v\2\2i\24\3\2\2\2jk\7e\2\2kl\7q\2\2lm\7p\2\2mn\7u\2\2no\7v\2\2o\26"+
-		"\3\2\2\2pq\7y\2\2qr\7j\2\2rs\7k\2\2st\7n\2\2tu\7g\2\2u\30\3\2\2\2vw\7"+
-		"k\2\2wx\7h\2\2x\32\3\2\2\2yz\7g\2\2z{\7n\2\2{|\7u\2\2|}\7g\2\2}\34\3\2"+
-		"\2\2~\177\7d\2\2\177\u0080\7t\2\2\u0080\u0081\7g\2\2\u0081\u0082\7c\2"+
-		"\2\u0082\u0083\7m\2\2\u0083\36\3\2\2\2\u0084\u0085\7e\2\2\u0085\u0086"+
-		"\7q\2\2\u0086\u0087\7p\2\2\u0087\u0088\7v\2\2\u0088\u0089\7k\2\2\u0089"+
-		"\u008a\7p\2\2\u008a\u008b\7w\2\2\u008b\u008c\7g\2\2\u008c \3\2\2\2\u008d"+
-		"\u008e\7>\2\2\u008e\"\3\2\2\2\u008f\u0090\7@\2\2\u0090$\3\2\2\2\u0091"+
-		"\u0092\7>\2\2\u0092\u0093\7?\2\2\u0093&\3\2\2\2\u0094\u0095\7@\2\2\u0095"+
-		"\u0096\7?\2\2\u0096(\3\2\2\2\u0097\u0098\7?\2\2\u0098\u0099\7?\2\2\u0099"+
-		"*\3\2\2\2\u009a\u009b\7#\2\2\u009b\u009c\7?\2\2\u009c,\3\2\2\2\u009d\u009e"+
+		"\u00e8\3\2\2\2M\u00f6\3\2\2\2O\u0101\3\2\2\2QR\7.\2\2R\4\3\2\2\2ST\7*"+
+		"\2\2T\6\3\2\2\2UV\7+\2\2V\b\3\2\2\2WX\7}\2\2X\n\3\2\2\2YZ\7\177\2\2Z\f"+
+		"\3\2\2\2[\\\7]\2\2\\\16\3\2\2\2]^\7_\2\2^\20\3\2\2\2_`\7t\2\2`a\7g\2\2"+
+		"ab\7v\2\2bc\7w\2\2cd\7t\2\2de\7p\2\2e\22\3\2\2\2fg\7k\2\2gh\7p\2\2hi\7"+
+		"v\2\2i\24\3\2\2\2jk\7e\2\2kl\7q\2\2lm\7p\2\2mn\7u\2\2no\7v\2\2o\26\3\2"+
+		"\2\2pq\7y\2\2qr\7j\2\2rs\7k\2\2st\7n\2\2tu\7g\2\2u\30\3\2\2\2vw\7k\2\2"+
+		"wx\7h\2\2x\32\3\2\2\2yz\7g\2\2z{\7n\2\2{|\7u\2\2|}\7g\2\2}\34\3\2\2\2"+
+		"~\177\7d\2\2\177\u0080\7t\2\2\u0080\u0081\7g\2\2\u0081\u0082\7c\2\2\u0082"+
+		"\u0083\7m\2\2\u0083\36\3\2\2\2\u0084\u0085\7e\2\2\u0085\u0086\7q\2\2\u0086"+
+		"\u0087\7p\2\2\u0087\u0088\7v\2\2\u0088\u0089\7k\2\2\u0089\u008a\7p\2\2"+
+		"\u008a\u008b\7w\2\2\u008b\u008c\7g\2\2\u008c \3\2\2\2\u008d\u008e\7>\2"+
+		"\2\u008e\"\3\2\2\2\u008f\u0090\7@\2\2\u0090$\3\2\2\2\u0091\u0092\7>\2"+
+		"\2\u0092\u0093\7?\2\2\u0093&\3\2\2\2\u0094\u0095\7@\2\2\u0095\u0096\7"+
+		"?\2\2\u0096(\3\2\2\2\u0097\u0098\7?\2\2\u0098\u0099\7?\2\2\u0099*\3\2"+
+		"\2\2\u009a\u009b\7#\2\2\u009b\u009c\7?\2\2\u009c,\3\2\2\2\u009d\u009e"+
 		"\7(\2\2\u009e\u009f\7(\2\2\u009f.\3\2\2\2\u00a0\u00a1\7~\2\2\u00a1\u00a2"+
 		"\7~\2\2\u00a2\60\3\2\2\2\u00a3\u00bb\7?\2\2\u00a4\u00a5\7,\2\2\u00a5\u00bb"+
 		"\7?\2\2\u00a6\u00a7\7\61\2\2\u00a7\u00bb\7?\2\2\u00a8\u00a9\7\'\2\2\u00a9"+

@@ -32,8 +32,10 @@ public class Main {
         declaredFunc.put("putint", "void");
         declaredFunc.put("putch", "void");
         declaredFunc.put("putarray", "void");
+        declaredFunc.put("memset", "void");
 
         visitor.visit(tree);
+        Visitor.IR_List.add(0, "declare void @memset(i32*, i32, i32)\n");
         for (String s : Visitor.IR_List) {
             System.out.print(s);
         }

@@ -4,6 +4,8 @@ LParser: '(';
 RParser: ')';
 LBrace: '{';
 RBrace: '}';
+LBracket: '[';
+RBracket: ']';
 RETURN_KW: 'return';
 INT_KW: 'int';
 CONST_KW: 'const';
@@ -63,7 +65,7 @@ stmt:
 	| BREAK_KW Semicolon
     | CONTINUE_KW Semicolon
 	| returnStmt;
-lVal: Ident ('[' exp ']')*;
+lVal: Ident (LBracket exp RBracket)*;
 number: intConst;
 intConst: DecimalConst | OctalConst | HexadecimalConst;
 returnStmt: RETURN_KW exp Semicolon;
@@ -84,9 +86,9 @@ primaryExp: LParser exp RParser | lVal | number;
 decl: constDecl | varDecl;
 constDecl: CONST_KW bType constDef (',' constDef)* Semicolon;
 bType: INT_KW;
-constDef: Ident ( '[' constExp ']' )* ASSIGN constInitVal;
-constInitVal: constExp | '{' ( constInitVal ( ',' constInitVal )* )? '}';
+constDef: Ident ( LBracket constExp RBracket )* ASSIGN constInitVal;
+constInitVal: constExp | LBrace ( constInitVal ( ',' constInitVal )* )? RBrace;
 constExp: addExp;
 varDecl: bType varDef (',' varDef)* Semicolon;
-varDef: Ident ( '[' constExp ']' )* | Ident ( '[' constExp ']' )* ASSIGN initVal;
-initVal: exp | '{' ( initVal ( ',' initVal )* )? '}';
+varDef: Ident ( LBracket constExp RBracket )* | Ident ( LBracket constExp RBracket )* ASSIGN initVal;
+initVal: exp | LBrace ( initVal ( ',' initVal )* )? RBrace;

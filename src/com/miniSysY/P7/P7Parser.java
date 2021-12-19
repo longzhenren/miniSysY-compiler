@@ -17,12 +17,12 @@ public class P7Parser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, LParser=4, RParser=5, LBrace=6, RBrace=7, RETURN_KW=8, 
-		INT_KW=9, CONST_KW=10, WHILE_KW=11, IF_KW=12, ELSE_KW=13, BREAK_KW=14, 
-		CONTINUE_KW=15, LT_KW=16, GT_KW=17, LE_KW=18, GE_KW=19, EQ_KW=20, NEQ_KW=21, 
-		LAND_KW=22, LOR_KW=23, ASSIGN=24, ADD=25, SUB=26, MUL=27, DIV=28, MOD=29, 
-		NOT=30, Semicolon=31, WhiteSpace=32, FuncIdent=33, DecimalConst=34, OctalConst=35, 
-		HexadecimalConst=36, BlockComment=37, LineComment=38, Ident=39;
+		T__0=1, LParser=2, RParser=3, LBrace=4, RBrace=5, LBracket=6, RBracket=7, 
+		RETURN_KW=8, INT_KW=9, CONST_KW=10, WHILE_KW=11, IF_KW=12, ELSE_KW=13, 
+		BREAK_KW=14, CONTINUE_KW=15, LT_KW=16, GT_KW=17, LE_KW=18, GE_KW=19, EQ_KW=20, 
+		NEQ_KW=21, LAND_KW=22, LOR_KW=23, ASSIGN=24, ADD=25, SUB=26, MUL=27, DIV=28, 
+		MOD=29, NOT=30, Semicolon=31, WhiteSpace=32, FuncIdent=33, DecimalConst=34, 
+		OctalConst=35, HexadecimalConst=36, BlockComment=37, LineComment=38, Ident=39;
 	public static final int
 		RULE_compUnit = 0, RULE_funcType = 1, RULE_funcIdent = 2, RULE_funcDef = 3, 
 		RULE_block = 4, RULE_blockItem = 5, RULE_stmt = 6, RULE_lVal = 7, RULE_number = 8, 
@@ -45,7 +45,7 @@ public class P7Parser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'['", "']'", "','", "'('", "')'", "'{'", "'}'", "'return'", "'int'", 
+			null, "','", "'('", "')'", "'{'", "'}'", "'['", "']'", "'return'", "'int'", 
 			"'const'", "'while'", "'if'", "'else'", "'break'", "'continue'", "'<'", 
 			"'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'", null, "'+'", "'-'", 
 			"'*'", "'/'", "'%'", "'!'", "';'", null, "'main'"
@@ -54,12 +54,12 @@ public class P7Parser extends Parser {
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, "LParser", "RParser", "LBrace", "RBrace", "RETURN_KW", 
-			"INT_KW", "CONST_KW", "WHILE_KW", "IF_KW", "ELSE_KW", "BREAK_KW", "CONTINUE_KW", 
-			"LT_KW", "GT_KW", "LE_KW", "GE_KW", "EQ_KW", "NEQ_KW", "LAND_KW", "LOR_KW", 
-			"ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "NOT", "Semicolon", "WhiteSpace", 
-			"FuncIdent", "DecimalConst", "OctalConst", "HexadecimalConst", "BlockComment", 
-			"LineComment", "Ident"
+			null, null, "LParser", "RParser", "LBrace", "RBrace", "LBracket", "RBracket", 
+			"RETURN_KW", "INT_KW", "CONST_KW", "WHILE_KW", "IF_KW", "ELSE_KW", "BREAK_KW", 
+			"CONTINUE_KW", "LT_KW", "GT_KW", "LE_KW", "GE_KW", "EQ_KW", "NEQ_KW", 
+			"LAND_KW", "LOR_KW", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "MOD", "NOT", 
+			"Semicolon", "WhiteSpace", "FuncIdent", "DecimalConst", "OctalConst", 
+			"HexadecimalConst", "BlockComment", "LineComment", "Ident"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -644,11 +644,19 @@ public class P7Parser extends Parser {
 
 	public static class LValContext extends ParserRuleContext {
 		public TerminalNode Ident() { return getToken(P7Parser.Ident, 0); }
+		public List<TerminalNode> LBracket() { return getTokens(P7Parser.LBracket); }
+		public TerminalNode LBracket(int i) {
+			return getToken(P7Parser.LBracket, i);
+		}
 		public List<ExpContext> exp() {
 			return getRuleContexts(ExpContext.class);
 		}
 		public ExpContext exp(int i) {
 			return getRuleContext(ExpContext.class,i);
+		}
+		public List<TerminalNode> RBracket() { return getTokens(P7Parser.RBracket); }
+		public TerminalNode RBracket(int i) {
+			return getToken(P7Parser.RBracket, i);
 		}
 		public LValContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -686,11 +694,11 @@ public class P7Parser extends Parser {
 					{
 					{
 					setState(124);
-					match(T__0);
+					match(LBracket);
 					setState(125);
 					exp();
 					setState(126);
-					match(T__1);
+					match(RBracket);
 					}
 					} 
 				}
@@ -1556,11 +1564,11 @@ public class P7Parser extends Parser {
 					setState(218);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la==T__2) {
+					while (_la==T__0) {
 						{
 						{
 						setState(214);
-						match(T__2);
+						match(T__0);
 						setState(215);
 						exp();
 						}
@@ -1802,11 +1810,11 @@ public class P7Parser extends Parser {
 			setState(248);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__2) {
+			while (_la==T__0) {
 				{
 				{
 				setState(244);
-				match(T__2);
+				match(T__0);
 				setState(245);
 				constDef();
 				}
@@ -1878,11 +1886,19 @@ public class P7Parser extends Parser {
 		public ConstInitValContext constInitVal() {
 			return getRuleContext(ConstInitValContext.class,0);
 		}
+		public List<TerminalNode> LBracket() { return getTokens(P7Parser.LBracket); }
+		public TerminalNode LBracket(int i) {
+			return getToken(P7Parser.LBracket, i);
+		}
 		public List<ConstExpContext> constExp() {
 			return getRuleContexts(ConstExpContext.class);
 		}
 		public ConstExpContext constExp(int i) {
 			return getRuleContext(ConstExpContext.class,i);
+		}
+		public List<TerminalNode> RBracket() { return getTokens(P7Parser.RBracket); }
+		public TerminalNode RBracket(int i) {
+			return getToken(P7Parser.RBracket, i);
 		}
 		public ConstDefContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1915,15 +1931,15 @@ public class P7Parser extends Parser {
 			setState(262);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__0) {
+			while (_la==LBracket) {
 				{
 				{
 				setState(256);
-				match(T__0);
+				match(LBracket);
 				setState(257);
 				constExp();
 				setState(258);
-				match(T__1);
+				match(RBracket);
 				}
 				}
 				setState(264);
@@ -2015,11 +2031,11 @@ public class P7Parser extends Parser {
 					setState(275);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la==T__2) {
+					while (_la==T__0) {
 						{
 						{
 						setState(271);
-						match(T__2);
+						match(T__0);
 						setState(272);
 						constInitVal();
 						}
@@ -2138,11 +2154,11 @@ public class P7Parser extends Parser {
 			setState(291);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__2) {
+			while (_la==T__0) {
 				{
 				{
 				setState(287);
-				match(T__2);
+				match(T__0);
 				setState(288);
 				varDef();
 				}
@@ -2168,11 +2184,19 @@ public class P7Parser extends Parser {
 
 	public static class VarDefContext extends ParserRuleContext {
 		public TerminalNode Ident() { return getToken(P7Parser.Ident, 0); }
+		public List<TerminalNode> LBracket() { return getTokens(P7Parser.LBracket); }
+		public TerminalNode LBracket(int i) {
+			return getToken(P7Parser.LBracket, i);
+		}
 		public List<ConstExpContext> constExp() {
 			return getRuleContexts(ConstExpContext.class);
 		}
 		public ConstExpContext constExp(int i) {
 			return getRuleContext(ConstExpContext.class,i);
+		}
+		public List<TerminalNode> RBracket() { return getTokens(P7Parser.RBracket); }
+		public TerminalNode RBracket(int i) {
+			return getToken(P7Parser.RBracket, i);
 		}
 		public TerminalNode ASSIGN() { return getToken(P7Parser.ASSIGN, 0); }
 		public InitValContext initVal() {
@@ -2213,15 +2237,15 @@ public class P7Parser extends Parser {
 				setState(303);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==T__0) {
+				while (_la==LBracket) {
 					{
 					{
 					setState(297);
-					match(T__0);
+					match(LBracket);
 					setState(298);
 					constExp();
 					setState(299);
-					match(T__1);
+					match(RBracket);
 					}
 					}
 					setState(305);
@@ -2238,15 +2262,15 @@ public class P7Parser extends Parser {
 				setState(313);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==T__0) {
+				while (_la==LBracket) {
 					{
 					{
 					setState(307);
-					match(T__0);
+					match(LBracket);
 					setState(308);
 					constExp();
 					setState(309);
-					match(T__1);
+					match(RBracket);
 					}
 					}
 					setState(315);
@@ -2340,11 +2364,11 @@ public class P7Parser extends Parser {
 					setState(327);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la==T__2) {
+					while (_la==T__0) {
 						{
 						{
 						setState(323);
-						match(T__2);
+						match(T__0);
 						setState(324);
 						initVal();
 						}
@@ -2474,16 +2498,16 @@ public class P7Parser extends Parser {
 		"\2\2\66\u011d\3\2\2\28\u011f\3\2\2\2:\u0140\3\2\2\2<\u014f\3\2\2\2>@\5"+
 		",\27\2?>\3\2\2\2@C\3\2\2\2A?\3\2\2\2AB\3\2\2\2BD\3\2\2\2CA\3\2\2\2DE\5"+
 		"\b\5\2E\3\3\2\2\2FG\7\13\2\2G\5\3\2\2\2HI\7#\2\2I\7\3\2\2\2JK\5\4\3\2"+
-		"KL\5\6\4\2LM\7\6\2\2MN\7\7\2\2NO\5\n\6\2O\t\3\2\2\2PT\7\b\2\2QS\5\f\7"+
-		"\2RQ\3\2\2\2SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2UW\3\2\2\2VT\3\2\2\2WX\7\t\2"+
+		"KL\5\6\4\2LM\7\4\2\2MN\7\5\2\2NO\5\n\6\2O\t\3\2\2\2PT\7\6\2\2QS\5\f\7"+
+		"\2RQ\3\2\2\2SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2UW\3\2\2\2VT\3\2\2\2WX\7\7\2"+
 		"\2X\13\3\2\2\2Y\\\5,\27\2Z\\\5\16\b\2[Y\3\2\2\2[Z\3\2\2\2\\\r\3\2\2\2"+
 		"]^\5\20\t\2^_\7\32\2\2_`\5\30\r\2`a\7!\2\2a|\3\2\2\2b|\5\n\6\2ce\5\30"+
-		"\r\2dc\3\2\2\2de\3\2\2\2ef\3\2\2\2f|\7!\2\2gh\7\16\2\2hi\7\6\2\2ij\5\32"+
-		"\16\2jk\7\7\2\2kn\5\16\b\2lm\7\17\2\2mo\5\16\b\2nl\3\2\2\2no\3\2\2\2o"+
-		"|\3\2\2\2pq\7\r\2\2qr\7\6\2\2rs\5\32\16\2st\7\7\2\2tu\5\16\b\2u|\3\2\2"+
+		"\r\2dc\3\2\2\2de\3\2\2\2ef\3\2\2\2f|\7!\2\2gh\7\16\2\2hi\7\4\2\2ij\5\32"+
+		"\16\2jk\7\5\2\2kn\5\16\b\2lm\7\17\2\2mo\5\16\b\2nl\3\2\2\2no\3\2\2\2o"+
+		"|\3\2\2\2pq\7\r\2\2qr\7\4\2\2rs\5\32\16\2st\7\5\2\2tu\5\16\b\2u|\3\2\2"+
 		"\2vw\7\20\2\2w|\7!\2\2xy\7\21\2\2y|\7!\2\2z|\5\26\f\2{]\3\2\2\2{b\3\2"+
 		"\2\2{d\3\2\2\2{g\3\2\2\2{p\3\2\2\2{v\3\2\2\2{x\3\2\2\2{z\3\2\2\2|\17\3"+
-		"\2\2\2}\u0084\7)\2\2~\177\7\3\2\2\177\u0080\5\30\r\2\u0080\u0081\7\4\2"+
+		"\2\2\2}\u0084\7)\2\2~\177\7\b\2\2\177\u0080\5\30\r\2\u0080\u0081\7\t\2"+
 		"\2\u0081\u0083\3\2\2\2\u0082~\3\2\2\2\u0083\u0086\3\2\2\2\u0084\u0082"+
 		"\3\2\2\2\u0084\u0085\3\2\2\2\u0085\21\3\2\2\2\u0086\u0084\3\2\2\2\u0087"+
 		"\u0088\5\24\13\2\u0088\23\3\2\2\2\u0089\u008a\t\2\2\2\u008a\25\3\2\2\2"+
@@ -2509,46 +2533,46 @@ public class P7Parser extends Parser {
 		"\u00ca\u00cb\b\24\1\2\u00cb\u00cc\5(\25\2\u00cc\u00d2\3\2\2\2\u00cd\u00ce"+
 		"\f\3\2\2\u00ce\u00cf\t\6\2\2\u00cf\u00d1\5(\25\2\u00d0\u00cd\3\2\2\2\u00d1"+
 		"\u00d4\3\2\2\2\u00d2\u00d0\3\2\2\2\u00d2\u00d3\3\2\2\2\u00d3\'\3\2\2\2"+
-		"\u00d4\u00d2\3\2\2\2\u00d5\u00d6\7)\2\2\u00d6\u00df\7\6\2\2\u00d7\u00dc"+
-		"\5\30\r\2\u00d8\u00d9\7\5\2\2\u00d9\u00db\5\30\r\2\u00da\u00d8\3\2\2\2"+
+		"\u00d4\u00d2\3\2\2\2\u00d5\u00d6\7)\2\2\u00d6\u00df\7\4\2\2\u00d7\u00dc"+
+		"\5\30\r\2\u00d8\u00d9\7\3\2\2\u00d9\u00db\5\30\r\2\u00da\u00d8\3\2\2\2"+
 		"\u00db\u00de\3\2\2\2\u00dc\u00da\3\2\2\2\u00dc\u00dd\3\2\2\2\u00dd\u00e0"+
 		"\3\2\2\2\u00de\u00dc\3\2\2\2\u00df\u00d7\3\2\2\2\u00df\u00e0\3\2\2\2\u00e0"+
-		"\u00e1\3\2\2\2\u00e1\u00e6\7\7\2\2\u00e2\u00e3\t\7\2\2\u00e3\u00e6\5("+
+		"\u00e1\3\2\2\2\u00e1\u00e6\7\5\2\2\u00e2\u00e3\t\7\2\2\u00e3\u00e6\5("+
 		"\25\2\u00e4\u00e6\5*\26\2\u00e5\u00d5\3\2\2\2\u00e5\u00e2\3\2\2\2\u00e5"+
-		"\u00e4\3\2\2\2\u00e6)\3\2\2\2\u00e7\u00e8\7\6\2\2\u00e8\u00e9\5\30\r\2"+
-		"\u00e9\u00ea\7\7\2\2\u00ea\u00ee\3\2\2\2\u00eb\u00ee\5\20\t\2\u00ec\u00ee"+
+		"\u00e4\3\2\2\2\u00e6)\3\2\2\2\u00e7\u00e8\7\4\2\2\u00e8\u00e9\5\30\r\2"+
+		"\u00e9\u00ea\7\5\2\2\u00ea\u00ee\3\2\2\2\u00eb\u00ee\5\20\t\2\u00ec\u00ee"+
 		"\5\22\n\2\u00ed\u00e7\3\2\2\2\u00ed\u00eb\3\2\2\2\u00ed\u00ec\3\2\2\2"+
 		"\u00ee+\3\2\2\2\u00ef\u00f2\5.\30\2\u00f0\u00f2\58\35\2\u00f1\u00ef\3"+
 		"\2\2\2\u00f1\u00f0\3\2\2\2\u00f2-\3\2\2\2\u00f3\u00f4\7\f\2\2\u00f4\u00f5"+
-		"\5\60\31\2\u00f5\u00fa\5\62\32\2\u00f6\u00f7\7\5\2\2\u00f7\u00f9\5\62"+
+		"\5\60\31\2\u00f5\u00fa\5\62\32\2\u00f6\u00f7\7\3\2\2\u00f7\u00f9\5\62"+
 		"\32\2\u00f8\u00f6\3\2\2\2\u00f9\u00fc\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa"+
 		"\u00fb\3\2\2\2\u00fb\u00fd\3\2\2\2\u00fc\u00fa\3\2\2\2\u00fd\u00fe\7!"+
 		"\2\2\u00fe/\3\2\2\2\u00ff\u0100\7\13\2\2\u0100\61\3\2\2\2\u0101\u0108"+
-		"\7)\2\2\u0102\u0103\7\3\2\2\u0103\u0104\5\66\34\2\u0104\u0105\7\4\2\2"+
+		"\7)\2\2\u0102\u0103\7\b\2\2\u0103\u0104\5\66\34\2\u0104\u0105\7\t\2\2"+
 		"\u0105\u0107\3\2\2\2\u0106\u0102\3\2\2\2\u0107\u010a\3\2\2\2\u0108\u0106"+
 		"\3\2\2\2\u0108\u0109\3\2\2\2\u0109\u010b\3\2\2\2\u010a\u0108\3\2\2\2\u010b"+
 		"\u010c\7\32\2\2\u010c\u010d\5\64\33\2\u010d\63\3\2\2\2\u010e\u011c\5\66"+
-		"\34\2\u010f\u0118\7\b\2\2\u0110\u0115\5\64\33\2\u0111\u0112\7\5\2\2\u0112"+
+		"\34\2\u010f\u0118\7\6\2\2\u0110\u0115\5\64\33\2\u0111\u0112\7\3\2\2\u0112"+
 		"\u0114\5\64\33\2\u0113\u0111\3\2\2\2\u0114\u0117\3\2\2\2\u0115\u0113\3"+
 		"\2\2\2\u0115\u0116\3\2\2\2\u0116\u0119\3\2\2\2\u0117\u0115\3\2\2\2\u0118"+
-		"\u0110\3\2\2\2\u0118\u0119\3\2\2\2\u0119\u011a\3\2\2\2\u011a\u011c\7\t"+
+		"\u0110\3\2\2\2\u0118\u0119\3\2\2\2\u0119\u011a\3\2\2\2\u011a\u011c\7\7"+
 		"\2\2\u011b\u010e\3\2\2\2\u011b\u010f\3\2\2\2\u011c\65\3\2\2\2\u011d\u011e"+
 		"\5$\23\2\u011e\67\3\2\2\2\u011f\u0120\5\60\31\2\u0120\u0125\5:\36\2\u0121"+
-		"\u0122\7\5\2\2\u0122\u0124\5:\36\2\u0123\u0121\3\2\2\2\u0124\u0127\3\2"+
+		"\u0122\7\3\2\2\u0122\u0124\5:\36\2\u0123\u0121\3\2\2\2\u0124\u0127\3\2"+
 		"\2\2\u0125\u0123\3\2\2\2\u0125\u0126\3\2\2\2\u0126\u0128\3\2\2\2\u0127"+
 		"\u0125\3\2\2\2\u0128\u0129\7!\2\2\u01299\3\2\2\2\u012a\u0131\7)\2\2\u012b"+
-		"\u012c\7\3\2\2\u012c\u012d\5\66\34\2\u012d\u012e\7\4\2\2\u012e\u0130\3"+
+		"\u012c\7\b\2\2\u012c\u012d\5\66\34\2\u012d\u012e\7\t\2\2\u012e\u0130\3"+
 		"\2\2\2\u012f\u012b\3\2\2\2\u0130\u0133\3\2\2\2\u0131\u012f\3\2\2\2\u0131"+
 		"\u0132\3\2\2\2\u0132\u0141\3\2\2\2\u0133\u0131\3\2\2\2\u0134\u013b\7)"+
-		"\2\2\u0135\u0136\7\3\2\2\u0136\u0137\5\66\34\2\u0137\u0138\7\4\2\2\u0138"+
+		"\2\2\u0135\u0136\7\b\2\2\u0136\u0137\5\66\34\2\u0137\u0138\7\t\2\2\u0138"+
 		"\u013a\3\2\2\2\u0139\u0135\3\2\2\2\u013a\u013d\3\2\2\2\u013b\u0139\3\2"+
 		"\2\2\u013b\u013c\3\2\2\2\u013c\u013e\3\2\2\2\u013d\u013b\3\2\2\2\u013e"+
 		"\u013f\7\32\2\2\u013f\u0141\5<\37\2\u0140\u012a\3\2\2\2\u0140\u0134\3"+
-		"\2\2\2\u0141;\3\2\2\2\u0142\u0150\5\30\r\2\u0143\u014c\7\b\2\2\u0144\u0149"+
-		"\5<\37\2\u0145\u0146\7\5\2\2\u0146\u0148\5<\37\2\u0147\u0145\3\2\2\2\u0148"+
+		"\2\2\2\u0141;\3\2\2\2\u0142\u0150\5\30\r\2\u0143\u014c\7\6\2\2\u0144\u0149"+
+		"\5<\37\2\u0145\u0146\7\3\2\2\u0146\u0148\5<\37\2\u0147\u0145\3\2\2\2\u0148"+
 		"\u014b\3\2\2\2\u0149\u0147\3\2\2\2\u0149\u014a\3\2\2\2\u014a\u014d\3\2"+
 		"\2\2\u014b\u0149\3\2\2\2\u014c\u0144\3\2\2\2\u014c\u014d\3\2\2\2\u014d"+
-		"\u014e\3\2\2\2\u014e\u0150\7\t\2\2\u014f\u0142\3\2\2\2\u014f\u0143\3\2"+
+		"\u014e\3\2\2\2\u014e\u0150\7\7\2\2\u014f\u0142\3\2\2\2\u014f\u0143\3\2"+
 		"\2\2\u0150=\3\2\2\2 AT[dn{\u0084\u009b\u00a6\u00b1\u00bc\u00c7\u00d2\u00dc"+
 		"\u00df\u00e5\u00ed\u00f1\u00fa\u0108\u0115\u0118\u011b\u0125\u0131\u013b"+
 		"\u0140\u0149\u014c\u014f";
