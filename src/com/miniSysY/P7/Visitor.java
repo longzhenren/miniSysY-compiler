@@ -261,8 +261,8 @@ public class Visitor extends P7BaseVisitor<Void> {
     public Void visitConstDef(P7Parser.ConstDefContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
+        String thisReg;
         String Ident = ctx.Ident().getText();
-        // TODO:数组保存维数，并解析初值并保存到节点上
         if (ctx.constExp() != null) {
             ArrayList<Integer> size = new ArrayList<>();
             attr_Val.put("size", size);
@@ -272,34 +272,137 @@ public class Visitor extends P7BaseVisitor<Void> {
                 visit(ce);
                 size.add(Integer.parseInt((String) (node_attr_Val.get(ce).get("constExpVal"))));
             }
-            if (ctx.constInitVal() != null) {
-                visit(ctx.constInitVal());
-                String arrReg = (String) node_attr_Val.get(ctx.constInitVal()).get("thisReg");
-                ident_Put_Reg(ctx, Ident, arrReg);
-                attr_Val.put("thisReg", arrReg);
-            }
-        } else if (node_attr_Val.get(ctx.parent).containsKey("global")) {
-            attr_Val.put("global", "global");
-            long globalInitValue = 0;
-            if (ctx.ASSIGN() != null) {
-                if (ctx.ASSIGN().getText().equals("=")) {
+            if (node_attr_Val.get(ctx.parent).containsKey("global")) {
+                attr_Val.put("global", "global");
+                thisReg = "@" + Ident;
+                if (ctx.constInitVal() != null) {
+                    StringBuilder sbIR = new StringBuilder();
+                    sbIR.append(thisReg).append(" = dso_local constant ");
+                    if (size.size() == 1) {
+                        sbIR.append("[").append(size.get(0)).append(" x i32] ");
+                    } else if (size.size() == 2) {
+                        sbIR.append("[").append(size.get(0)).append(" x [").append(size.get(1)).append(" x i32]] ");
+                    }
+                    visit(ctx.constInitVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
+                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_pos_val");
+                    sbIR.append("[");
+                    if (size.size() == 1) {
+                        boolean zerorow = true;
+                        for (int i = 0; i < size.get(0); i++) {
+                            if (arr_pos_val.containsKey(String.valueOf(i))) {
+                                zerorow = false;
+                                break;
+                            }
+                        }
+                        if (!zerorow) {
+                            for (int i = 0; i < size.get(0); i++) {
+                                if (arr_pos_val.containsKey(String.valueOf(i))) {
+                                    sbIR.append("i32 ").append(arr_pos_val.get(String.valueOf(i)));
+                                } else {
+                                    sbIR.append("i32 0");
+                                }
+                                if (i < size.get(0) - 1) {
+                                    sbIR.append(", ");
+                                }
+                            }
+                        } else {
+                            sbIR.append("zeroinitializer");
+                        }
+                    } else if (size.size() == 2) {
+                        for (int i = 0; i < size.get(0); i++) {
+                            sbIR.append("[").append(size.get(1)).append(" x i32] ");
+                            boolean zerorow = true;
+                            for (int j = 0; j < size.get(1); j++) {
+                                int tmp = size.get(1) * i + j;
+                                if (arr_pos_val.containsKey(String.valueOf(tmp))) {
+                                    zerorow = false;
+                                    break;
+                                }
+                            }
+                            if (!zerorow) {
+                                sbIR.append("[");
+                                for (int j = 0; j < size.get(1); j++) {
+                                    int tmp = size.get(1) * i + j;
+                                    if (arr_pos_val.containsKey(String.valueOf(tmp))) {
+                                        sbIR.append("i32 ").append(arr_pos_val.get(String.valueOf(tmp)));
+                                    } else {
+                                        sbIR.append("i32 0");
+                                    }
+                                    if (j < size.get(1) - 1) {
+                                        sbIR.append(", ");
+                                    }
+                                }
+                                sbIR.append("]");
+                            } else {
+                                sbIR.append("zeroinitializer");
+                            }
+                            if (i < size.get(0) - 1) {
+                                sbIR.append(", ");
+                            }
+                        }
+                    }
+                    sbIR.append("]");
+                    sbIR.append("\n");
+                    IR_List.add(String.valueOf(sbIR));
+                } else {
+                    if (size.size() == 1) {
+                        IR_List.add(thisReg + " = dso_local global [" + size.get(0) + " x i32] zeroinitializer\n");
+                    } else if (size.size() == 2) {
+                        IR_List.add(thisReg + " = dso_local global [" + size.get(1) + " x [" + size.get(0) + " x i32]] zeroinitializer\n");
+                    }
+                }
+                ident_Put_Reg(ctx, Ident, thisReg);
+            } else {
+                thisReg = "%x" + currentReg++;
+                ident_Put_Reg(ctx, Ident, thisReg);
+                String colptr = null;
+                if (size.size() == 2) {
+                    String baselineptr = "%x" + currentReg++;
+                    colptr = "%x" + currentReg++;
+                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(1) + " x [" + size.get(0) + " x i32]]\n");
+                    IR_List.add("\t" + baselineptr + " = getelementptr [" + size.get(1) + " x [" + size.get(0) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
+                    IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + baselineptr + ", i32 0, i32 0\n");
+                    IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(1) * size.get(0) + ")\n");
+                } else if (size.size() == 1) {
+                    colptr = "%x" + currentReg++;
+                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(0) + " x i32]\n");
+                    IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + thisReg + ", i32 0, i32 0\n");
+                    IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(0) + ")\n");
+                }
+                if (ctx.constInitVal() != null) {
                     visit(ctx.constInitVal());
-                    if (node_attr_Val.get(ctx.constInitVal()).containsKey("constExpVal")) {
-                        globalInitValue = Long.parseLong((String) (node_attr_Val.get(ctx.constInitVal()).get("constExpVal")));
+                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_pos_val");
+                    for (String pos : arr_pos_val.keySet()) {
+                        String tmpReg = "%x" + currentReg++;
+                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + colptr + ", i32 " + pos + "\n");
+                        IR_List.add("\tstore i32 " + arr_pos_val.get(pos) + ", i32* " + tmpReg + "\n");
                     }
                 }
             }
-            ident_Put_Reg(ctx, Ident, String.valueOf(globalInitValue));
         } else {
-            if (ctx.ASSIGN() != null) {
-                if (ctx.ASSIGN().getText().equals("=")) {
-                    visit(ctx.constInitVal());
-                    Long constExpVal = Long.parseLong((String) (node_attr_Val.get(ctx.constInitVal()).get("constExpVal")));
-                    if (!ident_Check_Reg_this_Block(ctx, Ident)) {
-                        ident_Put_Reg(ctx, Ident, String.valueOf(constExpVal));
-                    } else {
-                        System.err.println("Re-Declaration ident:" + Ident);
-                        System.exit(1);
+            if (node_attr_Val.get(ctx.parent).containsKey("global")) {
+                attr_Val.put("global", "global");
+                long globalInitValue = 0;
+                if (ctx.ASSIGN() != null) {
+                    if (ctx.ASSIGN().getText().equals("=")) {
+                        visit(ctx.constInitVal());
+                        if (node_attr_Val.get(ctx.constInitVal()).containsKey("constExpVal")) {
+                            globalInitValue = Long.parseLong((String) (node_attr_Val.get(ctx.constInitVal()).get("constExpVal")));
+                        }
+                    }
+                }
+                ident_Put_Reg(ctx, Ident, String.valueOf(globalInitValue));
+            } else {
+                if (ctx.ASSIGN() != null) {
+                    if (ctx.ASSIGN().getText().equals("=")) {
+                        visit(ctx.constInitVal());
+                        Long constExpVal = Long.parseLong((String) (node_attr_Val.get(ctx.constInitVal()).get("constExpVal")));
+                        if (!ident_Check_Reg_this_Block(ctx, Ident)) {
+                            ident_Put_Reg(ctx, Ident, String.valueOf(constExpVal));
+                        } else {
+                            System.err.println("Re-Declaration ident:" + Ident);
+                            System.exit(1);
+                        }
                     }
                 }
             }
@@ -394,34 +497,116 @@ public class Visitor extends P7BaseVisitor<Void> {
             attr_Val.put("size", size);
             arri_size.put(Ident, size);
             attr_Val.put("dim", size.size());
-            thisReg = "%x" + currentReg++;
-            ident_Put_Reg(ctx, Ident, thisReg);
             for (P7Parser.ConstExpContext ce : ctx.constExp()) {
                 visit(ce);
                 size.add(Integer.parseInt((String) (node_attr_Val.get(ce).get("constExpVal"))));
             }
+            if (node_attr_Val.get(ctx.parent).containsKey("global")) {
+                attr_Val.put("global", "global");
+                thisReg = "@" + Ident;
+                if (ctx.initVal() != null) {
+                    StringBuilder sbIR = new StringBuilder();
+                    sbIR.append(thisReg).append(" = dso_local global ");
+                    if (size.size() == 1) {
+                        sbIR.append("[").append(size.get(0)).append(" x i32] ");
+                    } else if (size.size() == 2) {
+                        sbIR.append("[").append(size.get(0)).append(" x [").append(size.get(1)).append(" x i32]] ");
+                    }
+                    visit(ctx.initVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
+                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
+                    sbIR.append("[");
+                    if (size.size() == 1) {
+                        boolean zerorow = true;
+                        for (int i = 0; i < size.get(0); i++) {
+                            if (arr_pos_val.containsKey(String.valueOf(i))) {
+                                zerorow = false;
+                                break;
+                            }
 
-            String colptr = null;
-            if (size.size() == 2) {
-                String baselineptr = "%x" + currentReg++;
-                colptr = "%x" + currentReg++;
-                IR_List.add("\t" + thisReg + " = alloca [" + size.get(1) + " x [" + size.get(0) + " x i32]]\n");
-                IR_List.add("\t" + baselineptr + " = getelementptr [" + size.get(1) + " x [" + size.get(0) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
-                IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + baselineptr + ", i32 0, i32 0\n");
-                IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(1) * size.get(0) + ")\n");
-            } else if (size.size() == 1) {
-                colptr = "%x" + currentReg++;
-                IR_List.add("\t" + thisReg + " = alloca [" + size.get(0) + " x i32]\n");
-                IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + thisReg + ", i32 0, i32 0\n");
-                IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(0) + ")\n");
-            }
-            if (ctx.initVal() != null) {
-                visit(ctx.initVal());
-                HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
-                for (String pos : arr_pos_val.keySet()) {
-                    String tmpReg = "%x" + currentReg++;
-                    IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + colptr + ", i32 " + pos + "\n");
-                    IR_List.add("\tstore i32 " + arr_pos_val.get(pos) + ", i32* " + tmpReg + "\n");
+                        }
+                        if (!zerorow) {
+                            for (int i = 0; i < size.get(0); i++) {
+                                if (arr_pos_val.containsKey(String.valueOf(i))) {
+                                    sbIR.append("i32 ").append(arr_pos_val.get(String.valueOf(i)));
+                                } else {
+                                    sbIR.append("i32 0");
+                                }
+                                if (i < size.get(0) - 1) {
+                                    sbIR.append(", ");
+                                }
+                            }
+                        } else {
+                            sbIR.append("zeroinitializer");
+                        }
+                    } else if (size.size() == 2) {
+                        for (int i = 0; i < size.get(0); i++) {
+                            sbIR.append("[").append(size.get(1)).append(" x i32] ");
+                            boolean zerorow = true;
+                            for (int j = 0; j < size.get(1); j++) {
+                                int tmp = size.get(1) * i + j;
+                                if (arr_pos_val.containsKey(String.valueOf(tmp))) {
+                                    zerorow = false;
+                                    break;
+                                }
+                            }
+                            if (!zerorow) {
+                                sbIR.append("[");
+                                for (int j = 0; j < size.get(1); j++) {
+                                    int tmp = size.get(1) * i + j;
+                                    if (arr_pos_val.containsKey(String.valueOf(tmp))) {
+                                        sbIR.append("i32 ").append(arr_pos_val.get(String.valueOf(tmp)));
+                                    } else {
+                                        sbIR.append("i32 0");
+                                    }
+                                    if (j < size.get(1) - 1) {
+                                        sbIR.append(", ");
+                                    }
+                                }
+                                sbIR.append("]");
+                            } else {
+                                sbIR.append("zeroinitializer");
+                            }
+                            if (i < size.get(0) - 1) {
+                                sbIR.append(", ");
+                            }
+                        }
+                    }
+                    sbIR.append("]");
+                    sbIR.append("\n");
+                    IR_List.add(String.valueOf(sbIR));
+                } else {
+                    if (size.size() == 1) {
+                        IR_List.add(thisReg + " = dso_local global [" + size.get(0) + " x i32] zeroinitializer\n");
+                    } else if (size.size() == 2) {
+                        IR_List.add(thisReg + " = dso_local global [" + size.get(1) + " x [" + size.get(0) + " x i32]] zeroinitializer\n");
+                    }
+                }
+                ident_Put_Reg(ctx, Ident, thisReg);
+            } else {
+                thisReg = "%x" + currentReg++;
+                ident_Put_Reg(ctx, Ident, thisReg);
+                String colptr = null;
+                if (size.size() == 2) {
+                    String baselineptr = "%x" + currentReg++;
+                    colptr = "%x" + currentReg++;
+                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(1) + " x [" + size.get(0) + " x i32]]\n");
+                    IR_List.add("\t" + baselineptr + " = getelementptr [" + size.get(1) + " x [" + size.get(0) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
+                    IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + baselineptr + ", i32 0, i32 0\n");
+                    IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(1) * size.get(0) + ")\n");
+                } else if (size.size() == 1) {
+                    colptr = "%x" + currentReg++;
+                    IR_List.add("\t" + thisReg + " = alloca [" + size.get(0) + " x i32]\n");
+                    IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + thisReg + ", i32 0, i32 0\n");
+                    IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(0) + ")\n");
+                }
+                if (ctx.initVal() != null) {
+                    visit(ctx.initVal());
+                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
+                    for (String pos : arr_pos_val.keySet()) {
+                        String tmpReg = "%x" + currentReg++;
+                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + colptr + ", i32 " + pos + "\n");
+                        IR_List.add("\tstore i32 " + arr_pos_val.get(pos) + ", i32* " + tmpReg + "\n");
+                    }
                 }
             }
         } else {
@@ -465,7 +650,6 @@ public class Visitor extends P7BaseVisitor<Void> {
                 }
             }
         }
-
         return null;
     }
 
