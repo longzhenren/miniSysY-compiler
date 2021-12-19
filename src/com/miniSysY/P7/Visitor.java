@@ -133,7 +133,7 @@ public class Visitor extends P7BaseVisitor<Void> {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
         String Ident = ctx.Ident().getText();
-        if (ctx.exp() != null) {
+        if (ctx.exp().size() != 0) {
             if (ident_Check_Reg(ctx, Ident)) {
                 //取出数组中的元素相关IR
                 //获取维数，计算地址偏移量，取值
@@ -149,7 +149,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                     if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
                         e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
                     } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
-                        e0val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
                     }
                     IR_List.add("\t" + rowReg + " = add i32 0, " + e0val + "\n");
                     visit(ctx.exp(1));
@@ -176,7 +176,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                     if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
                         e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
                     } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
-                        e0val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
                     }
                     String colReg = "%x" + currentReg++;
                     IR_List.add("\t" + colReg + " = add i32 0, " + e0val + "\n");
@@ -275,6 +275,8 @@ public class Visitor extends P7BaseVisitor<Void> {
             if (node_attr_Val.get(ctx.parent).containsKey("global")) {
                 attr_Val.put("global", "global");
                 thisReg = "@" + Ident;
+                reg_Type.put(thisReg, "i32");
+                arri_size.put(thisReg, size);
                 if (ctx.constInitVal() != null) {
                     StringBuilder sbIR = new StringBuilder();
                     sbIR.append(thisReg).append(" = dso_local constant ");
@@ -355,6 +357,7 @@ public class Visitor extends P7BaseVisitor<Void> {
             } else {
                 thisReg = "%x" + currentReg++;
                 ident_Put_Reg(ctx, Ident, thisReg);
+                reg_Type.put(thisReg, "i32");
                 String colptr = null;
                 if (size.size() == 2) {
                     String baselineptr = "%x" + currentReg++;
@@ -430,6 +433,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 arr_pos_val = new HashMap<>();
                 arrsize = (ArrayList<Integer>) node_attr_Val.get(ctx.parent).get("size");
                 attr_Val.put("arr_pos_val", arr_pos_val);
+                pos = 0;
             }
             int cnt = pos;
             boolean bottom = false;
@@ -492,7 +496,7 @@ public class Visitor extends P7BaseVisitor<Void> {
         node_attr_Val.put(ctx, attr_Val);
         String thisReg;
         String Ident = ctx.Ident().getText();
-        if (ctx.constExp() != null) {
+        if (ctx.constExp().size() != 0) {
             ArrayList<Integer> size = new ArrayList<>();
             attr_Val.put("size", size);
             arri_size.put(Ident, size);
@@ -504,6 +508,8 @@ public class Visitor extends P7BaseVisitor<Void> {
             if (node_attr_Val.get(ctx.parent).containsKey("global")) {
                 attr_Val.put("global", "global");
                 thisReg = "@" + Ident;
+                arri_size.put(thisReg, size);
+                reg_Type.put(thisReg, "i32");
                 if (ctx.initVal() != null) {
                     StringBuilder sbIR = new StringBuilder();
                     sbIR.append(thisReg).append(" = dso_local global ");
@@ -585,6 +591,7 @@ public class Visitor extends P7BaseVisitor<Void> {
             } else {
                 thisReg = "%x" + currentReg++;
                 ident_Put_Reg(ctx, Ident, thisReg);
+                reg_Type.put(thisReg, "i32");
                 String colptr = null;
                 if (size.size() == 2) {
                     String baselineptr = "%x" + currentReg++;
@@ -602,6 +609,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 if (ctx.initVal() != null) {
                     visit(ctx.initVal());
                     HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
+
                     for (String pos : arr_pos_val.keySet()) {
                         String tmpReg = "%x" + currentReg++;
                         IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + colptr + ", i32 " + pos + "\n");
