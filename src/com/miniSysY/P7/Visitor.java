@@ -173,7 +173,6 @@ public class Visitor extends P7BaseVisitor<Void> {
                     IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + idptr + ", i32 0, i32 0\n");
                     String e0val = null;
                     visit(ctx.exp(0));
-                    IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x [" + size.get(1) + " x i32]], [" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + idptr + ", i32 0, i32 0\n");
                     if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
                         e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
                     } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
