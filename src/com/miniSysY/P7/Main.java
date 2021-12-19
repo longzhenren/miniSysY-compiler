@@ -4,8 +4,10 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class Main {
     public static HashMap<String, String> declaredFunc = new HashMap<>();
@@ -13,7 +15,12 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
+        Scanner s = new Scanner(System.in);
+        while (s.hasNextLine()){
+            System.err.println(s.nextLine());
+        }
         CharStream inputStream = CharStreams.fromStream(System.in);
+
 //        CharStream inputStream = CharStreams.fromString("");
         P7Lexer lexer = new P7Lexer(inputStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
