@@ -14,9 +14,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        Scanner s = new Scanner(System.in);
-        while (s.hasNextLine()){
-            System.err.println(s.nextLine());
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNextLine()){
+            System.err.println(sc.nextLine());
         }
         CharStream inputStream = CharStreams.fromStream(System.in);
 
