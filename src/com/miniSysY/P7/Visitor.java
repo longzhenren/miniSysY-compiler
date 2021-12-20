@@ -352,7 +352,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                     if (size.size() == 1) {
                         IR_List.add(thisReg + " = dso_local global [" + size.get(0) + " x i32] zeroinitializer\n");
                     } else if (size.size() == 2) {
-                        IR_List.add(thisReg + " = dso_local global [" + size.get(1) + " x [" + size.get(0) + " x i32]] zeroinitializer\n");
+                        IR_List.add(thisReg + " = dso_local global [" + size.get(0) + " x [" + size.get(1) + " x i32]] zeroinitializer\n");
                     }
                 }
                 ident_Put_Reg(ctx, Ident, thisReg);
@@ -586,7 +586,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                     if (size.size() == 1) {
                         IR_List.add(thisReg + " = dso_local global [" + size.get(0) + " x i32] zeroinitializer\n");
                     } else if (size.size() == 2) {
-                        IR_List.add(thisReg + " = dso_local global [" + size.get(1) + " x [" + size.get(0) + " x i32]] zeroinitializer\n");
+                        IR_List.add(thisReg + " = dso_local global [" + size.get(0) + " x [" + size.get(1) + " x i32]] zeroinitializer\n");
                     }
                 }
                 ident_Put_Reg(ctx, Ident, thisReg);
@@ -824,7 +824,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 if (ctx.stmt().size() == 2)
                     visit(ctx.stmt(1));
                 IR_List.add("\tbr label %x" + PassLabel + "\n");
- 
+
                 IR_List.add("\nx" + PassLabel + ":\n");
             }
         } else if (ctx.block() != null) {
