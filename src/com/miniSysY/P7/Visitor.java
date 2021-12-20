@@ -1199,7 +1199,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 String thisReg = "%x" + currentReg++;
                 reg_Type.put(thisReg, "i32");
                 attr_Val.put("thisReg", thisReg);
-                IR_List.add("\t%x" + thisReg + " = sub nsw " + unaryExpType + " 0" + ", %x" + unaryExpReg + "\n");
+                IR_List.add("\t%x" + thisReg + " = sub nsw " + unaryExpType + " 0" + ", " + unaryExpReg + "\n");
             }
         } else if (ctx.NOT() != null) {
             visit(ctx.unaryExp());
