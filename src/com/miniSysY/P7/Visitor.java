@@ -164,6 +164,8 @@ public class Visitor extends P7BaseVisitor<Void> {
                     String colReg = "%x" + currentReg++;
                     IR_List.add("\t" + colReg + " = add i32 " + mulReg + ", " + e1val + "\n");
                     String valReg = "%x" + currentReg++;
+                    attr_Val.put("arrReg", valReg);
+                    reg_Type.put(valReg, "i32");
                     IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baselineptr + ", i32 " + colReg + "\n");
                     String thisReg = "%x" + currentReg++;
                     IR_List.add("\t" + thisReg + " = load i32, i32* " + valReg + "\n");
@@ -184,6 +186,8 @@ public class Visitor extends P7BaseVisitor<Void> {
                     IR_List.add("\t" + colReg + " = add i32 0, " + e0val + "\n");
                     String valReg = "%x" + currentReg++;
                     IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baseptr + ", i32 " + colReg + "\n");
+                    attr_Val.put("arrReg", valReg);
+                    reg_Type.put(valReg, "i32");
                     String thisReg = "%x" + currentReg++;
                     IR_List.add("\t" + thisReg + " = load i32, i32* " + valReg + "\n");
                     reg_Type.put(thisReg, "i32");
@@ -776,7 +780,12 @@ public class Visitor extends P7BaseVisitor<Void> {
                     System.exit(1);
                 }
                 visit(ctx.lVal());
-                String identReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
+                String identReg = null;
+                if (node_attr_Val.get(ctx.lVal()).containsKey("arrReg")) {
+                    identReg = (String) node_attr_Val.get(ctx.lVal()).get("arrReg");
+                } else {
+                    identReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
+                }
 //                String identReg = (String) ident_Get_Reg(ctx, Ident);
                 String bType = reg_Type.get(identReg);
                 visit(ctx.exp());
@@ -786,18 +795,6 @@ public class Visitor extends P7BaseVisitor<Void> {
                         System.out.println("Type dismatch!");
                         System.exit(-1);
                     }
-//                    if (!((reg_Type.get(identReg).startsWith("arr") && reg_Type.get(identReg).contains(reg_Type.get(expReg))) || (reg_Type.get(identReg).equals(reg_Type.get(expReg))))) {
-//                        System.out.println("Type dismatch!");
-//                        System.exit(-1);
-//                    }
-//                    if(reg_Type.get(identReg).startsWith("arr") && reg_Type.get(identReg).contains(reg_Type.get(expReg))){
-//                        ArrayList<Integer> size = arri_size.get(identReg);
-//                        if(size.size()==2){
-//
-//                        }else if(size.size()==1){
-//
-//                        }
-//                    }
                     IR_List.add("\tstore " + bType + " " + expReg + ", " + bType + "* " + identReg + "\n");
                 } else if (node_attr_Val.get(ctx.exp()).containsKey("numberVal")) {
                     IR_List.add("\tstore i32 " + node_attr_Val.get(ctx.exp()).get("numberVal") + ", i32* " + identReg + "\n");
