@@ -135,9 +135,13 @@ public class Visitor extends P7BaseVisitor<Void> {
         String Ident = ctx.Ident().getText();
         if (ctx.exp().size() != 0) {
             if (ident_Check_Reg(ctx, Ident)) {
+                ArrayList<Integer> size = arri_size.get(Ident);
+                if (ctx.exp().size() != size.size()) {
+                    System.err.println("Array Type not Match!");
+                    System.exit(-1);
+                }
                 //取出数组中的元素相关IR
                 //获取维数，计算地址偏移量，取值
-                ArrayList<Integer> size = arri_size.get(Ident);
                 if (size.size() == 2) {
                     String e0val = null, e1val = null;
                     visit(ctx.exp(0));
