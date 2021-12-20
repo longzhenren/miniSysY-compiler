@@ -138,26 +138,26 @@ public class Visitor extends P7BaseVisitor<Void> {
                 //取出数组中的元素相关IR
                 //获取维数，计算地址偏移量，取值
                 ArrayList<Integer> size = arri_size.get(Ident);
-                String baseptr = "%x" + (currentReg++);
-                String idptr = (String) ident_Get_Reg(ctx, Ident);
                 if (size.size() == 2) {
-                    String rowReg = "%x" + currentReg++;
-                    String mulReg = "%x" + currentReg++;
                     String e0val = null, e1val = null;
                     visit(ctx.exp(0));
+                    String baseptr = "%x" + (currentReg++);
+                    String idptr = (String) ident_Get_Reg(ctx, Ident);
                     IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x [" + size.get(1) + " x i32]], [" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + idptr + ", i32 0, i32 0\n");
                     if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
                         e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
                     } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
                         e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
                     }
-                    IR_List.add("\t" + rowReg + " = add i32 0, " + e0val + "\n");
                     visit(ctx.exp(1));
+                    String rowReg = "%x" + currentReg++;
+                    IR_List.add("\t" + rowReg + " = add i32 0, " + e0val + "\n");
                     if (node_attr_Val.get(ctx.exp(1)).containsKey("numberVal")) {
                         e1val = (String) node_attr_Val.get(ctx.exp(1)).get("numberVal");
                     } else if (node_attr_Val.get(ctx.exp(1)).containsKey("thisReg")) {
                         e1val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
                     }
+                    String mulReg = "%x" + currentReg++;
                     IR_List.add("\t" + mulReg + " = mul i32 " + rowReg + ", " + size.get(1) + "\n");
                     String baselineptr = "%x" + (currentReg++);
                     IR_List.add("\t" + baselineptr + " = getelementptr [" + size.get(1) + " x i32], [" + size.get(1) + " x i32]* " + baseptr + ", i32 0, i32 0\n");
@@ -170,9 +170,11 @@ public class Visitor extends P7BaseVisitor<Void> {
                     reg_Type.put(thisReg, "i32");
                     attr_Val.put("thisReg", thisReg);
                 } else if (size.size() == 1) {
+                    visit(ctx.exp(0));
+                    String baseptr = "%x" + (currentReg++);
+                    String idptr = (String) ident_Get_Reg(ctx, Ident);
                     IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + idptr + ", i32 0, i32 0\n");
                     String e0val = null;
-                    visit(ctx.exp(0));
                     if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
                         e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
                     } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
@@ -773,14 +775,29 @@ public class Visitor extends P7BaseVisitor<Void> {
                     System.err.println("Undeclared Ident:" + Ident);
                     System.exit(1);
                 }
-                String identReg = (String) ident_Get_Reg(ctx, Ident);
+                visit(ctx.lVal());
+                String identReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
+//                String identReg = (String) ident_Get_Reg(ctx, Ident);
                 String bType = reg_Type.get(identReg);
                 visit(ctx.exp());
                 if (node_attr_Val.get(ctx.exp()).containsKey("thisReg")) {
                     String expReg = (String) node_attr_Val.get(ctx.exp()).get("thisReg");
-                    if (!reg_Type.get(expReg).equals(bType)) {
+                    if (!(reg_Type.get(identReg).equals(reg_Type.get(expReg)))) {
+                        System.out.println("Type dismatch!");
                         System.exit(-1);
                     }
+//                    if (!((reg_Type.get(identReg).startsWith("arr") && reg_Type.get(identReg).contains(reg_Type.get(expReg))) || (reg_Type.get(identReg).equals(reg_Type.get(expReg))))) {
+//                        System.out.println("Type dismatch!");
+//                        System.exit(-1);
+//                    }
+//                    if(reg_Type.get(identReg).startsWith("arr") && reg_Type.get(identReg).contains(reg_Type.get(expReg))){
+//                        ArrayList<Integer> size = arri_size.get(identReg);
+//                        if(size.size()==2){
+//
+//                        }else if(size.size()==1){
+//
+//                        }
+//                    }
                     IR_List.add("\tstore " + bType + " " + expReg + ", " + bType + "* " + identReg + "\n");
                 } else if (node_attr_Val.get(ctx.exp()).containsKey("numberVal")) {
                     IR_List.add("\tstore i32 " + node_attr_Val.get(ctx.exp()).get("numberVal") + ", i32* " + identReg + "\n");
@@ -807,7 +824,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 if (ctx.stmt().size() == 2)
                     visit(ctx.stmt(1));
                 IR_List.add("\tbr label %x" + PassLabel + "\n");
-
+ 
                 IR_List.add("\nx" + PassLabel + ":\n");
             }
         } else if (ctx.block() != null) {
