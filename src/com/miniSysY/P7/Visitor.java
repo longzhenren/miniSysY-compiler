@@ -812,6 +812,8 @@ public class Visitor extends P7BaseVisitor<Void> {
                 IR_List.add("\tbr label %x" + PassLabel + "\n");
 
                 IR_List.add("\nx" + PassLabel + ":\n");
+                IR_List.add("\tbr label %x" + FLabel + "\n");
+                IR_List.add("\nx" + FLabel + ":\n");
             } else {
                 IR_List.add("\nx" + TLabel + ":\n");
                 visit(ctx.stmt(0));
