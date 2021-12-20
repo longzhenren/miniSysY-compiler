@@ -269,7 +269,7 @@ public class Visitor extends P7BaseVisitor<Void> {
         node_attr_Val.put(ctx, attr_Val);
         String thisReg;
         String Ident = ctx.Ident().getText();
-        if (ctx.constExp() != null) {
+        if (ctx.constExp().size() != 0) {
             ArrayList<Integer> size = new ArrayList<>();
             attr_Val.put("size", size);
             arri_size.put(Ident, size);
