@@ -206,10 +206,10 @@ public class Visitor extends P7BaseVisitor<Void> {
             if (ident_Check_Reg(ctx, Ident)) {
                 String identReg = (String) ident_Get_Reg(ctx, Ident);
                 if (identReg.startsWith("%x") || identReg.startsWith("@")) {// local var or global var
-                    String thisReg = "%x" + currentReg++;
-                    reg_Type.put(thisReg, "i32");
-                    IR_List.add("\t" + thisReg + " = load i32, i32* " + identReg + "\n");
-                    attr_Val.put("thisReg", thisReg);
+//                    String thisReg = "%x" + currentReg++;
+//                    reg_Type.put(thisReg, "i32");
+//                    IR_List.add("\t" + thisReg + " = load i32, i32* " + identReg + "\n");
+                    attr_Val.put("thisReg", identReg);
                 } else {// const
                     attr_Val.put("nodeVal", identReg);
                 }
@@ -1016,9 +1016,9 @@ public class Visitor extends P7BaseVisitor<Void> {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\t").append(thisReg).append(" = ");
                 if (ctx.ADD() != null) {
-                    sb.append("add nsw i32 ");
+                    sb.append("add i32 ");
                 } else if (ctx.SUB() != null) {
-                    sb.append("sub nsw i32 ");
+                    sb.append("sub i32 ");
                 }
                 if (node_attr_Val.get(ctx.addExp()).containsKey("numberVal")
                         && node_attr_Val.get(ctx.mulExp()).containsKey("thisReg")) {
@@ -1087,7 +1087,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 if (node_attr_Val.get(ctx.mulExp()).containsKey("numberVal")
                         && node_attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
                     if (ctx.MUL() != null) {
-                        IR_List.add("\t" + thisReg + " = mul nsw " + mulExpType + " " + mulExpVal + ", "
+                        IR_List.add("\t" + thisReg + " = mul " + mulExpType + " " + mulExpVal + ", "
                                 + unaryExpReg + "\n");
                     } else if (ctx.DIV() != null) {
                         IR_List.add("\t" + thisReg + " = sdiv " + mulExpType + " " + mulExpVal + ", " + unaryExpReg
@@ -1099,7 +1099,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 } else if (node_attr_Val.get(ctx.mulExp()).containsKey("thisReg")
                         && node_attr_Val.get(ctx.unaryExp()).containsKey("numberVal")) {
                     if (ctx.MUL() != null) {
-                        IR_List.add("\t" + thisReg + " = mul nsw " + mulExpType + " " + mulExpReg + ", "
+                        IR_List.add("\t" + thisReg + " = mul " + mulExpType + " " + mulExpReg + ", "
                                 + unaryExpVal + "\n");
                     } else if (ctx.DIV() != null) {
                         IR_List.add("\t" + thisReg + " = sdiv " + mulExpType + " " + mulExpReg + ", " + unaryExpVal
@@ -1111,7 +1111,7 @@ public class Visitor extends P7BaseVisitor<Void> {
                 } else if (node_attr_Val.get(ctx.mulExp()).containsKey("thisReg")
                         && node_attr_Val.get(ctx.unaryExp()).containsKey("thisReg")) {
                     if (ctx.MUL() != null) {
-                        IR_List.add("\t" + thisReg + " = mul nsw " + mulExpType + " " + mulExpReg + ", "
+                        IR_List.add("\t" + thisReg + " = mul " + mulExpType + " " + mulExpReg + ", "
                                 + unaryExpReg + "\n");
                     } else if (ctx.DIV() != null) {
                         IR_List.add("\t" + thisReg + " = sdiv " + mulExpType + " " + mulExpReg + ", "
