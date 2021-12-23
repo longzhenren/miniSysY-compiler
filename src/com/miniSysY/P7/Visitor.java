@@ -698,6 +698,9 @@ public class Visitor extends P7BaseVisitor<Void> {
                     if (node_attr_Val.get(i).containsKey("numberVal")) {//直接就是一个数字
                         String expval = (String) node_attr_Val.get(i).get("numberVal");
                         arr_pos_val.put(String.valueOf(pos++), expval);
+                    }else if(node_attr_Val.get(i).containsKey("thisReg")){
+                        String expval = (String) node_attr_Val.get(i).get("thisReg");
+                        arr_pos_val.put(String.valueOf(pos++), expval);
                     }
                 } else {
                     sid++;
