@@ -206,10 +206,10 @@ public class Visitor extends P7BaseVisitor<Void> {
             if (ident_Check_Reg(ctx, Ident)) {
                 String identReg = (String) ident_Get_Reg(ctx, Ident);
                 if (identReg.startsWith("%x") || identReg.startsWith("@")) {// local var or global var
-//                    String thisReg = "%x" + currentReg++;
-//                    reg_Type.put(thisReg, "i32");
-//                    IR_List.add("\t" + thisReg + " = load i32, i32* " + identReg + "\n");
-                    attr_Val.put("thisReg", identReg);
+                    String thisReg = "%x" + currentReg++;
+                    reg_Type.put(thisReg, "i32");
+                    IR_List.add("\t" + thisReg + " = load i32, i32* " + identReg + "\n");
+                    attr_Val.put("thisReg", thisReg);
                 } else {// const
                     attr_Val.put("nodeVal", identReg);
                 }
