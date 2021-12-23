@@ -425,6 +425,7 @@ public class Visitor extends P7BaseVisitor<Void> {
     }
 
     int pos = 0;
+    int sid = 0;
     HashMap<String, String> arr_pos_val = null;
     ArrayList<Integer> arrsize = null;
 
@@ -444,25 +445,22 @@ public class Visitor extends P7BaseVisitor<Void> {
                 arrsize = (ArrayList<Integer>) node_attr_Val.get(ctx.parent).get("size");
                 attr_Val.put("arr_pos_val", arr_pos_val);
                 pos = 0;
+                sid = 1;
             }
-            int cnt = pos;
-            boolean bottom = false;
             for (P7Parser.ConstInitValContext ci : ctx.constInitVal()) {//一个括号内部
                 visit(ci);
                 if (ci.constExp() != null) {
-                    bottom = true;
                     String expval = (String) node_attr_Val.get(ci.constExp()).get("constExpVal");
-                    arr_pos_val.put(String.valueOf(cnt++), expval);
+                    arr_pos_val.put(String.valueOf(pos++), expval);
+                } else {
+                    sid++;
                 }
             }
-            if (bottom && (cnt - pos) < arrsize.get(arrsize.size() - 1)) {
-                cnt = arrsize.get(arrsize.size() - 1);
-            }
+            pos = arrsize.get(arrsize.size() - 1) * sid;
 //            while (bottom && (cnt - pos) < arrsize.get(arrsize.size() - 1)) {
 //                arrval.add(cnt++, "0");
 //                cnt++;
 //            }
-            pos = cnt;
         }
         return null;
     }
@@ -687,33 +685,25 @@ public class Visitor extends P7BaseVisitor<Void> {
                 attr_Val.put("numberVal", node_attr_Val.get(ctx.exp()).get("numberVal"));
             }
         } else if (ctx.initVal() != null) {
-            // {{1}, {2, 3}}
-            //TODO:分层解析赋值语句
             if (ctx.parent instanceof P7Parser.VarDefContext) {
                 arr_pos_val = new HashMap<>();
                 arrsize = (ArrayList<Integer>) node_attr_Val.get(ctx.parent).get("size");
                 attr_Val.put("arr_pos_val", arr_pos_val);
                 pos = 0;
+                sid = 1;
             }
-            int cnt = pos;
-            boolean bottom = false;
             for (P7Parser.InitValContext i : ctx.initVal()) {//一个括号内部
                 visit(i);
                 if (i.exp() != null) {
-                    bottom = true;
                     if (node_attr_Val.get(i).containsKey("numberVal")) {//直接就是一个数字
                         String expval = (String) node_attr_Val.get(i).get("numberVal");
-                        arr_pos_val.put(String.valueOf(cnt++), expval);
-                    } else if (node_attr_Val.get(i).containsKey("thisReg")) {//传进来Lval对应的东西
-                        String expval = (String) node_attr_Val.get(i).get("thisReg");
-                        arr_pos_val.put(String.valueOf(cnt++), expval);
+                        arr_pos_val.put(String.valueOf(pos++), expval);
                     }
+                } else {
+                    sid++;
                 }
             }
-            if (bottom && (cnt - pos) < arrsize.get(arrsize.size() - 1)) {
-                cnt = arrsize.get(arrsize.size() - 1);
-            }
-            pos = cnt;
+            pos = arrsize.get(arrsize.size() - 1) * sid;
         }
         return null;
     }
