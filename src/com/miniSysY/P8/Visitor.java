@@ -1,8 +1,7 @@
 package com.miniSysY.P8;
 
-import com.miniSysY.P8.P8BaseVisitor;
-import com.miniSysY.P8.P8Parser;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 
 import java.util.ArrayList;
@@ -700,7 +699,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                     if (node_attr_Val.get(i).containsKey("numberVal")) {//直接就是一个数字
                         String expval = (String) node_attr_Val.get(i).get("numberVal");
                         arr_pos_val.put(String.valueOf(pos++), expval);
-                    }else if(node_attr_Val.get(i).containsKey("thisReg")){
+                    } else if (node_attr_Val.get(i).containsKey("thisReg")) {
                         String expval = (String) node_attr_Val.get(i).get("thisReg");
                         arr_pos_val.put(String.valueOf(pos++), expval);
                     }
@@ -714,14 +713,11 @@ public class Visitor extends P8BaseVisitor<Void> {
     }
 
     @Override
-    // compUnit:(decl)* funcDef;
+    // compUnit:(decl|funcDef)*(decl|funcDef);
     public Void visitCompUnit(P8Parser.CompUnitContext ctx) {
-        if (ctx.decl().size() > 0) {
-            for (P8Parser.DeclContext dcx : ctx.decl()) {
-                visit(dcx);
-            }
+        for (ParseTree child : ctx.children) {
+            visit(child);
         }
-        visit(ctx.funcDef());
         return null;
     }
 
@@ -735,21 +731,20 @@ public class Visitor extends P8BaseVisitor<Void> {
         return null;
     }
 
-    @Override
-    // funcIdent:FuncIdent;
-    public Void visitFuncIdent(P8Parser.FuncIdentContext ctx) {
-        HashMap<String, Object> attr_Val = new HashMap<>();
-        attr_Val.put("funcIdent", ctx.FuncIdent().getText());
-        node_attr_Val.put(ctx, attr_Val);
-        return null;
-    }
+//    @Override
+//    // funcIdent:FuncIdent;
+//    public Void visitFuncIdent(P8Parser.FuncIdentContext ctx) {
+//        HashMap<String, Object> attr_Val = new HashMap<>();
+//        attr_Val.put("funcIdent", ctx.FuncIdent().getText());
+//        node_attr_Val.put(ctx, attr_Val);
+//        return null;
+//    }
 
     @Override
-    // funcDef:funcType funcIdent LParser RParser block;
+    // funcDef:funcType Ident LParser RParser block;
     public Void visitFuncDef(P8Parser.FuncDefContext ctx) {
         visit(ctx.funcType());
-        visit(ctx.funcIdent());
-        IR_List.add("define dso_local " + node_attr_Val.get(ctx.funcType()).get("funcType") + " " + "@" + node_attr_Val.get(ctx.funcIdent()).get("funcIdent") + " ()" + "{\n");
+        IR_List.add("define dso_local " + node_attr_Val.get(ctx.funcType()).get("funcType") + " " + "@" + ctx.Ident().getText() + " ()" + "{\n");
         visit(ctx.block());
         IR_List.add("}");
         return null;
