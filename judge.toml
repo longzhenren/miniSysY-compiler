@@ -1,0 +1,7 @@
+[jobs.lab8]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+  "java -cp .:../lib/* com.miniSysY.P8.Main < $input > $ir"
+]
