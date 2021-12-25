@@ -9,6 +9,9 @@ import java.util.HashMap;
 
 public class Visitor extends P8BaseVisitor<Void> {
     Integer currentReg = 0;
+    int pos = 0, sid = 0;
+    HashMap<String, String> arr_pos_val = null;
+    ArrayList<Integer> arrsize = null;
     public static HashMap<RuleNode, HashMap<String, Object>> node_attr_Val = new HashMap<>(); // 保存树上结点的各种属性
     public static HashMap<RuleContext, HashMap<String, Object>> block_ident_Reg = new HashMap<>();
     public static HashMap<String, String> reg_Type = new HashMap<>();
@@ -45,23 +48,6 @@ public class Visitor extends P8BaseVisitor<Void> {
         }
         return false;
     }
-
-//    public HashMap<String, Integer> get_Id_List(RuleContext ctx) {// 获取当前可用的符号表
-//        RuleContext parent = ctx;
-//        HashMap<String, Integer> res = new HashMap<>();
-//        while (!(parent instanceof P8Parser.CompUnitContext)) {
-//            if (parent instanceof P8Parser.BlockContext) {
-//                HashMap<String, Integer> tmp = block_ident_Reg.get(parent);
-//                for (String ident : tmp.keySet()) {
-//                    if (!res.containsKey(ident)) {
-//                        res.put(ident, tmp.get(ident));
-//                    }
-//                }
-//            }
-//            parent = parent.parent;
-//        }
-//        return res;
-//    }
 
     public void ident_Put_Reg(RuleContext ctx, String Ident, Object Reg) {// 添加符号
         RuleContext parent = ctx;
@@ -111,114 +97,20 @@ public class Visitor extends P8BaseVisitor<Void> {
     }
 
     @Override
-    // blockItem:decl|stmt;
-    public Void visitBlockItem(P8Parser.BlockItemContext ctx) {
-        HashMap<String, Object> attr_Val = new HashMap<>();
-        node_attr_Val.put(ctx, attr_Val);
-        if (ctx.stmt() != null) {
-            attr_Val.put("type", "stmt");
-            visit(ctx.stmt());
-        } else if (ctx.decl() != null) {
-            attr_Val.put("type", "decl");
-            visit(ctx.decl());
-        }
-        if (ctx.parent instanceof P8Parser.StmtContext) {
-            visit(ctx.stmt());
+    // compUnit:(decl|funcDef)*(decl|funcDef);
+    public Void visitCompUnit(P8Parser.CompUnitContext ctx) {
+        for (ParseTree child : ctx.children) {
+            visit(child);
         }
         return null;
     }
 
     @Override
-    // lVal:Ident (LBracket exp RBracket)*;
-    public Void visitLVal(P8Parser.LValContext ctx) {
+    // bType:INT_KW;
+    public Void visitBType(P8Parser.BTypeContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
-        String Ident = ctx.Ident().getText();
-        if (ctx.exp().size() != 0) {
-            if (ident_Check_Reg(ctx, Ident)) {
-                ArrayList<Integer> size = arri_size.get(Ident);
-                if (ctx.exp().size() != size.size()) {
-                    System.err.println("Array Type not Match!");
-                    System.exit(-1);
-                }
-                //取出数组中的元素相关IR
-                //获取维数，计算地址偏移量，取值
-                if (size.size() == 2) {
-                    String e0val = null, e1val = null;
-                    visit(ctx.exp(0));
-                    String baseptr = "%x" + (currentReg++);
-                    String idptr = (String) ident_Get_Reg(ctx, Ident);
-                    IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x [" + size.get(1) + " x i32]], [" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + idptr + ", i32 0, i32 0\n");
-                    if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
-                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
-                    } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
-                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
-                    }
-                    visit(ctx.exp(1));
-                    String rowReg = "%x" + currentReg++;
-                    IR_List.add("\t" + rowReg + " = add i32 0, " + e0val + "\n");
-                    if (node_attr_Val.get(ctx.exp(1)).containsKey("numberVal")) {
-                        e1val = (String) node_attr_Val.get(ctx.exp(1)).get("numberVal");
-                    } else if (node_attr_Val.get(ctx.exp(1)).containsKey("thisReg")) {
-                        e1val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
-                    }
-                    String mulReg = "%x" + currentReg++;
-                    IR_List.add("\t" + mulReg + " = mul i32 " + rowReg + ", " + size.get(1) + "\n");
-                    String baselineptr = "%x" + (currentReg++);
-                    IR_List.add("\t" + baselineptr + " = getelementptr [" + size.get(1) + " x i32], [" + size.get(1) + " x i32]* " + baseptr + ", i32 0, i32 0\n");
-                    String colReg = "%x" + currentReg++;
-                    IR_List.add("\t" + colReg + " = add i32 " + mulReg + ", " + e1val + "\n");
-                    String valReg = "%x" + currentReg++;
-                    attr_Val.put("arrReg", valReg);
-                    reg_Type.put(valReg, "i32");
-                    IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baselineptr + ", i32 " + colReg + "\n");
-                    String thisReg = "%x" + currentReg++;
-                    IR_List.add("\t" + thisReg + " = load i32, i32* " + valReg + "\n");
-                    reg_Type.put(thisReg, "i32");
-                    attr_Val.put("thisReg", thisReg);
-                } else if (size.size() == 1) {
-                    visit(ctx.exp(0));
-                    String baseptr = "%x" + (currentReg++);
-                    String idptr = (String) ident_Get_Reg(ctx, Ident);
-                    IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + idptr + ", i32 0, i32 0\n");
-                    String e0val = null;
-                    if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
-                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
-                    } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
-                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
-                    }
-                    String colReg = "%x" + currentReg++;
-                    IR_List.add("\t" + colReg + " = add i32 0, " + e0val + "\n");
-                    String valReg = "%x" + currentReg++;
-                    IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baseptr + ", i32 " + colReg + "\n");
-                    attr_Val.put("arrReg", valReg);
-                    reg_Type.put(valReg, "i32");
-                    String thisReg = "%x" + currentReg++;
-                    IR_List.add("\t" + thisReg + " = load i32, i32* " + valReg + "\n");
-                    reg_Type.put(thisReg, "i32");
-                    attr_Val.put("thisReg", thisReg);
-                }
-
-            } else {
-                System.err.println("Undeclared Ident:" + Ident);
-                System.exit(1);
-            }
-        } else {
-            if (ident_Check_Reg(ctx, Ident)) {
-                String identReg = (String) ident_Get_Reg(ctx, Ident);
-                if (identReg.startsWith("%x") || identReg.startsWith("@")) {// local var or global var
-                    String thisReg = "%x" + currentReg++;
-                    reg_Type.put(thisReg, "i32");
-                    IR_List.add("\t" + thisReg + " = load i32, i32* " + identReg + "\n");
-                    attr_Val.put("thisReg", thisReg);
-                } else {// const
-                    attr_Val.put("nodeVal", identReg);
-                }
-            } else {
-                System.err.println("Undeclared Ident:" + Ident);
-                System.exit(1);
-            }
-        }
+        attr_Val.put("bType", "i32");
         return null;
     }
 
@@ -254,15 +146,6 @@ public class Visitor extends P8BaseVisitor<Void> {
                 System.exit(1);
             }
             visit(cdf);
-        }
-        return null;
-    }
-
-    @Override
-    // bType:INT_KW;
-    public Void visitBType(P8Parser.BTypeContext ctx) {
-        if (ctx.INT_KW() != null) {
-            node_attr_Val.get(ctx.parent).put("bType", "i32");
         }
         return null;
     }
@@ -425,11 +308,6 @@ public class Visitor extends P8BaseVisitor<Void> {
         return null;
     }
 
-    int pos = 0;
-    int sid = 0;
-    HashMap<String, String> arr_pos_val = null;
-    ArrayList<Integer> arrsize = null;
-
     @Override
     // constInitVal:constExp | LBrace ( constInitVal ( ',' constInitVal )* )? RBrace;
     public Void visitConstInitVal(P8Parser.ConstInitValContext ctx) {
@@ -463,16 +341,6 @@ public class Visitor extends P8BaseVisitor<Void> {
 //                cnt++;
 //            }
         }
-        return null;
-    }
-
-    @Override
-    // constExp:addExp;
-    public Void visitConstExp(P8Parser.ConstExpContext ctx) {
-        HashMap<String, Object> attr_Val = new HashMap<>();
-        node_attr_Val.put(ctx, attr_Val);
-        visit(ctx.addExp());
-        attr_Val.put("constExpVal", node_attr_Val.get(ctx.addExp()).get("numberVal"));
         return null;
     }
 
@@ -605,12 +473,17 @@ public class Visitor extends P8BaseVisitor<Void> {
                 if (size.size() == 2) {
                     String baselineptr = "%x" + currentReg++;
                     colptr = "%x" + currentReg++;
+                    reg_Type.put(thisReg, "i32**");
+                    reg_Type.put(baselineptr, "i32**");
+                    reg_Type.put(colptr, "i32*");
                     IR_List.add("\t" + thisReg + " = alloca [" + size.get(0) + " x [" + size.get(1) + " x i32]]\n");
                     IR_List.add("\t" + baselineptr + " = getelementptr " + "[" + size.get(0) + " x [" + size.get(1) + " x i32]]" + ", " + "[" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + thisReg + ", i32 0, i32 0\n");
                     IR_List.add("\t" + colptr + " = getelementptr [" + size.get(1) + " x i32], [" + size.get(1) + " x i32]* " + baselineptr + ", i32 0, i32 0\n");
                     IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(1) * size.get(0) + ")\n");
                 } else if (size.size() == 1) {
                     colptr = "%x" + currentReg++;
+                    reg_Type.put(thisReg, "i32*");
+                    reg_Type.put(colptr, "i32*");
                     IR_List.add("\t" + thisReg + " = alloca [" + size.get(0) + " x i32]\n");
                     IR_List.add("\t" + colptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + thisReg + ", i32 0, i32 0\n");
                     IR_List.add("\tcall void @memset(i32* " + colptr + ", i32 0, i32 " + 4 * size.get(0) + ")\n");
@@ -645,9 +518,10 @@ public class Visitor extends P8BaseVisitor<Void> {
                 IR_List.add(thisReg + " = dso_local global " + bType + " " + globalInitValue + "\n");
             } else {
                 thisReg = "%x" + currentReg++;
-                String bType = (String) node_attr_Val.get(ctx.parent).get("bType");
-                reg_Type.put(thisReg, bType);
-                IR_List.add("\t" + thisReg + " = alloca " + bType + ", align 4" + "\n");
+                String bType = "i32";
+//                String bType = (String) node_attr_Val.get(ctx.parent).get("bType");
+                reg_Type.put(thisReg, "i32");
+                IR_List.add("\t" + thisReg + " = alloca i32, align 4" + "\n");
                 ident_Put_Reg(ctx, Ident, thisReg);
                 if (ctx.ASSIGN() != null) {
                     if (ctx.ASSIGN().getText().equals("=")) {
@@ -713,66 +587,130 @@ public class Visitor extends P8BaseVisitor<Void> {
     }
 
     @Override
-    // compUnit:(decl|funcDef)*(decl|funcDef);
-    public Void visitCompUnit(P8Parser.CompUnitContext ctx) {
-        for (ParseTree child : ctx.children) {
-            visit(child);
-        }
-        return null;
-    }
-
-    @Override
-    // funcType:INT_KW;
+    // funcType: INT_KW | VOID_KW;
     public Void visitFuncType(P8Parser.FuncTypeContext ctx) {
-        HashMap<String, Object> node_Attr = new HashMap<>();
-        if (ctx.INT_KW().getText().equals("int"))
-            node_Attr.put("funcType", "i32");
-        node_attr_Val.put(ctx, node_Attr);
+        HashMap<String, Object> attr_val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_val);
+        if (ctx.INT_KW() != null)
+            attr_val.put("funcType", "i32");
+        else if (ctx.VOID_KW() != null)
+            attr_val.put("funcType", "void");
+
         return null;
     }
-
-//    @Override
-//    // funcIdent:FuncIdent;
-//    public Void visitFuncIdent(P8Parser.FuncIdentContext ctx) {
-//        HashMap<String, Object> attr_Val = new HashMap<>();
-//        attr_Val.put("funcIdent", ctx.FuncIdent().getText());
-//        node_attr_Val.put(ctx, attr_Val);
-//        return null;
-//    }
 
     @Override
     // funcDef: funcType Ident LParser (funcFParams)? RParser block;
     public Void visitFuncDef(P8Parser.FuncDefContext ctx) {
+        HashMap<String, Object> attr_val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_val);
         visit(ctx.funcType());
         String Ident = ctx.Ident().getText();
-        HashMap<String, Object> attr_val = new HashMap<>();
         attr_val.put("retType", node_attr_Val.get(ctx.funcType()).get("funcType"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("define dso_local ").append(node_attr_Val.get(ctx.funcType()).get("funcType")).append(" ").append("@").append(Ident).append(" (");
+        ArrayList<String> tmpIR = null;
         if (ctx.funcFParams() != null) {
             visit(ctx.funcFParams());
             attr_val.put("funcFParams", node_attr_Val.get(ctx.funcFParams()).get("funcFParams"));
+            sb.append(node_attr_Val.get(ctx.funcFParams()).get("pStr"));
+            tmpIR = (ArrayList<String>) node_attr_Val.get(ctx.funcFParams()).get("tmpIR");
         }
         funcIdent_Attr.put(Ident, attr_val);
-        IR_List.add("define dso_local " + node_attr_Val.get(ctx.funcType()).get("funcType") + " " + "@" + Ident + " ()" + "{\n");
+        sb.append(")" + "{\n");
+        IR_List.add(String.valueOf(sb));
+        if (tmpIR != null)
+            IR_List.addAll(tmpIR);
         visit(ctx.block());
         IR_List.add("}\n");
         return null;
     }
 
     @Override
+//    funcFParams: funcFParam ( ',' funcFParam )*;
     public Void visitFuncFParams(P8Parser.FuncFParamsContext ctx) {
-        return super.visitFuncFParams(ctx);
+        HashMap<String, Object> attr_val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_val);
+        HashMap<String, HashMap<String, String>> funcFParams = new HashMap<>();
+        attr_val.put("funcFParams", funcFParams);
+        StringBuilder sb = new StringBuilder();
+        ArrayList<String> tmpIR = new ArrayList<>();
+        int tmpreg = currentReg;
+        currentReg += ctx.funcFParam().size();
+        for (P8Parser.FuncFParamContext fpc : ctx.funcFParam()) {
+            visit(fpc);
+            String pType = (String) node_attr_Val.get(fpc).get("pType");
+            String Ident = (String) node_attr_Val.get(fpc).get("Ident");
+            String pReg = "%x" + tmpreg++;
+            sb.append(pType).append(" ").append(pReg).append(", ");
+            HashMap<String, String> tmp = new HashMap<>();
+            tmp.put("Ident", Ident);
+            tmp.put("pType", pType);
+            String thisReg = "%x" + currentReg++;
+            tmpIR.add("\t" + thisReg + " = alloca " + pType + "\n");
+            tmpIR.add("\tstore " + pType + " " + pReg + ", " + pType + "* " + thisReg + "\n");
+            funcFParams.put(pReg, tmp);
+        }
+        sb.setLength(sb.length() - 2);
+        attr_val.put("tmpIR", tmpIR);
+        attr_val.put("pStr", String.valueOf(sb));
+        return null;
     }
 
     @Override
+//    funcFParam : bType Ident (LBracket RBracket ( LBracket exp RBracket )*)?;
     public Void visitFuncFParam(P8Parser.FuncFParamContext ctx) {
-        return super.visitFuncFParam(ctx);
+        HashMap<String, Object> attr_val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_val);
+        attr_val.put("Ident", ctx.Ident().getText());
+        if (ctx.LBracket().size() == 0) {
+            attr_val.put("pType", "i32");
+        }
+        if (ctx.LBracket().size() == 1) {
+            attr_val.put("pType", "i32*");
+        }
+        if (ctx.LBracket().size() == 2) {
+            attr_val.put("pType", "i32**");
+            if (ctx.exp().size() != 0) {
+                visit(ctx.exp(0));
+            }
+        }
+        return null;
     }
 
     @Override
     // block:LBrace (blockItem)* RBrace;
     public Void visitBlock(P8Parser.BlockContext ctx) {
+        if (node_attr_Val.get(ctx.parent).containsKey("funcFParams")) {
+            HashMap<String, HashMap<String, String>> Ident_pReg_Type = (HashMap<String, HashMap<String, String>>) node_attr_Val.get(ctx.parent).get("funcFParams");
+            for (String pReg : Ident_pReg_Type.keySet()) {
+                HashMap<String, String> pattr_val = Ident_pReg_Type.get(pReg);
+                String Ident = pattr_val.get("Ident");
+                String pType = pattr_val.get("pType");
+                ident_Put_Reg(ctx, Ident, pReg);
+                reg_Type.put(pReg, pType);
+            }
+        }
         for (P8Parser.BlockItemContext bi : ctx.blockItem()) {
             visit(bi);
+        }
+        return null;
+    }
+
+    @Override
+    // blockItem:decl|stmt;
+    public Void visitBlockItem(P8Parser.BlockItemContext ctx) {
+        HashMap<String, Object> attr_Val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_Val);
+        if (ctx.stmt() != null) {
+            attr_Val.put("type", "stmt");
+            visit(ctx.stmt());
+        } else if (ctx.decl() != null) {
+            attr_Val.put("type", "decl");
+            visit(ctx.decl());
+        }
+        if (ctx.parent instanceof P8Parser.StmtContext) {
+            visit(ctx.stmt());
         }
         return null;
     }
@@ -798,7 +736,6 @@ public class Visitor extends P8BaseVisitor<Void> {
                 } else {
                     identReg = (String) ident_Get_Reg(ctx, Ident);
                 }
-//                String identReg = (String) ident_Get_Reg(ctx, Ident);
                 String bType = reg_Type.get(identReg);
                 visit(ctx.exp());
                 if (node_attr_Val.get(ctx.exp()).containsKey("thisReg")) {
@@ -908,41 +845,156 @@ public class Visitor extends P8BaseVisitor<Void> {
     }
 
     @Override
-    // number:intConst;
-    public Void visitNumber(P8Parser.NumberContext ctx) {
+    // lVal:Ident (LBracket exp RBracket)*;
+    public Void visitLVal(P8Parser.LValContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
-        if (node_attr_Val.get(ctx.parent).containsKey("global")) {
-            attr_Val.put("global", "global");
-        }
-        if (ctx.intConst() != null) {
-            visit(ctx.intConst());
-            attr_Val.put("nodeVal", node_attr_Val.get(ctx.intConst()).get("nodeVal"));
+        String Ident = ctx.Ident().getText();
+        if (ctx.exp().size() != 0) {
+            if (ident_Check_Reg(ctx, Ident)) {
+                ArrayList<Integer> size = arri_size.get(Ident);
+                if (size == null) {
+                    String thisReg = (String) ident_Get_Reg(ctx, Ident);
+                    attr_Val.put("thisReg", thisReg);
+                    return null;
+                }
+                if (size.size() == 1 && ctx.exp().size() == 0) {
+                    String idptr = (String) ident_Get_Reg(ctx, Ident);
+                    String thisReg = "%x" + (currentReg++);
+                    IR_List.add("\t" + thisReg + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + idptr + ", i32 0, i32 0\n");
+                    attr_Val.put("thisReg", thisReg);
+                    reg_Type.put(thisReg, "i32*");
+                } else if (size.size() == 2 && ctx.exp().size() == 1) {
+                    String e0val = null;
+                    visit(ctx.exp(0));
+                    String baseptr = "%x" + (currentReg++);
+                    String idptr = (String) ident_Get_Reg(ctx, Ident);
+                    IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x [" + size.get(1) + " x i32]], [" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + idptr + ", i32 0, i32 0\n");
+                    if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
+                    } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
+                    }
+                    String rowReg = "%x" + currentReg++;
+                    IR_List.add("\t" + rowReg + " = add i32 0, " + e0val + "\n");
+                    String mulReg = "%x" + currentReg++;
+                    IR_List.add("\t" + mulReg + " = mul i32 " + rowReg + ", " + size.get(1) + "\n");
+                    String thisReg = "%x" + (currentReg++);
+                    IR_List.add("\t" + thisReg + " = getelementptr [" + size.get(1) + " x i32], [" + size.get(1) + " x i32]* " + baseptr + ", i32 0, i32 " + mulReg + "\n");
+                    attr_Val.put("thisReg", thisReg);
+                    reg_Type.put(thisReg, "i32*");
+                }
+                //取出数组中的元素相关IR
+                //获取维数，计算地址偏移量，取值
+                else if (size.size() == 2 && ctx.exp().size() == 2) {
+                    String e0val = null, e1val = null;
+                    visit(ctx.exp(0));
+                    String baseptr = "%x" + (currentReg++);
+                    String idptr = (String) ident_Get_Reg(ctx, Ident);
+                    IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x [" + size.get(1) + " x i32]], [" + size.get(0) + " x [" + size.get(1) + " x i32]]* " + idptr + ", i32 0, i32 0\n");
+                    if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
+                    } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
+                    }
+                    visit(ctx.exp(1));
+                    String rowReg = "%x" + currentReg++;
+                    IR_List.add("\t" + rowReg + " = add i32 0, " + e0val + "\n");
+                    if (node_attr_Val.get(ctx.exp(1)).containsKey("numberVal")) {
+                        e1val = (String) node_attr_Val.get(ctx.exp(1)).get("numberVal");
+                    } else if (node_attr_Val.get(ctx.exp(1)).containsKey("thisReg")) {
+                        e1val = (String) node_attr_Val.get(ctx.exp(1)).get("thisReg");
+                    }
+                    String mulReg = "%x" + currentReg++;
+                    IR_List.add("\t" + mulReg + " = mul i32 " + rowReg + ", " + size.get(1) + "\n");
+                    String baselineptr = "%x" + (currentReg++);
+                    IR_List.add("\t" + baselineptr + " = getelementptr [" + size.get(1) + " x i32], [" + size.get(1) + " x i32]* " + baseptr + ", i32 0, i32 0\n");
+                    String colReg = "%x" + currentReg++;
+                    IR_List.add("\t" + colReg + " = add i32 " + mulReg + ", " + e1val + "\n");
+                    reg_Type.put(colReg, "i32*");
+                    String valReg = "%x" + currentReg++;
+                    attr_Val.put("arrReg", valReg);
+                    reg_Type.put(valReg, "i32*");
+                    IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baselineptr + ", i32 " + colReg + "\n");
+                    String thisReg = "%x" + currentReg++;
+                    IR_List.add("\t" + thisReg + " = load i32, i32* " + valReg + "\n");
+                    reg_Type.put(thisReg, "i32");
+                    attr_Val.put("thisReg", thisReg);
+                } else if (size.size() == 1) {
+                    visit(ctx.exp(0));
+                    String baseptr = "%x" + (currentReg++);
+                    String idptr = (String) ident_Get_Reg(ctx, Ident);
+                    IR_List.add("\t" + baseptr + " = getelementptr [" + size.get(0) + " x i32], [" + size.get(0) + " x i32]* " + idptr + ", i32 0, i32 0\n");
+                    String e0val = null;
+                    if (node_attr_Val.get(ctx.exp(0)).containsKey("numberVal")) {
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("numberVal");
+                    } else if (node_attr_Val.get(ctx.exp(0)).containsKey("thisReg")) {
+                        e0val = (String) node_attr_Val.get(ctx.exp(0)).get("thisReg");
+                    }
+                    String colReg = "%x" + currentReg++;
+                    IR_List.add("\t" + colReg + " = add i32 0, " + e0val + "\n");
+                    String valReg = "%x" + currentReg++;
+                    IR_List.add("\t" + valReg + " = getelementptr i32, i32* " + baseptr + ", i32 " + colReg + "\n");
+                    attr_Val.put("arrReg", valReg);
+                    reg_Type.put(valReg, "i32");
+                    String thisReg = "%x" + currentReg++;
+                    IR_List.add("\t" + thisReg + " = load i32, i32* " + valReg + "\n");
+                    reg_Type.put(thisReg, "i32");
+                    attr_Val.put("thisReg", thisReg);
+                }
+
+            } else {
+                System.err.println("Undeclared Ident:" + Ident);
+                System.exit(1);
+            }
+        } else {
+            if (ident_Check_Reg(ctx, Ident)) {
+                String identReg = (String) ident_Get_Reg(ctx, Ident);
+                if (identReg.startsWith("%x") || identReg.startsWith("@")) {// local var or global var
+                    String thisReg = "%x" + currentReg++;
+                    reg_Type.put(thisReg, "i32");
+                    IR_List.add("\t" + thisReg + " = load i32, i32* " + identReg + "\n");
+                    attr_Val.put("thisReg", thisReg);
+                } else {// const
+                    attr_Val.put("nodeVal", identReg);
+                }
+            } else {
+                System.err.println("Undeclared Ident:" + Ident);
+                System.exit(1);
+            }
         }
         return null;
     }
 
     @Override
-    // intConst:DecimalConst|OctalConst|HexadecimalConst;
-    public Void visitIntConst(P8Parser.IntConstContext ctx) {
+    // cond:lOrExp
+    public Void visitCond(P8Parser.CondContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
-        long res = 0L;
-        if (ctx.HexadecimalConst() != null) {
-            String hex = ctx.HexadecimalConst().getText().toLowerCase().substring(2);
-            res = Long.parseLong(hex, 16);
-        } else if (ctx.OctalConst() != null) {
-            String oct = ctx.OctalConst().getText();
-            res = Long.parseLong(oct, 8);
-        } else if (ctx.DecimalConst() != null) {
-            String dec = ctx.DecimalConst().getText();
-            res = Long.parseLong(dec, 10);
+        visit(ctx.lOrExp());
+        String thisReg = "%x" + currentReg++;
+        reg_Type.put(thisReg, "i1");
+        int trueLabel = currentReg++;
+        int falseLabel = currentReg++;
+        if (node_attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
+            String numberVal = (String) node_attr_Val.get(ctx.lOrExp()).get("numberVal");
+            IR_List.add("\t" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
+            IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+        } else if (node_attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
+            String lOrExpReg = (String) node_attr_Val.get(ctx.lOrExp()).get("thisReg");
+            if (reg_Type.get(lOrExpReg).equals("i32")) {
+                IR_List.add("\t" + thisReg + " = icmp ne i32 " + lOrExpReg + ", 0\n");
+                IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+            } else if (reg_Type.get(lOrExpReg).equals("i1")) {
+                IR_List.add("\tbr i1 " + lOrExpReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+            }
         }
-        if (res <= 2147483647L && res >= 0L) {
-            attr_Val.put("nodeVal", String.valueOf(res));
-        }
+
+        attr_Val.put("TLabel", trueLabel);
+        attr_Val.put("FLabel", falseLabel);
         return null;
     }
+
 
     @Override
     // returnStmt:RETURN_KW exp Semicolon;
@@ -957,6 +1009,16 @@ public class Visitor extends P8BaseVisitor<Void> {
         } else if (node_attr_Val.get(ctx.exp()).containsKey("numberVal")) {
             IR_List.add("\tret i32 " + node_attr_Val.get(ctx.exp()).get("numberVal") + "\n");
         }
+        return null;
+    }
+
+    @Override
+    // constExp:addExp;
+    public Void visitConstExp(P8Parser.ConstExpContext ctx) {
+        HashMap<String, Object> attr_Val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_Val);
+        visit(ctx.addExp());
+        attr_Val.put("constExpVal", node_attr_Val.get(ctx.addExp()).get("numberVal"));
         return null;
     }
 
@@ -1143,7 +1205,7 @@ public class Visitor extends P8BaseVisitor<Void> {
         if (node_attr_Val.get(ctx.parent).containsKey("global")) {
             attr_Val.put("global", "global");
         }
-        if (ctx.Ident() != null) { // Ident LParser (exp ( ',' exp )+)* RParser
+        if (ctx.Ident() != null) { // Ident LParser (exp ( ',' exp)*)? RParser
             String Ident = ctx.Ident().getText();
             if (!ident_Check_Reg_this_Block(ctx, Ident) && !Main.externalFunc.containsKey(Ident) && !funcIdent_Attr.containsKey(Ident)) {
                 System.err.println("Undeclared Ident:" + Ident);
@@ -1153,8 +1215,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             sbIR.append("\t");
             if (Main.externalFunc.containsKey(Ident)) {
                 String retType = Main.externalFunc.get(Ident);
-                StringBuilder sbdecl = new StringBuilder();
-                sbdecl.append("declare ").append(retType).append(" @").append(Ident).append("(");
+                String para = Main.externalFunc_para.get(Ident);
                 if (!retType.equals("void")) {
                     String thisReg = "%x" + currentReg++;
                     reg_Type.put(thisReg, retType);
@@ -1165,21 +1226,21 @@ public class Visitor extends P8BaseVisitor<Void> {
                 int i = ctx.exp().size() - 1;
                 for (P8Parser.ExpContext exp : ctx.exp()) {
                     visit(exp);
-                    sbdecl.append("i32");
+                    //TODO:函数参数
                     if (node_attr_Val.get(exp).containsKey("thisReg")) {
-                        sbIR.append("i32 ").append(node_attr_Val.get(exp).get("thisReg"));
+                        String thisReg = (String) node_attr_Val.get(exp).get("thisReg");
+                        String pType = reg_Type.get(thisReg);
+                        sbIR.append(pType).append(" ").append(thisReg);
                     } else if (node_attr_Val.get(exp).containsKey("numberVal")) {
                         sbIR.append("i32 ").append(node_attr_Val.get(exp).get("numberVal"));
                     }
                     if (i-- > 0) {
                         sbIR.append(", ");
-                        sbdecl.append(", ");
                     }
                 }
                 sbIR.append(")\n");
-                sbdecl.append(")\n");
                 if (!Main.funcUsed.contains(Ident)) {
-                    IR_List.add(0, String.valueOf(sbdecl));
+                    IR_List.add(0, "declare " + retType + " @" + Ident + "(" + para + ")\n");
                     Main.funcUsed.add(Ident);
                 }
                 IR_List.add(String.valueOf(sbIR));
@@ -1288,35 +1349,6 @@ public class Visitor extends P8BaseVisitor<Void> {
                 attr_Val.put("numberVal", node_attr_Val.get(ctx.lVal()).get("nodeVal"));
             }
         }
-        return null;
-    }
-
-    @Override
-    // cond:lOrExp
-    public Void visitCond(P8Parser.CondContext ctx) {
-        HashMap<String, Object> attr_Val = new HashMap<>();
-        node_attr_Val.put(ctx, attr_Val);
-        visit(ctx.lOrExp());
-        String thisReg = "%x" + currentReg++;
-        reg_Type.put(thisReg, "i1");
-        int trueLabel = currentReg++;
-        int falseLabel = currentReg++;
-        if (node_attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
-            String numberVal = (String) node_attr_Val.get(ctx.lOrExp()).get("numberVal");
-            IR_List.add("\t" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
-            IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
-        } else if (node_attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
-            String lOrExpReg = (String) node_attr_Val.get(ctx.lOrExp()).get("thisReg");
-            if (reg_Type.get(lOrExpReg).equals("i32")) {
-                IR_List.add("\t" + thisReg + " = icmp ne i32 " + lOrExpReg + ", 0\n");
-                IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
-            } else if (reg_Type.get(lOrExpReg).equals("i1")) {
-                IR_List.add("\tbr i1 " + lOrExpReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
-            }
-        }
-
-        attr_Val.put("TLabel", trueLabel);
-        attr_Val.put("FLabel", falseLabel);
         return null;
     }
 
@@ -1537,4 +1569,42 @@ public class Visitor extends P8BaseVisitor<Void> {
         }
         return null;
     }
+
+    @Override
+    // number:intConst;
+    public Void visitNumber(P8Parser.NumberContext ctx) {
+        HashMap<String, Object> attr_Val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_Val);
+        if (node_attr_Val.get(ctx.parent).containsKey("global")) {
+            attr_Val.put("global", "global");
+        }
+        if (ctx.intConst() != null) {
+            visit(ctx.intConst());
+            attr_Val.put("nodeVal", node_attr_Val.get(ctx.intConst()).get("nodeVal"));
+        }
+        return null;
+    }
+
+    @Override
+    // intConst:DecimalConst|OctalConst|HexadecimalConst;
+    public Void visitIntConst(P8Parser.IntConstContext ctx) {
+        HashMap<String, Object> attr_Val = new HashMap<>();
+        node_attr_Val.put(ctx, attr_Val);
+        long res = 0L;
+        if (ctx.HexadecimalConst() != null) {
+            String hex = ctx.HexadecimalConst().getText().toLowerCase().substring(2);
+            res = Long.parseLong(hex, 16);
+        } else if (ctx.OctalConst() != null) {
+            String oct = ctx.OctalConst().getText();
+            res = Long.parseLong(oct, 8);
+        } else if (ctx.DecimalConst() != null) {
+            String dec = ctx.DecimalConst().getText();
+            res = Long.parseLong(dec, 10);
+        }
+        if (res <= 2147483647L && res >= 0L) {
+            attr_Val.put("nodeVal", String.valueOf(res));
+        }
+        return null;
+    }
+
 }
