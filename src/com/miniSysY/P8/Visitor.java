@@ -1292,14 +1292,6 @@ public class Visitor extends P8BaseVisitor<Void> {
             visit(ctx.lVal());
             if (node_attr_Val.get(ctx.lVal()).containsKey("thisReg")) {
                 String lValReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
-                String type = reg_Type.get(lValReg);
-//                if (type.startsWith("i32") && type.endsWith("*")) {
-//                    String thisReg = "%x" + currentReg++;
-//                    String tmptype = type.substring(0, type.length() - 1);
-//                    reg_Type.put(thisReg, tmptype);
-//                    IR_List.add("\t" + thisReg + " = load " + tmptype + ", " + type + " " + lValReg + "\n");
-//                    attr_Val.put("lValReg", thisReg);
-//                } else
                 if (node_attr_Val.get(ctx.lVal()).containsKey("remainSize")) {
                     ArrayList<Integer> size = (ArrayList<Integer>) node_attr_Val.get(ctx.lVal()).get("remainSize");
                     StringBuilder sb = new StringBuilder();
@@ -1312,7 +1304,16 @@ public class Visitor extends P8BaseVisitor<Void> {
                     attr_Val.put("lValReg", thisReg);
                     reg_Type.put(thisReg, "i32*");
                 } else {
-                    attr_Val.put("lValReg", lValReg);
+                    String type = reg_Type.get(lValReg);
+                    if (type.startsWith("i32") && type.endsWith("*")) {
+                        String thisReg = "%x" + currentReg++;
+                        String tmptype = type.substring(0, type.length() - 1);
+                        reg_Type.put(thisReg, tmptype);
+                        IR_List.add("\t" + thisReg + " = load " + tmptype + ", " + type + " " + lValReg + "\n");
+                        attr_Val.put("lValReg", thisReg);
+                    } else {
+                        attr_Val.put("lValReg", lValReg);
+                    }
                 }
             } else if (node_attr_Val.get(ctx.lVal()).containsKey("nodeVal")) {
                 attr_Val.put("numberVal", node_attr_Val.get(ctx.lVal()).get("nodeVal"));
