@@ -361,6 +361,7 @@ public class Visitor extends P8BaseVisitor<Void> {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
         visit(ctx.bType());
+        attr_Val.put("bType", node_attr_Val.get(ctx.bType()).get("bType"));
         if (node_attr_Val.get(ctx.parent).containsKey("global")) {
             attr_Val.put("global", "global");
         }
@@ -1262,6 +1263,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 if (type.startsWith("i32") && type.endsWith("*")) {
                     String thisReg = "%x" + currentReg++;
                     String tmptype = type.substring(0, type.length() - 1);
+                    reg_Type.put(thisReg, tmptype);
                     IR_List.add("\t" + thisReg + " = load " + tmptype + ", " + type + " " + lValReg + "\n");
                     attr_Val.put("lValReg", thisReg);
                 } else if (node_attr_Val.get(ctx.lVal()).containsKey("remainSize")) {
