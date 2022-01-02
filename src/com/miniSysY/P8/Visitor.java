@@ -275,7 +275,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                             tmpsize.add(size.get(j));
                         }
                         curptr = "%x" + currentReg++;
-                        IR_List.add("\t" + curptr + " = getelementptr " + getArrSizeString(tmpsize) + " " + getArrSizeString(tmpsize) + "* " + thisReg + ", i32 0, i32 0\n");
+                        IR_List.add("\t" + curptr + " = getelementptr " + getArrSizeString(tmpsize) + ", " + getArrSizeString(tmpsize) + "* " + thisReg + ", i32 0, i32 0\n");
                         memsize *= size.get(i);
                         thisReg = curptr;
                     }
@@ -428,7 +428,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                             tmpsize.add(size.get(j));
                         }
                         curptr = "%x" + currentReg++;
-                        IR_List.add("\t" + curptr + " = getelementptr " + getArrSizeString(tmpsize) + " " + getArrSizeString(tmpsize) + "* " + thisReg + ", i32 0, i32 0\n");
+                        IR_List.add("\t" + curptr + " = getelementptr " + getArrSizeString(tmpsize) + ", " + getArrSizeString(tmpsize) + "* " + thisReg + ", i32 0, i32 0\n");
                         memsize *= size.get(i);
                         thisReg = curptr;
                     }
