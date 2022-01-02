@@ -32,10 +32,13 @@ public class Main {
         externalFunc.put("getarray", "i32");
         externalFunc_para.put("getarray", "i32*");
         externalFunc.put("putint", "void");
+        externalFunc_para.put("putint", "i32");
         externalFunc.put("putch", "void");
+        externalFunc_para.put("putch", "i32");
         externalFunc.put("putarray", "void");
-        externalFunc_para.put("putarray", "i32 i32*");
+        externalFunc_para.put("putarray", "i32, i32*");
         externalFunc.put("memset", "void");
+        externalFunc_para.put("memset", "i32*, i32, i32");
 
         visitor.visit(tree);
         Visitor.IR_List.add(0, "declare void @memset(i32*, i32, i32)\n");
