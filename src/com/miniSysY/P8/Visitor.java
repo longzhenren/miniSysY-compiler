@@ -1300,7 +1300,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                     String thisReg = "%x" + currentReg++;
                     sb.append("\t").append(thisReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(lValReg);
                     //TODO:Correct?
-                    sb.append(", i32 0".repeat(size.size()));
+                    sb.append(", i32 0".repeat(size.size()+1));
                     sb.append("\n");
                     IR_List.add(String.valueOf(sb));
                     attr_Val.put("lValReg", thisReg);
