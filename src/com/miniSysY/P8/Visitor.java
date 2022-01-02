@@ -250,7 +250,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 visit(ce);
                 size.add(Integer.parseInt((String) (node_attr_Val.get(ce).get("constExpVal"))));
             }
-            reg_Type.put(Ident, getArrSizeString(size) + "*");
+//            reg_Type.put(Ident, getArrSizeString(size) + "*");
             if (node_attr_Val.get(ctx.parent).containsKey("global")) {
                 attr_Val.put("global", "global");
                 thisReg = "@" + Ident;
@@ -279,18 +279,17 @@ public class Visitor extends P8BaseVisitor<Void> {
                 reg_Type.put(thisReg, getArrSizeString(size) + "*");
                 arri_size.put(Ident, size);
                 int dim = size.size();
-//                String curptr = null;
                 IR_List.add("\t" + thisReg + " = alloca" + getArrSizeString(size) + "\n");
                 if (dim != 0) {
                     int memsize = 1;
                     StringBuilder sb = new StringBuilder();
                     String tmpReg = "%x" + currentReg++;
-                    reg_Type.put(tmpReg, "i32*");
                     sb.append("\t").append(tmpReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
                     for (Integer integer : size) {
                         sb.append(", i32 0");
                         memsize *= integer;
                     }
+                    reg_Type.put(tmpReg, "i32*");
                     IR_List.add(sb + "\n");
                     IR_List.add("\tcall void @memset(i32* " + tmpReg + ", i32 0, i32 " + 4 * memsize + ")\n");
                 }
@@ -487,9 +486,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                 IR_List.add(thisReg + " = dso_local global " + bType + " " + globalInitValue + "\n");
             } else {
                 thisReg = "%x" + currentReg++;
-                String bType = "i32";
-                reg_Type.put(thisReg, "i32*");
-                IR_List.add("\t" + thisReg + " = alloca i32, align 4" + "\n");
+                String bType = (String) node_attr_Val.get(ctx.parent).get("bType");
+                reg_Type.put(thisReg, bType + "*");
+                IR_List.add("\t" + thisReg + " = alloca " + bType + "\n");
                 ident_Put_Reg(ctx, Ident, thisReg);
                 if (ctx.ASSIGN() != null) {
                     if (ctx.ASSIGN().getText().equals("=")) {
@@ -544,7 +543,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                     } else if (node_attr_Val.get(i).containsKey("thisReg")) {
                         String expval = (String) node_attr_Val.get(i).get("thisReg");
                         String exptype = reg_Type.get(expval);
-                        //TOOD:Need?
+                        //TODO:Need?
                         if (exptype.startsWith("i32") && exptype.endsWith("*")) {
                             String tmpReg = "%x" + currentReg++;
                             String tmptype = exptype.substring(0, exptype.length() - 1);
@@ -721,16 +720,22 @@ public class Visitor extends P8BaseVisitor<Void> {
                     System.exit(1);
                 }
                 visit(ctx.lVal());
-                String identReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
+                String lvalReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
+
 //                String identReg = (String) ident_Get_Reg(ctx, Ident);
-//                String bType = reg_Type.get(identReg);
+                String identType = reg_Type.get(lvalReg);
+//                System.out.println(Ident + " " + identType);
                 visit(ctx.exp());
                 if (node_attr_Val.get(ctx.exp()).containsKey("thisReg")) {
                     String expReg = (String) node_attr_Val.get(ctx.exp()).get("thisReg");
                     String bType = reg_Type.get(expReg);
-                    IR_List.add("\tstore " + bType + " " + expReg + ", " + bType + "* " + identReg + "\n");
+                    if (!identType.startsWith(bType)) {
+                        System.err.println("Not Match Lval and new Value!");
+                        System.exit(-1);
+                    }
+                    IR_List.add("\tstore " + bType + " " + expReg + ", " + bType + "* " + lvalReg + "\n");
                 } else if (node_attr_Val.get(ctx.exp()).containsKey("numberVal")) {
-                    IR_List.add("\tstore i32 " + node_attr_Val.get(ctx.exp()).get("numberVal") + ", i32* " + identReg + "\n");
+                    IR_List.add("\tstore i32 " + node_attr_Val.get(ctx.exp()).get("numberVal") + ", i32* " + lvalReg + "\n");
                 }
             }
         } else if (ctx.IF_KW() != null) {
@@ -838,14 +843,14 @@ public class Visitor extends P8BaseVisitor<Void> {
             ArrayList<Integer> size = arri_size.get(Ident);
             //TODO:Type here
             String idptr = (String) ident_Get_Reg(ctx, Ident);
-            String idtype = reg_Type.get(idptr);
-            if (idtype.startsWith("i32") && idtype.endsWith("*")) {
-                String tmpReg = "%x" + currentReg++;
-                String tmptype = idtype.substring(0, idtype.length() - 1);
-                reg_Type.put(tmpReg, tmptype);
-                IR_List.add("\t" + tmpReg + " = load " + tmptype + ", " + idtype + " " + idptr + "\n");
-                idptr = tmpReg;
-            }
+//            String idtype = reg_Type.get(idptr);
+//            if (idtype.startsWith("i32") && idtype.endsWith("*")) {
+//                String tmpReg = "%x" + currentReg++;
+//                String tmptype = idtype.substring(0, idtype.length() - 1);
+//                reg_Type.put(tmpReg, tmptype);
+//                IR_List.add("\t" + tmpReg + " = load " + tmptype + ", " + idtype + " " + idptr + "\n");
+//                idptr = tmpReg;
+//            }
             int dim = size.size();
             int lvaldim = ctx.exp().size();
             ArrayList<String> lvalList = new ArrayList<>();
@@ -1288,13 +1293,14 @@ public class Visitor extends P8BaseVisitor<Void> {
             if (node_attr_Val.get(ctx.lVal()).containsKey("thisReg")) {
                 String lValReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
                 String type = reg_Type.get(lValReg);
-                if (type.startsWith("i32") && type.endsWith("*")) {
-                    String thisReg = "%x" + currentReg++;
-                    String tmptype = type.substring(0, type.length() - 1);
-                    reg_Type.put(thisReg, tmptype);
-                    IR_List.add("\t" + thisReg + " = load " + tmptype + ", " + type + " " + lValReg + "\n");
-                    attr_Val.put("lValReg", thisReg);
-                } else if (node_attr_Val.get(ctx.lVal()).containsKey("remainSize")) {
+//                if (type.startsWith("i32") && type.endsWith("*")) {
+//                    String thisReg = "%x" + currentReg++;
+//                    String tmptype = type.substring(0, type.length() - 1);
+//                    reg_Type.put(thisReg, tmptype);
+//                    IR_List.add("\t" + thisReg + " = load " + tmptype + ", " + type + " " + lValReg + "\n");
+//                    attr_Val.put("lValReg", thisReg);
+//                } else
+                if (node_attr_Val.get(ctx.lVal()).containsKey("remainSize")) {
                     ArrayList<Integer> size = (ArrayList<Integer>) node_attr_Val.get(ctx.lVal()).get("remainSize");
                     StringBuilder sb = new StringBuilder();
                     String thisReg = "%x" + currentReg++;
