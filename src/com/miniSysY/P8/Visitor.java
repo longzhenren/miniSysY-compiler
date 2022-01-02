@@ -279,24 +279,29 @@ public class Visitor extends P8BaseVisitor<Void> {
                 reg_Type.put(thisReg, getArrSizeString(size) + "*");
                 arri_size.put(Ident, size);
                 int dim = size.size();
-                String curptr = null;
+//                String curptr = null;
                 IR_List.add("\t" + thisReg + " = alloca" + getArrSizeString(size) + "\n");
                 if (dim != 0) {
                     int memsize = 1;
-                    for (int i = 0; i < dim; i++) {
-                        ArrayList<Integer> tmpsize = new ArrayList<>();
-                        for (int j = i; j < dim; j++) {
-                            tmpsize.add(size.get(j));
-                        }
-                        curptr = "%x" + currentReg++;
-                        IR_List.add("\t" + curptr + " = getelementptr " + getArrSizeString(tmpsize) + ", " + getArrSizeString(tmpsize) + "* " + thisReg + ", i32 0, i32 0\n");
-                        memsize *= size.get(i);
-                        thisReg = curptr;
+                    StringBuilder sb = new StringBuilder();
+                    String tmpReg = "%x" + currentReg++;
+                    reg_Type.put(tmpReg, "i32*");
+                    sb.append("\t").append(tmpReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
+                    for (Integer integer : size) {
+                        sb.append(", i32 0");
+                        memsize *= integer;
                     }
-                    IR_List.add("\tcall void @memset(i32* " + curptr + ", i32 0, i32 " + 4 * memsize + ")\n");
+                    IR_List.add(sb + "\n");
+                    IR_List.add("\tcall void @memset(i32* " + tmpReg + ", i32 0, i32 " + 4 * memsize + ")\n");
                 }
                 if (ctx.constInitVal() != null) {
                     visit(ctx.constInitVal());
+                    StringBuilder sb = new StringBuilder();
+                    String curptr = "%x" + currentReg++;
+                    reg_Type.put(curptr, "i32*");
+                    sb.append("\t").append(curptr).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg);
+                    sb.append(", i32 0".repeat(Math.max(0, dim - 1)));
+                    IR_List.add(sb + "\n");
                     HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_pos_val");
                     for (String pos : arr_pos_val.keySet()) {
                         String tmpReg = "%x" + currentReg++;
@@ -433,25 +438,28 @@ public class Visitor extends P8BaseVisitor<Void> {
                 reg_Type.put(thisReg, getArrSizeString(size) + "*");
                 arri_size.put(Ident, size);
                 int dim = size.size();
-                String curptr = null;
-                IR_List.add("\t" + thisReg + " = alloca " + getArrSizeString(size) + "\n");
+                IR_List.add("\t" + thisReg + " = alloca" + getArrSizeString(size) + "\n");
                 if (dim != 0) {
                     int memsize = 1;
-                    for (int i = 0; i < dim; i++) {
-                        ArrayList<Integer> tmpsize = new ArrayList<>();
-                        for (int j = i; j < dim; j++) {
-                            tmpsize.add(size.get(j));
-                        }
-                        curptr = "%x" + currentReg++;
-                        IR_List.add("\t" + curptr + " = getelementptr " + getArrSizeString(tmpsize) + ", " + getArrSizeString(tmpsize) + "* " + thisReg + ", i32 0, i32 0\n");
-                        memsize *= size.get(i);
-                        reg_Type.put(curptr, getArrSizeString(tmpsize) + "*");
-                        thisReg = curptr;
+                    StringBuilder sb = new StringBuilder();
+                    String tmpReg = "%x" + currentReg++;
+                    reg_Type.put(tmpReg, "i32*");
+                    sb.append("\t").append(tmpReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
+                    for (Integer integer : size) {
+                        sb.append(", i32 0");
+                        memsize *= integer;
                     }
-                    IR_List.add("\tcall void @memset(i32* " + curptr + ", i32 0, i32 " + 4 * memsize + ")\n");
+                    IR_List.add(sb + "\n");
+                    IR_List.add("\tcall void @memset(i32* " + tmpReg + ", i32 0, i32 " + 4 * memsize + ")\n");
                 }
                 if (ctx.initVal() != null) {
                     visit(ctx.initVal());
+                    StringBuilder sb = new StringBuilder();
+                    String curptr = "%x" + currentReg++;
+                    reg_Type.put(curptr, "i32*");
+                    sb.append("\t").append(curptr).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg);
+                    sb.append(", i32 0".repeat(Math.max(0, dim - 1)));
+                    IR_List.add(sb + "\n");
                     HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
                     for (String pos : arr_pos_val.keySet()) {
                         String tmpReg = "%x" + currentReg++;
@@ -860,7 +868,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             StringBuilder sb = new StringBuilder();
             sb.append("\t").append(thisReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(idptr);
             if (size.get(0) != 0) {
-                sb.append(", i32 0 ");
+                sb.append(", i32 0");
             }
             for (int i = 0; i < lvaldim; i++) {
                 sb.append(", i32 ").append(lvalList.get(i));
@@ -872,7 +880,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 String identReg = (String) ident_Get_Reg(ctx, Ident);
                 if (identReg.startsWith("%x") || identReg.startsWith("@")) {// local var or global var
                     attr_Val.put("thisReg", identReg);
-                    String type = reg_Type.get(identReg);
+//                    String type = reg_Type.get(identReg);
 //                    if (type.startsWith("i32") && type.endsWith("*")) {
 //                        String thisReg = "%x" + currentReg++;
 //                        String tmptype = type.substring(0, type.length() - 1);
@@ -1181,7 +1189,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                 for (P8Parser.ExpContext exp : ctx.exp()) {
                     visit(exp);
                     if (node_attr_Val.get(exp).containsKey("thisReg")) {
-                        sbIR.append("i32 ").append(node_attr_Val.get(exp).get("thisReg"));
+                        String thisReg = (String) node_attr_Val.get(exp).get("thisReg");
+                        String bType = reg_Type.get(thisReg);
+                        sbIR.append(bType).append(" ").append(node_attr_Val.get(exp).get("thisReg"));
                     } else if (node_attr_Val.get(exp).containsKey("numberVal")) {
                         sbIR.append("i32 ").append(node_attr_Val.get(exp).get("numberVal"));
                     }
