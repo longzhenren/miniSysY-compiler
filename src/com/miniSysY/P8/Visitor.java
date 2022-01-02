@@ -843,14 +843,14 @@ public class Visitor extends P8BaseVisitor<Void> {
             ArrayList<Integer> size = arri_size.get(Ident);
             //TODO:Type here
             String idptr = (String) ident_Get_Reg(ctx, Ident);
-//            String idtype = reg_Type.get(idptr);
-//            if (idtype.startsWith("i32") && idtype.endsWith("*")) {
-//                String tmpReg = "%x" + currentReg++;
-//                String tmptype = idtype.substring(0, idtype.length() - 1);
-//                reg_Type.put(tmpReg, tmptype);
-//                IR_List.add("\t" + tmpReg + " = load " + tmptype + ", " + idtype + " " + idptr + "\n");
-//                idptr = tmpReg;
-//            }
+            String idtype = reg_Type.get(idptr);
+            if (idtype.startsWith("i32") && idtype.endsWith("*")) {
+                String tmpReg = "%x" + currentReg++;
+                String tmptype = idtype.substring(0, idtype.length() - 1);
+                reg_Type.put(tmpReg, tmptype);
+                IR_List.add("\t" + tmpReg + " = load " + tmptype + ", " + idtype + " " + idptr + "\n");
+                idptr = tmpReg;
+            }
             int dim = size.size();
             int lvaldim = ctx.exp().size();
             ArrayList<String> lvalList = new ArrayList<>();
