@@ -858,7 +858,10 @@ public class Visitor extends P8BaseVisitor<Void> {
             reg_Type.put(thisReg, getArrSizeString(tmpsize) + "*");
             attr_Val.put("remainSize", tmpsize);
             StringBuilder sb = new StringBuilder();
-            sb.append("\t").append(thisReg).append(" = getelementptr ").append(getArrSizeString(tmpsize)).append(", ").append(getArrSizeString(tmpsize)).append("* ").append(idptr);
+            sb.append("\t").append(thisReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(idptr);
+            if (size.get(0) != 0) {
+                sb.append(", i32 0 ");
+            }
             for (int i = 0; i < lvaldim; i++) {
                 sb.append(", i32 ").append(lvalList.get(i));
             }
