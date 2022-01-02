@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk
 USER root
 WORKDIR /home/compile/
 COPY ./src/com/miniSysY/P8/* ./src/com/miniSysY/P8/
