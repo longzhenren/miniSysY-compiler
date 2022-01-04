@@ -773,14 +773,20 @@ public class Visitor extends P8BaseVisitor<Void> {
             } else {
                 IR_List.add("\nx" + TLabel + ":\n");
                 visit(ctx.stmt(0));
-                IR_List.add("\tbr label %x" + PassLabel + "\n");
-
+                if(!IR_List.get(IR_List.size()-1).contains("ret")){
+                    IR_List.add("\tbr label %x" + PassLabel + "\n");
+                }
                 IR_List.add("\nx" + FLabel + ":\n");
                 if (ctx.stmt().size() == 2)
                     visit(ctx.stmt(1));
-                IR_List.add("\tbr label %x" + PassLabel + "\n");
 
-                IR_List.add("\nx" + PassLabel + ":\n");
+                if(!IR_List.get(IR_List.size()-1).contains("ret")){
+                    IR_List.add("\tbr label %x" + PassLabel + "\n");
+
+                    IR_List.add("\nx" + PassLabel + ":\n");
+                }else {
+                    IR_List.add("\n");
+                }
             }
         } else if (ctx.block() != null) {
             visit(ctx.block());
