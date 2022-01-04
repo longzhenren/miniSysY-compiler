@@ -453,7 +453,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                     String curptr = "%x" + currentReg++;
                     reg_Type.put(curptr, "i32*");
                     sb.append("\t").append(curptr).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
-                    sb.append(", i32 0".repeat(Math.max(0, dim - 1)));
+                    sb.append(", i32 0".repeat(dim));
                     IR_List.add(sb + "\n");
                     HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
                     for (String pos : arr_pos_val.keySet()) {
