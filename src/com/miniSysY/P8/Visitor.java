@@ -631,7 +631,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             String thisReg = "%x" + currentReg++;
             tmpIR.add("\t" + thisReg + " = alloca " + pType + "\n");
             tmpIR.add("\tstore " + pType + " " + pReg + ", " + pType + "* " + thisReg + "\n");
-            reg_Type.put(thisReg, pType + "*");
+            reg_Type.put(thisReg, pType);
             reg_Type.put(pReg, pType);
             funcFParams.put(thisReg, tmp);
         }
