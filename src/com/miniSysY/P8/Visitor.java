@@ -588,6 +588,7 @@ public class Visitor extends P8BaseVisitor<Void> {
         if (ctx.funcFParams() != null) {
             visit(ctx.funcFParams());
             attr_val.put("funcFParams", node_attr_Val.get(ctx.funcFParams()).get("funcFParams"));
+            attr_val.put("pTypes", node_attr_Val.get(ctx.funcFParams()).get("pTypes"));
             sb.append(node_attr_Val.get(ctx.funcFParams()).get("pStr"));
             tmpIR = (ArrayList<String>) node_attr_Val.get(ctx.funcFParams()).get("tmpIR");
         }
@@ -612,7 +613,9 @@ public class Visitor extends P8BaseVisitor<Void> {
         HashMap<String, Object> attr_val = new HashMap<>();
         node_attr_Val.put(ctx, attr_val);
         HashMap<String, HashMap<String, String>> funcFParams = new HashMap<>();
+        ArrayList<String> pTypes = new ArrayList<>();
         attr_val.put("funcFParams", funcFParams);
+        attr_val.put("pTypes", pTypes);
         StringBuilder sb = new StringBuilder();
         ArrayList<String> tmpIR = new ArrayList<>();
         int tmpreg = currentReg;
@@ -626,6 +629,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             HashMap<String, String> tmp = new HashMap<>();
             tmp.put("Ident", Ident);
             tmp.put("pType", pType);
+            pTypes.add(pType);
             String saveReg = "%x" + currentReg++;
             tmpIR.add("\t" + saveReg + " = alloca " + pType + "\n");
             tmpIR.add("\tstore " + pType + " " + pReg + ", " + pType + "* " + saveReg + "\n");
@@ -1207,23 +1211,33 @@ public class Visitor extends P8BaseVisitor<Void> {
             StringBuilder sbIR = new StringBuilder();
             if (Main.externalFunc.containsKey(Ident)) {
                 String retType = Main.externalFunc.get(Ident);
-                String para = Main.externalFunc_para.get(Ident);
+                ArrayList<String> pTypes = Main.externalFunc_para.get(Ident);
                 sbIR.append("call ").append(retType).append(" @").append(Ident).append("(");
-                int i = ctx.exp().size() - 1;
-                for (P8Parser.ExpContext exp : ctx.exp()) {
-                    visit(exp);
-                    //TODO:函数参数
-                    if (node_attr_Val.get(exp).containsKey("thisReg")) {
-                        String thisReg = (String) node_attr_Val.get(exp).get("thisReg");
-                        String pType = reg_Type.get(thisReg);
-                        sbIR.append(pType).append(" ").append(thisReg);
-                    } else if (node_attr_Val.get(exp).containsKey("numberVal")) {
-                        sbIR.append("i32 ").append(node_attr_Val.get(exp).get("numberVal"));
+                for (int i=0;i<ctx.exp().size();i++) {
+                    visit(ctx.exp(i));
+                    if (node_attr_Val.get(ctx.exp(i)).containsKey("thisReg")) {
+                        String thisReg = (String) node_attr_Val.get(ctx.exp(i)).get("thisReg");
+                        String bType = reg_Type.get(thisReg);
+                        if(bType.equals("i32*")&&pTypes.get(i).equals("i32")){
+                            String tmpReg = "%x" + currentReg++;
+                            IR_List.add("\t"+tmpReg+" = load i32, i32* "+thisReg+"\n");
+                            reg_Type.put(tmpReg,"i32");
+                            thisReg = tmpReg;
+                        }
+                        sbIR.append(bType).append(" ").append(thisReg);
+                    } else if (node_attr_Val.get(ctx.exp(i)).containsKey("numberVal")) {
+                        sbIR.append("i32 ").append(node_attr_Val.get(ctx.exp(i)).get("numberVal"));
                     }
-                    if (i-- > 0) {
+                    if(i!=ctx.exp().size()-1){
                         sbIR.append(", ");
                     }
                 }
+                StringBuilder psb = new StringBuilder();
+                for(String s:pTypes){
+                    psb.append(s).append(", ");
+                }
+                psb.delete(psb.length()-2,psb.length());
+                String para = String.valueOf(psb);
                 sbIR.append(")\n");
                 if (!Main.funcUsed.contains(Ident)) {
                     if (para != null)
@@ -1242,18 +1256,25 @@ public class Visitor extends P8BaseVisitor<Void> {
                 }
             } else if (funcIdent_Attr.containsKey(Ident)) {
                 String retType = (String) funcIdent_Attr.get(Ident).get("retType");
+                ArrayList<String> pTypes = (ArrayList<String>) funcIdent_Attr.get(Ident).get("pTypes");
                 sbIR.append("call ").append(retType).append(" @").append(Ident).append("(");
-                int i = ctx.exp().size() - 1;
-                for (P8Parser.ExpContext exp : ctx.exp()) {
-                    visit(exp);
-                    if (node_attr_Val.get(exp).containsKey("thisReg")) {
-                        String thisReg = (String) node_attr_Val.get(exp).get("thisReg");
+                for (int i=0;i<ctx.exp().size();i++) {
+                    visit(ctx.exp(i));
+                    if (node_attr_Val.get(ctx.exp(i)).containsKey("thisReg")) {
+                        String thisReg = (String) node_attr_Val.get(ctx.exp(i)).get("thisReg");
                         String bType = reg_Type.get(thisReg);
-                        sbIR.append(bType).append(" ").append(node_attr_Val.get(exp).get("thisReg"));
-                    } else if (node_attr_Val.get(exp).containsKey("numberVal")) {
-                        sbIR.append("i32 ").append(node_attr_Val.get(exp).get("numberVal"));
+                        if(bType.equals("i32*")&&pTypes.get(i).equals("i32")){
+                            String tmpReg = "%x" + currentReg++;
+                            IR_List.add("\t"+tmpReg+" = load i32, i32* "+thisReg+"\n");
+                            reg_Type.put(tmpReg,"i32");
+                            thisReg = tmpReg;
+                            bType = "i32";
+                        }
+                        sbIR.append(bType).append(" ").append(thisReg);
+                    } else if (node_attr_Val.get(ctx.exp(i)).containsKey("numberVal")) {
+                        sbIR.append("i32 ").append(node_attr_Val.get(ctx.exp(i)).get("numberVal"));
                     }
-                    if (i-- > 0) {
+                    if(i!=ctx.exp().size()-1){
                         sbIR.append(", ");
                     }
                 }
