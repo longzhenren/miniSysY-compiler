@@ -735,7 +735,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 }
                 visit(ctx.lVal());
                 String lvalReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
-//                String identReg = (String) ident_Get_Reg(ctx, Ident);
+//                String lvalReg = (String) ident_Get_Reg(ctx, Ident);
                 String identType = reg_Type.get(lvalReg);
 //                System.err.println(Ident + " " + identType);
                 visit(ctx.exp());
@@ -871,13 +871,13 @@ public class Visitor extends P8BaseVisitor<Void> {
             String idptr = (String) ident_Get_Reg(ctx, Ident);
             String idtype = reg_Type.get(idptr);
             System.err.println("visitLVal,Arr Ident:"+Ident+" Reg:"+idptr+" Type:"+idtype);
-//            if (idtype.equals("i32*")) {
-//                String tmpReg = "%x" + currentReg++;
-////                String tmptype = idtype.substring(0, idtype.length() - 1);
-//                reg_Type.put(tmpReg, "i32");
-//                IR_List.add("\t" + tmpReg + " = load i32, i32* " + idptr + "\n");
-//                idptr = tmpReg;
-//            }
+            if (idtype.equals("i32**")) {
+                String tmpReg = "%x" + currentReg++;
+//                String tmptype = idtype.substring(0, idtype.length() - 1);
+                reg_Type.put(tmpReg, "i32*");
+                IR_List.add("\t" + tmpReg + " = load i32*, i32** " + idptr + "\n");
+                idptr = tmpReg;
+            }
             int dim = size.size();
             int lvaldim = ctx.exp().size();
             ArrayList<String> lvalList = new ArrayList<>();
