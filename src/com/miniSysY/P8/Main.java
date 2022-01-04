@@ -54,8 +54,8 @@ public class Main {
         externalFunc_para.put("putch", pType);
         externalFunc.put("putarray", "void");
         pType = new ArrayList<>();
-        pType.add("i32");
         pType.add("i32*");
+        pType.add("i32");
         externalFunc_para.put("putarray", pType);
         externalFunc.put("memset", "void");
         pType = new ArrayList<>();
