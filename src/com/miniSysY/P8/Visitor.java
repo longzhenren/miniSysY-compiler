@@ -493,6 +493,13 @@ public class Visitor extends P8BaseVisitor<Void> {
                         visit(ctx.initVal());
                         if (node_attr_Val.get(ctx.initVal()).containsKey("thisReg")) {
                             String initValReg = (String) node_attr_Val.get(ctx.initVal()).get("thisReg");
+                            String initType = reg_Type.get(initValReg);
+                            if(initType.equals("i32*")){
+                                String tmpReg = "%x"+currentReg++;
+                                IR_List.add("\t"+tmpReg+" = load i32, i32* "+initValReg+"\n");
+                                reg_Type.put(tmpReg,"i32");
+                                initValReg = tmpReg;
+                            }
                             if (!bType.equals(reg_Type.get(initValReg))) {
                                 System.err.println("Type dismatch!");
                                 System.exit(-1);
@@ -1453,7 +1460,7 @@ public class Visitor extends P8BaseVisitor<Void> {
 //                    }
 //                }
 //            }
-        else if (node_attr_Val.get(ctx.lVal()).containsKey("nodeVal")) {
+            else if (node_attr_Val.get(ctx.lVal()).containsKey("nodeVal")) {
                 attr_Val.put("numberVal", node_attr_Val.get(ctx.lVal()).get("nodeVal"));
             }
         }
