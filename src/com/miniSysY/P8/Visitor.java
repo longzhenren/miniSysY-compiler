@@ -452,7 +452,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                     StringBuilder sb = new StringBuilder();
                     String curptr = "%x" + currentReg++;
                     reg_Type.put(curptr, "i32*");
-                    sb.append("\t").append(curptr).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg);
+                    sb.append("\t").append(curptr).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
                     sb.append(", i32 0".repeat(Math.max(0, dim - 1)));
                     IR_List.add(sb + "\n");
                     HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
@@ -1405,16 +1405,12 @@ public class Visitor extends P8BaseVisitor<Void> {
             attr_Val.put("expReg", thisReg);
         } else if (ctx.lVal() != null) {
             visit(ctx.lVal());
-            //TODO:问题大的很
             if(node_attr_Val.get(ctx.lVal()).containsKey("remainSize")){//Array
                 if(node_attr_Val.get(ctx.lVal()).containsKey("thisReg")){
                     ArrayList<Integer> size = (ArrayList<Integer>) node_attr_Val.get(ctx.lVal()).get("remainSize");
                     String type = getArrSizeString(size);
                     String lvalReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
                     if(type.equals("i32")){
-//                        String thisReg = "%x" + currentReg++;
-//                        reg_Type.put(thisReg, "i32");
-//                        IR_List.add("\t" + thisReg + " = load i32, i32* " + lvalReg + "\n");
                         attr_Val.put("lValReg", lvalReg);
                     }else{
                         StringBuilder sb = new StringBuilder();
@@ -1431,42 +1427,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             else if(node_attr_Val.get(ctx.lVal()).containsKey("thisReg")){
                 String lValReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
                 attr_Val.put("lValReg", lValReg);
-            }
-//
-//
-//            if (node_attr_Val.get(ctx.lVal()).containsKey("thisReg")) {
-//                String lValReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
-//
-//                String regType = reg_Type.get(lValReg);
-//                if(regType.equals("i32*")){
-//                    String thisReg = "%x" + currentReg++;
-//                    reg_Type.put(thisReg, "i32");
-//                    IR_List.add("\t" + thisReg + " = load i32, i32* " + lValReg + "\n");
-//                    attr_Val.put("lValReg", thisReg);
-//                } else if (node_attr_Val.get(ctx.lVal()).containsKey("remainSize")) {
-//                    ArrayList<Integer> size = (ArrayList<Integer>) node_attr_Val.get(ctx.lVal()).get("remainSize");
-//                    StringBuilder sb = new StringBuilder();
-//                    String thisReg = "%x" + currentReg++;
-//                    sb.append("\t").append(thisReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(lValReg);
-//                    //TODO:Correct?
-//                    sb.append(", i32 0".repeat(size.size() + 1));
-//                    sb.append("\n");
-//                    IR_List.add(String.valueOf(sb));
-//                    attr_Val.put("lValReg", thisReg);
-//                    reg_Type.put(thisReg, "i32*");
-//                } else {
-//                    String type = reg_Type.get(lValReg);
-//                    if (type.equals("i32*")) {
-//                        String thisReg = "%x" + currentReg++;
-//                        reg_Type.put(thisReg, "i32");
-//                        IR_List.add("\t" + thisReg + " = load i32, i32* " + lValReg + "\n");
-//                        attr_Val.put("lValReg", thisReg);
-//                    } else {
-//                        attr_Val.put("lValReg", lValReg);
-//                    }
-//                }
-//            }
-            else if (node_attr_Val.get(ctx.lVal()).containsKey("nodeVal")) {
+            } else if (node_attr_Val.get(ctx.lVal()).containsKey("nodeVal")) {
                 attr_Val.put("numberVal", node_attr_Val.get(ctx.lVal()).get("nodeVal"));
             }
         }
