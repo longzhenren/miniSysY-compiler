@@ -1252,7 +1252,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 for(String s:pTypes){
                     psb.append(s).append(", ");
                 }
-                psb.delete(psb.length()-2,psb.length());
+                if(psb.length()>=2) psb.delete(psb.length()-2,psb.length());
                 String para = String.valueOf(psb);
                 sbIR.append(")\n");
                 if (!Main.funcUsed.contains(Ident)) {
