@@ -37,9 +37,13 @@ public class Main {
 //        tmp.put("pTypes",pTypes);
 
 
-        ArrayList<String>pType;
+                ArrayList<String>pType;
         externalFunc.put("getint", "i32");
+        pType = new ArrayList<>();
+        externalFunc_para.put("getint", pType);
         externalFunc.put("getch", "i32");
+        pType = new ArrayList<>();
+        externalFunc_para.put("getch", pType);
         externalFunc.put("getarray", "i32");
         pType = new ArrayList<>();
         pType.add("i32*");
