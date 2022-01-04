@@ -14,58 +14,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-//        CharStream inputStream = CharStreams.fromStream(System.in);
-        CharStream inputStream = CharStreams.fromString("int n; \n" +
-                "int QuickSort(int arr[], int low, int high) { \n" +
-                "    if (low < high) { \n" +
-                "        int i; \n" +
-                "        i = low; \n" +
-                "        int j; \n" +
-                "        j = high; \n" +
-                "        int k; \n" +
-                "        k = arr[low]; \n" +
-                "        while (i < j) { \n" +
-                "            while (i < j && arr[j] > k - 1) { \n" +
-                "                j = j - 1; \n" +
-                "            } \n" +
-                " \n" +
-                "            if (i < j) { \n" +
-                "                arr[i] = arr[j]; \n" +
-                "                i      = i + 1; \n" +
-                "            } \n" +
-                " \n" +
-                "            while (i < j && arr[i] < k) { \n" +
-                "                i = i + 1; \n" +
-                "            } \n" +
-                " \n" +
-                "            if (i < j) { \n" +
-                "                arr[j] = arr[i]; \n" +
-                "                j      = j - 1; \n" +
-                "            } \n" +
-                "        } \n" +
-                " \n" +
-                "        arr[i] = k; \n" +
-                "        int tmp; \n" +
-                "        tmp = i - 1; \n" +
-                "        tmp = QuickSort(arr, low, tmp); \n" +
-                "        tmp = i + 1; \n" +
-                "        tmp = QuickSort(arr, tmp, high); \n" +
-                "    } \n" +
-                "    return 0; \n" +
-                "} \n" +
-                " \n" +
-                "int main() { \n" +
-                " \n" +
-                "    int a[10]; \n" +
-                "    n = getarray(a); \n" +
-                "    int i; \n" +
-                "    i = 0; \n" +
-                "    int tmp; \n" +
-                "    tmp = 9; \n" +
-                "    i   = QuickSort(a, i, tmp); \n" +
-                "    putarray(10, a); \n" +
-                "    return 0; \n" +
-                "} ");
+        CharStream inputStream = CharStreams.fromStream(System.in);
+        //CharStream inputStream = CharStreams.fromString("");
         P8Lexer lexer = new P8Lexer(inputStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         P8Parser parser = new P8Parser(tokenStream);
