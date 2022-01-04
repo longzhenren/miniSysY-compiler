@@ -645,7 +645,8 @@ public class Visitor extends P8BaseVisitor<Void> {
             reg_Type.put(saveReg, pType+"*");
             reg_Type.put(thisReg, pType);
             reg_Type.put(pReg, pType);
-            funcFParams.put(thisReg, tmp);
+//            funcFParams.put(thisReg, tmp);
+            funcFParams.put(saveReg, tmp);
         }
         sb.setLength(sb.length() - 2);
         attr_val.put("tmpIR", tmpIR);
@@ -689,6 +690,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 HashMap<String, String> pattr_val = Ident_pReg_Type.get(pReg);
                 String Ident = pattr_val.get("Ident");
 //                String pType = pattr_val.get("pType");
+                //TODO:???
                 ident_Put_Reg(ctx, Ident, pReg);
 //                reg_Type.put(pReg, pType);
             }
@@ -918,7 +920,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 String identReg = (String) ident_Get_Reg(ctx, Ident);
                 if (identReg.startsWith("%x") || identReg.startsWith("@")) {// local var or global var
                     System.err.println("visitLVal Ident:"+Ident+" Reg:"+identReg+" Type:"+reg_Type.get(identReg));
-                    String type = reg_Type.get(identReg);
+//                    String type = reg_Type.get(identReg);
 //                    if(type.equals("i32*")){
 //                        String thisReg = "%x" + currentReg++;
 //                        IR_List.add("      \t" + thisReg + " = load i32, i32* " + identReg + "\n");
