@@ -1222,6 +1222,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                             String tmpReg = "%x" + currentReg++;
                             IR_List.add("\t"+tmpReg+" = load i32, i32* "+thisReg+"\n");
                             reg_Type.put(tmpReg,"i32");
+                            bType = "i32";
                             thisReg = tmpReg;
                         }
                         sbIR.append(bType).append(" ").append(thisReg);
