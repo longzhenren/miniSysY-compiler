@@ -95,6 +95,13 @@ public class Visitor extends P8BaseVisitor<Void> {
                 }
             }
             reg_Type = globalReg;
+            HashMap<String,ArrayList<Integer>> global_arrr_size = new HashMap<>();
+            for(String Reg: reg_Type.keySet()){
+                if(arrr_size.containsKey(Reg)){
+                    global_arrr_size.put(Reg,arrr_size.get(Reg));
+                }
+            }
+            arrr_size = global_arrr_size;
         } else {
             reg_Type = new HashMap<>();
         }
@@ -333,6 +340,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                             ident_Put_Reg(ctx, Ident, String.valueOf(constExpVal));
                         } else {
                             System.err.println("Re-Declaration ident:" + Ident);
+                            for(String IR:IR_List){
+                                System.err.print(IR);
+                            }
                             System.exit(1);
                         }
                     }
@@ -388,6 +398,9 @@ public class Visitor extends P8BaseVisitor<Void> {
 //            if (ident_Reg.containsKey(Ident) || constIdent_Val.containsKey(Ident)) {
             if (ident_Check_Reg_this_Block(ctx, Ident)) {
                 System.err.println("Re-Declaration ident:" + Ident);
+                for(String IR:IR_List){
+                    System.err.print(IR);
+                }
                 System.exit(1);
             }
             visit(vdf);
@@ -507,6 +520,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                             }
                             if (!bType.equals(reg_Type.get(initValReg))) {
                                 System.err.println("Type dismatch!");
+                                for(String IR:IR_List){
+                                    System.err.print(IR);
+                                }
                                 System.exit(-1);
                             }
                             IR_List.add("\tstore " + bType + " " + initValReg + ", " + bType + "* " + thisReg + "\n");
@@ -741,6 +757,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                 String Ident = ctx.lVal().Ident().getText();
                 if (!ident_Check_Reg(ctx, Ident)) {
                     System.err.println("Undeclared Ident:" + Ident);
+                    for(String IR:IR_List){
+                        System.err.print(IR);
+                    }
                     System.exit(1);
                 }
                 visit(ctx.lVal());
@@ -754,6 +773,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                     String bType = reg_Type.get(expReg);
                     if (!identType.startsWith(bType)) {
                         System.err.println("Not Match Lval and new Value!");
+                        for(String IR:IR_List){
+                            System.err.print(IR);
+                        }
                         System.exit(-1);
                     }
                     if (bType.equals("i32*")) {
@@ -840,6 +862,9 @@ public class Visitor extends P8BaseVisitor<Void> {
             IR_List.add("\tbr label %x" + FLabel + "\n");
             if (StartLabel == null || TLabel == null || FLabel == null) {
                 System.err.println("Separate BREAK");
+                for(String IR:IR_List){
+                    System.err.print(IR);
+                }
                 System.exit(-1);
             }
         } else if (ctx.CONTINUE_KW() != null) {
@@ -860,6 +885,9 @@ public class Visitor extends P8BaseVisitor<Void> {
             IR_List.add("\tbr label %x" + StartLabel + "\n");
             if (StartLabel == null || TLabel == null || FLabel == null) {
                 System.err.println("Separate CONTINUE");
+                for(String IR:IR_List){
+                    System.err.print(IR);
+                }
                 System.exit(-1);
             }
         } else {
@@ -951,6 +979,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                 }
             } else {
                 System.err.println("Undeclared Ident:" + Ident);
+                for(String IR:IR_List){
+                    System.err.print(IR);
+                }
                 System.exit(1);
             }
         }
@@ -1232,6 +1263,9 @@ public class Visitor extends P8BaseVisitor<Void> {
             String Ident = ctx.Ident().getText();
             if (!ident_Check_Reg_this_Block(ctx, Ident) && !Main.externalFunc.containsKey(Ident) && !funcIdent_Attr.containsKey(Ident)) {
                 System.err.println("Undeclared Ident:" + Ident);
+                for(String IR:IR_List){
+                    System.err.print(IR);
+                }
                 System.exit(1);
             }
             StringBuilder sbIR = new StringBuilder();
