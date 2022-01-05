@@ -1023,21 +1023,26 @@ public class Visitor extends P8BaseVisitor<Void> {
     public Void visitReturnStmt(P8Parser.ReturnStmtContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
-        visit(ctx.exp());
-        if (node_attr_Val.get(ctx.exp()).containsKey("thisReg")) {
-            String expReg = (String) node_attr_Val.get(ctx.exp()).get("thisReg");
+        if(ctx.exp()!=null){
+            visit(ctx.exp());
+            if (node_attr_Val.get(ctx.exp()).containsKey("thisReg")) {
+                String expReg = (String) node_attr_Val.get(ctx.exp()).get("thisReg");
 //            String bType = reg_Type.get(expReg);
-            String thisReg = (String) node_attr_Val.get(ctx.exp()).get("thisReg");
-            if (reg_Type.get(thisReg).equals("i32*")) {
-                String tmpReg = "%x" + currentReg++;
-                IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
-                reg_Type.put(tmpReg, "i32");
-                thisReg = tmpReg;
+                String thisReg = (String) node_attr_Val.get(ctx.exp()).get("thisReg");
+                if (reg_Type.get(thisReg).equals("i32*")) {
+                    String tmpReg = "%x" + currentReg++;
+                    IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
+                    reg_Type.put(tmpReg, "i32");
+                    thisReg = tmpReg;
+                }
+                IR_List.add("\tret i32 " + thisReg + "\n");
+            } else if (node_attr_Val.get(ctx.exp()).containsKey("numberVal")) {
+                IR_List.add("\tret i32 " + node_attr_Val.get(ctx.exp()).get("numberVal") + "\n");
             }
-            IR_List.add("\tret i32 " + thisReg + "\n");
-        } else if (node_attr_Val.get(ctx.exp()).containsKey("numberVal")) {
-            IR_List.add("\tret i32 " + node_attr_Val.get(ctx.exp()).get("numberVal") + "\n");
+        }else {
+            IR_List.add("\tret void\n");
         }
+
         return null;
     }
 
