@@ -184,8 +184,15 @@ public class Visitor extends P8BaseVisitor<Void> {
     public static String getArrSizeString(ArrayList<Integer> size) {
         StringBuilder sb = new StringBuilder();
         int dim = size.size();
-        if (dim == 0 || size.get(0) == 0) {
+        if (dim == 0) {
             return "i32";
+        }
+        if(size.get(0).equals(0)){
+            ArrayList<Integer> tmpsize = new ArrayList<>();
+            for(int i=1;i<dim;i++){
+                tmpsize.add(size.get(i));
+            }
+            return getArrSizeString(tmpsize);
         }
         for (Integer integer : size) {
             sb.append("[").append(integer).append(" x ");
