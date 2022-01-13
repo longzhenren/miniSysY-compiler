@@ -912,13 +912,13 @@ public class Visitor extends scBaseVisitor<Void> {
         } else if (ctx.BREAK_KW() != null) {
             RuleContext parent = ctx;
             String StartLabel = null;
-            Integer TLabel = null, FLabel = null;
+            String TLabel = null, FLabel = null;
             while (!(parent instanceof scParser.CompUnitContext)) {
                 if (parent instanceof scParser.StmtContext) {
                     if (((scParser.StmtContext) parent).WHILE_KW() != null) {
                         StartLabel = (String) node_attr_Val.get(parent).get("StartLabel");
-                        TLabel = (Integer) node_attr_Val.get(parent).get("TLabel");
-                        FLabel = (Integer) node_attr_Val.get(parent).get("FLabel");
+                        TLabel = (String) node_attr_Val.get(parent).get("TLabel");
+                        FLabel = (String) node_attr_Val.get(parent).get("FLabel");
                         break;
                     }
                 }
@@ -935,13 +935,13 @@ public class Visitor extends scBaseVisitor<Void> {
         } else if (ctx.CONTINUE_KW() != null) {
             RuleContext parent = ctx;
             String StartLabel = null;
-            Integer TLabel = null, FLabel = null;
+            String TLabel = null, FLabel = null;
             while (!(parent instanceof scParser.CompUnitContext)) {
                 if (parent instanceof scParser.StmtContext) {
                     if (((scParser.StmtContext) parent).WHILE_KW() != null) {
                         StartLabel = (String) node_attr_Val.get(parent).get("StartLabel");
-                        TLabel = (Integer) node_attr_Val.get(parent).get("TLabel");
-                        FLabel = (Integer) node_attr_Val.get(parent).get("FLabel");
+                        TLabel = (String) node_attr_Val.get(parent).get("TLabel");
+                        FLabel = (String) node_attr_Val.get(parent).get("FLabel");
                         break;
                     }
                 }
@@ -1043,10 +1043,10 @@ public class Visitor extends scBaseVisitor<Void> {
     public Void visitCond(scParser.CondContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
-        int trueLabel = currentReg++;
-        int falseLabel = currentReg++;
-        attr_Val.put("TLabel", "x" + trueLabel);
-        attr_Val.put("FLabel", "x" + falseLabel);
+        String TLabel = "x"+currentReg++;
+        String FLabel = "x"+currentReg++;
+        attr_Val.put("TLabel", TLabel);
+        attr_Val.put("FLabel", FLabel);
         visit(ctx.lOrExp());
         String lOrExpReg = (String) node_attr_Val.get(ctx.lOrExp()).get("thisReg");
         if (lOrExpReg != null && reg_Type.get(lOrExpReg).equals("i32*")) {
@@ -1060,13 +1060,13 @@ public class Visitor extends scBaseVisitor<Void> {
         if (node_attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
             String numberVal = (String) node_attr_Val.get(ctx.lOrExp()).get("numberVal");
             IR_List.add("\t" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
-            IR_List.add("\tbr i1 " + thisReg + ", label %" + trueLabel + ", label %" + falseLabel + "\n");
+            IR_List.add("\tbr i1 " + thisReg + ", label %" + TLabel + ", label %" + FLabel + "\n");
         } else if (node_attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
             if (reg_Type.get(lOrExpReg).equals("i32")) {
                 IR_List.add("\t" + thisReg + " = icmp ne i32 " + lOrExpReg + ", 0\n");
-                IR_List.add("\tbr i1 " + thisReg + ", label %" + trueLabel + ", label %" + falseLabel + "\n");
+                IR_List.add("\tbr i1 " + thisReg + ", label %" + TLabel + ", label %" + FLabel + "\n");
             } else if (reg_Type.get(lOrExpReg).equals("i1")) {
-                IR_List.add("\tbr i1 " + lOrExpReg + ", label %" + trueLabel + ", label %" + falseLabel + "\n");
+                IR_List.add("\tbr i1 " + lOrExpReg + ", label %" + TLabel + ", label %" + FLabel + "\n");
             }
         }
         return null;
