@@ -1,4 +1,4 @@
-package com.miniSysY.P8;
+package com.miniSysY.md;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class Main {
     public static HashMap<String, String> externalFunc = new HashMap<>();
@@ -14,15 +13,11 @@ public class Main {
     public static ArrayList<String> funcUsed = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-        Scanner sc = new Scanner(System.in);
-        while (sc.hasNextLine()){
-            System.err.println(sc.nextLine());
-        }
         CharStream inputStream = CharStreams.fromStream(System.in);
 //        CharStream inputStream = CharStreams.fromString("");
-        P8Lexer lexer = new P8Lexer(inputStream);
+        mdLexer lexer = new mdLexer(inputStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-        P8Parser parser = new P8Parser(tokenStream);
+        mdParser parser = new mdParser(tokenStream);
         parser.addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {

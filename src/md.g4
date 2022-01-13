@@ -1,4 +1,4 @@
-grammar P8;
+grammar md;
 
 LParser: '(';
 RParser: ')';

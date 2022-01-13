@@ -1,7 +1,7 @@
 FROM openjdk
 USER root
 WORKDIR /home/compile/
-COPY ./src/com/miniSysY/P8/* ./src/com/miniSysY/P8/
+COPY ./src/com/miniSysY/md/* ./src/com/miniSysY/md/
 COPY ./lib/* ./lib/
 WORKDIR ./src/
-RUN javac -cp .:../lib/* ./com/miniSysY/P8/*.java
+RUN javac -cp .:../lib/* ./com/miniSysY/md/*.java

@@ -1,5 +1,5 @@
-// Generated from D:/Projects/IDEA/Compile/src\P8.g4 by ANTLR 4.9.2
-package com.miniSysY.P8;
+// Generated from D:/Projects/IDEA/Compile/src\md.g4 by ANTLR 4.9.2
+package com.miniSysY.md;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class P8Parser extends Parser {
+public class mdParser extends Parser {
 	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -97,7 +97,7 @@ public class P8Parser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "P8.g4"; }
+	public String getGrammarFileName() { return "md.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -108,7 +108,7 @@ public class P8Parser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-	public P8Parser(TokenStream input) {
+	public mdParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
@@ -132,15 +132,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_compUnit; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterCompUnit(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterCompUnit(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitCompUnit(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitCompUnit(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitCompUnit(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitCompUnit(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -210,23 +210,23 @@ public class P8Parser extends Parser {
 	}
 
 	public static class FuncTypeContext extends ParserRuleContext {
-		public TerminalNode INT_KW() { return getToken(P8Parser.INT_KW, 0); }
-		public TerminalNode VOID_KW() { return getToken(P8Parser.VOID_KW, 0); }
+		public TerminalNode INT_KW() { return getToken(mdParser.INT_KW, 0); }
+		public TerminalNode VOID_KW() { return getToken(mdParser.VOID_KW, 0); }
 		public FuncTypeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_funcType; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterFuncType(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterFuncType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitFuncType(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitFuncType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitFuncType(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitFuncType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -265,9 +265,9 @@ public class P8Parser extends Parser {
 		public FuncTypeContext funcType() {
 			return getRuleContext(FuncTypeContext.class,0);
 		}
-		public TerminalNode Ident() { return getToken(P8Parser.Ident, 0); }
-		public TerminalNode LParser() { return getToken(P8Parser.LParser, 0); }
-		public TerminalNode RParser() { return getToken(P8Parser.RParser, 0); }
+		public TerminalNode Ident() { return getToken(mdParser.Ident, 0); }
+		public TerminalNode LParser() { return getToken(mdParser.LParser, 0); }
+		public TerminalNode RParser() { return getToken(mdParser.RParser, 0); }
 		public BlockContext block() {
 			return getRuleContext(BlockContext.class,0);
 		}
@@ -280,15 +280,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_funcDef; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterFuncDef(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterFuncDef(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitFuncDef(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitFuncDef(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitFuncDef(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitFuncDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -346,15 +346,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_funcFParams; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterFuncFParams(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterFuncFParams(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitFuncFParams(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitFuncFParams(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitFuncFParams(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitFuncFParams(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -401,14 +401,14 @@ public class P8Parser extends Parser {
 		public BTypeContext bType() {
 			return getRuleContext(BTypeContext.class,0);
 		}
-		public TerminalNode Ident() { return getToken(P8Parser.Ident, 0); }
-		public List<TerminalNode> LBracket() { return getTokens(P8Parser.LBracket); }
+		public TerminalNode Ident() { return getToken(mdParser.Ident, 0); }
+		public List<TerminalNode> LBracket() { return getTokens(mdParser.LBracket); }
 		public TerminalNode LBracket(int i) {
-			return getToken(P8Parser.LBracket, i);
+			return getToken(mdParser.LBracket, i);
 		}
-		public List<TerminalNode> RBracket() { return getTokens(P8Parser.RBracket); }
+		public List<TerminalNode> RBracket() { return getTokens(mdParser.RBracket); }
 		public TerminalNode RBracket(int i) {
-			return getToken(P8Parser.RBracket, i);
+			return getToken(mdParser.RBracket, i);
 		}
 		public List<ExpContext> exp() {
 			return getRuleContexts(ExpContext.class);
@@ -422,15 +422,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_funcFParam; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterFuncFParam(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterFuncFParam(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitFuncFParam(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitFuncFParam(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitFuncFParam(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitFuncFParam(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -490,8 +490,8 @@ public class P8Parser extends Parser {
 	}
 
 	public static class BlockContext extends ParserRuleContext {
-		public TerminalNode LBrace() { return getToken(P8Parser.LBrace, 0); }
-		public TerminalNode RBrace() { return getToken(P8Parser.RBrace, 0); }
+		public TerminalNode LBrace() { return getToken(mdParser.LBrace, 0); }
+		public TerminalNode RBrace() { return getToken(mdParser.RBrace, 0); }
 		public List<BlockItemContext> blockItem() {
 			return getRuleContexts(BlockItemContext.class);
 		}
@@ -504,15 +504,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_block; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterBlock(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterBlock(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitBlock(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitBlock(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitBlock(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitBlock(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -568,15 +568,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_blockItem; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterBlockItem(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterBlockItem(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitBlockItem(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitBlockItem(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitBlockItem(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitBlockItem(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -636,30 +636,30 @@ public class P8Parser extends Parser {
 		public LValContext lVal() {
 			return getRuleContext(LValContext.class,0);
 		}
-		public TerminalNode ASSIGN() { return getToken(P8Parser.ASSIGN, 0); }
+		public TerminalNode ASSIGN() { return getToken(mdParser.ASSIGN, 0); }
 		public ExpContext exp() {
 			return getRuleContext(ExpContext.class,0);
 		}
-		public TerminalNode Semicolon() { return getToken(P8Parser.Semicolon, 0); }
+		public TerminalNode Semicolon() { return getToken(mdParser.Semicolon, 0); }
 		public BlockContext block() {
 			return getRuleContext(BlockContext.class,0);
 		}
-		public TerminalNode IF_KW() { return getToken(P8Parser.IF_KW, 0); }
-		public TerminalNode LParser() { return getToken(P8Parser.LParser, 0); }
+		public TerminalNode IF_KW() { return getToken(mdParser.IF_KW, 0); }
+		public TerminalNode LParser() { return getToken(mdParser.LParser, 0); }
 		public CondContext cond() {
 			return getRuleContext(CondContext.class,0);
 		}
-		public TerminalNode RParser() { return getToken(P8Parser.RParser, 0); }
+		public TerminalNode RParser() { return getToken(mdParser.RParser, 0); }
 		public List<StmtContext> stmt() {
 			return getRuleContexts(StmtContext.class);
 		}
 		public StmtContext stmt(int i) {
 			return getRuleContext(StmtContext.class,i);
 		}
-		public TerminalNode ELSE_KW() { return getToken(P8Parser.ELSE_KW, 0); }
-		public TerminalNode WHILE_KW() { return getToken(P8Parser.WHILE_KW, 0); }
-		public TerminalNode BREAK_KW() { return getToken(P8Parser.BREAK_KW, 0); }
-		public TerminalNode CONTINUE_KW() { return getToken(P8Parser.CONTINUE_KW, 0); }
+		public TerminalNode ELSE_KW() { return getToken(mdParser.ELSE_KW, 0); }
+		public TerminalNode WHILE_KW() { return getToken(mdParser.WHILE_KW, 0); }
+		public TerminalNode BREAK_KW() { return getToken(mdParser.BREAK_KW, 0); }
+		public TerminalNode CONTINUE_KW() { return getToken(mdParser.CONTINUE_KW, 0); }
 		public ReturnStmtContext returnStmt() {
 			return getRuleContext(ReturnStmtContext.class,0);
 		}
@@ -669,15 +669,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_stmt; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterStmt(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterStmt(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitStmt(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitStmt(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitStmt(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -808,10 +808,10 @@ public class P8Parser extends Parser {
 	}
 
 	public static class LValContext extends ParserRuleContext {
-		public TerminalNode Ident() { return getToken(P8Parser.Ident, 0); }
-		public List<TerminalNode> LBracket() { return getTokens(P8Parser.LBracket); }
+		public TerminalNode Ident() { return getToken(mdParser.Ident, 0); }
+		public List<TerminalNode> LBracket() { return getTokens(mdParser.LBracket); }
 		public TerminalNode LBracket(int i) {
-			return getToken(P8Parser.LBracket, i);
+			return getToken(mdParser.LBracket, i);
 		}
 		public List<ExpContext> exp() {
 			return getRuleContexts(ExpContext.class);
@@ -819,9 +819,9 @@ public class P8Parser extends Parser {
 		public ExpContext exp(int i) {
 			return getRuleContext(ExpContext.class,i);
 		}
-		public List<TerminalNode> RBracket() { return getTokens(P8Parser.RBracket); }
+		public List<TerminalNode> RBracket() { return getTokens(mdParser.RBracket); }
 		public TerminalNode RBracket(int i) {
-			return getToken(P8Parser.RBracket, i);
+			return getToken(mdParser.RBracket, i);
 		}
 		public LValContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -829,15 +829,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_lVal; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterLVal(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterLVal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitLVal(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitLVal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitLVal(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitLVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -894,15 +894,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_number; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterNumber(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterNumber(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitNumber(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitNumber(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitNumber(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitNumber(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -929,24 +929,24 @@ public class P8Parser extends Parser {
 	}
 
 	public static class IntConstContext extends ParserRuleContext {
-		public TerminalNode DecimalConst() { return getToken(P8Parser.DecimalConst, 0); }
-		public TerminalNode OctalConst() { return getToken(P8Parser.OctalConst, 0); }
-		public TerminalNode HexadecimalConst() { return getToken(P8Parser.HexadecimalConst, 0); }
+		public TerminalNode DecimalConst() { return getToken(mdParser.DecimalConst, 0); }
+		public TerminalNode OctalConst() { return getToken(mdParser.OctalConst, 0); }
+		public TerminalNode HexadecimalConst() { return getToken(mdParser.HexadecimalConst, 0); }
 		public IntConstContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_intConst; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterIntConst(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterIntConst(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitIntConst(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitIntConst(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitIntConst(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitIntConst(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -982,8 +982,8 @@ public class P8Parser extends Parser {
 	}
 
 	public static class ReturnStmtContext extends ParserRuleContext {
-		public TerminalNode RETURN_KW() { return getToken(P8Parser.RETURN_KW, 0); }
-		public TerminalNode Semicolon() { return getToken(P8Parser.Semicolon, 0); }
+		public TerminalNode RETURN_KW() { return getToken(mdParser.RETURN_KW, 0); }
+		public TerminalNode Semicolon() { return getToken(mdParser.Semicolon, 0); }
 		public ExpContext exp() {
 			return getRuleContext(ExpContext.class,0);
 		}
@@ -993,15 +993,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_returnStmt; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterReturnStmt(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterReturnStmt(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitReturnStmt(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitReturnStmt(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitReturnStmt(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitReturnStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1050,15 +1050,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_exp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1094,15 +1094,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_cond; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterCond(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterCond(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitCond(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitCond(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitCond(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitCond(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1135,25 +1135,25 @@ public class P8Parser extends Parser {
 		public RelExpContext relExp() {
 			return getRuleContext(RelExpContext.class,0);
 		}
-		public TerminalNode LT_KW() { return getToken(P8Parser.LT_KW, 0); }
-		public TerminalNode GT_KW() { return getToken(P8Parser.GT_KW, 0); }
-		public TerminalNode LE_KW() { return getToken(P8Parser.LE_KW, 0); }
-		public TerminalNode GE_KW() { return getToken(P8Parser.GE_KW, 0); }
+		public TerminalNode LT_KW() { return getToken(mdParser.LT_KW, 0); }
+		public TerminalNode GT_KW() { return getToken(mdParser.GT_KW, 0); }
+		public TerminalNode LE_KW() { return getToken(mdParser.LE_KW, 0); }
+		public TerminalNode GE_KW() { return getToken(mdParser.GE_KW, 0); }
 		public RelExpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_relExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterRelExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterRelExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitRelExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitRelExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitRelExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitRelExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1231,23 +1231,23 @@ public class P8Parser extends Parser {
 		public EqExpContext eqExp() {
 			return getRuleContext(EqExpContext.class,0);
 		}
-		public TerminalNode EQ_KW() { return getToken(P8Parser.EQ_KW, 0); }
-		public TerminalNode NEQ_KW() { return getToken(P8Parser.NEQ_KW, 0); }
+		public TerminalNode EQ_KW() { return getToken(mdParser.EQ_KW, 0); }
+		public TerminalNode NEQ_KW() { return getToken(mdParser.NEQ_KW, 0); }
 		public EqExpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_eqExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterEqExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterEqExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitEqExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitEqExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitEqExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitEqExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1325,22 +1325,22 @@ public class P8Parser extends Parser {
 		public LAndExpContext lAndExp() {
 			return getRuleContext(LAndExpContext.class,0);
 		}
-		public TerminalNode LAND_KW() { return getToken(P8Parser.LAND_KW, 0); }
+		public TerminalNode LAND_KW() { return getToken(mdParser.LAND_KW, 0); }
 		public LAndExpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lAndExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterLAndExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterLAndExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitLAndExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitLAndExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitLAndExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitLAndExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1409,22 +1409,22 @@ public class P8Parser extends Parser {
 		public LOrExpContext lOrExp() {
 			return getRuleContext(LOrExpContext.class,0);
 		}
-		public TerminalNode LOR_KW() { return getToken(P8Parser.LOR_KW, 0); }
+		public TerminalNode LOR_KW() { return getToken(mdParser.LOR_KW, 0); }
 		public LOrExpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lOrExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterLOrExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterLOrExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitLOrExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitLOrExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitLOrExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitLOrExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1493,23 +1493,23 @@ public class P8Parser extends Parser {
 		public AddExpContext addExp() {
 			return getRuleContext(AddExpContext.class,0);
 		}
-		public TerminalNode ADD() { return getToken(P8Parser.ADD, 0); }
-		public TerminalNode SUB() { return getToken(P8Parser.SUB, 0); }
+		public TerminalNode ADD() { return getToken(mdParser.ADD, 0); }
+		public TerminalNode SUB() { return getToken(mdParser.SUB, 0); }
 		public AddExpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_addExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterAddExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterAddExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitAddExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitAddExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitAddExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitAddExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1587,24 +1587,24 @@ public class P8Parser extends Parser {
 		public MulExpContext mulExp() {
 			return getRuleContext(MulExpContext.class,0);
 		}
-		public TerminalNode MUL() { return getToken(P8Parser.MUL, 0); }
-		public TerminalNode DIV() { return getToken(P8Parser.DIV, 0); }
-		public TerminalNode MOD() { return getToken(P8Parser.MOD, 0); }
+		public TerminalNode MUL() { return getToken(mdParser.MUL, 0); }
+		public TerminalNode DIV() { return getToken(mdParser.DIV, 0); }
+		public TerminalNode MOD() { return getToken(mdParser.MOD, 0); }
 		public MulExpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_mulExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterMulExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterMulExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitMulExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitMulExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitMulExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitMulExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1676,9 +1676,9 @@ public class P8Parser extends Parser {
 	}
 
 	public static class UnaryExpContext extends ParserRuleContext {
-		public TerminalNode Ident() { return getToken(P8Parser.Ident, 0); }
-		public TerminalNode LParser() { return getToken(P8Parser.LParser, 0); }
-		public TerminalNode RParser() { return getToken(P8Parser.RParser, 0); }
+		public TerminalNode Ident() { return getToken(mdParser.Ident, 0); }
+		public TerminalNode LParser() { return getToken(mdParser.LParser, 0); }
+		public TerminalNode RParser() { return getToken(mdParser.RParser, 0); }
 		public List<ExpContext> exp() {
 			return getRuleContexts(ExpContext.class);
 		}
@@ -1688,9 +1688,9 @@ public class P8Parser extends Parser {
 		public UnaryExpContext unaryExp() {
 			return getRuleContext(UnaryExpContext.class,0);
 		}
-		public TerminalNode ADD() { return getToken(P8Parser.ADD, 0); }
-		public TerminalNode SUB() { return getToken(P8Parser.SUB, 0); }
-		public TerminalNode NOT() { return getToken(P8Parser.NOT, 0); }
+		public TerminalNode ADD() { return getToken(mdParser.ADD, 0); }
+		public TerminalNode SUB() { return getToken(mdParser.SUB, 0); }
+		public TerminalNode NOT() { return getToken(mdParser.NOT, 0); }
 		public PrimaryExpContext primaryExp() {
 			return getRuleContext(PrimaryExpContext.class,0);
 		}
@@ -1700,15 +1700,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_unaryExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterUnaryExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterUnaryExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitUnaryExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitUnaryExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitUnaryExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitUnaryExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1796,11 +1796,11 @@ public class P8Parser extends Parser {
 	}
 
 	public static class PrimaryExpContext extends ParserRuleContext {
-		public TerminalNode LParser() { return getToken(P8Parser.LParser, 0); }
+		public TerminalNode LParser() { return getToken(mdParser.LParser, 0); }
 		public ExpContext exp() {
 			return getRuleContext(ExpContext.class,0);
 		}
-		public TerminalNode RParser() { return getToken(P8Parser.RParser, 0); }
+		public TerminalNode RParser() { return getToken(mdParser.RParser, 0); }
 		public LValContext lVal() {
 			return getRuleContext(LValContext.class,0);
 		}
@@ -1813,15 +1813,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_primaryExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterPrimaryExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterPrimaryExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitPrimaryExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitPrimaryExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitPrimaryExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitPrimaryExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1888,15 +1888,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_decl; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterDecl(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterDecl(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitDecl(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitDecl(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitDecl(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1938,7 +1938,7 @@ public class P8Parser extends Parser {
 	}
 
 	public static class ConstDeclContext extends ParserRuleContext {
-		public TerminalNode CONST_KW() { return getToken(P8Parser.CONST_KW, 0); }
+		public TerminalNode CONST_KW() { return getToken(mdParser.CONST_KW, 0); }
 		public BTypeContext bType() {
 			return getRuleContext(BTypeContext.class,0);
 		}
@@ -1948,22 +1948,22 @@ public class P8Parser extends Parser {
 		public ConstDefContext constDef(int i) {
 			return getRuleContext(ConstDefContext.class,i);
 		}
-		public TerminalNode Semicolon() { return getToken(P8Parser.Semicolon, 0); }
+		public TerminalNode Semicolon() { return getToken(mdParser.Semicolon, 0); }
 		public ConstDeclContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_constDecl; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterConstDecl(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterConstDecl(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitConstDecl(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitConstDecl(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitConstDecl(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitConstDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2013,22 +2013,22 @@ public class P8Parser extends Parser {
 	}
 
 	public static class BTypeContext extends ParserRuleContext {
-		public TerminalNode INT_KW() { return getToken(P8Parser.INT_KW, 0); }
+		public TerminalNode INT_KW() { return getToken(mdParser.INT_KW, 0); }
 		public BTypeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_bType; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterBType(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterBType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitBType(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitBType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitBType(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitBType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2055,14 +2055,14 @@ public class P8Parser extends Parser {
 	}
 
 	public static class ConstDefContext extends ParserRuleContext {
-		public TerminalNode Ident() { return getToken(P8Parser.Ident, 0); }
-		public TerminalNode ASSIGN() { return getToken(P8Parser.ASSIGN, 0); }
+		public TerminalNode Ident() { return getToken(mdParser.Ident, 0); }
+		public TerminalNode ASSIGN() { return getToken(mdParser.ASSIGN, 0); }
 		public ConstInitValContext constInitVal() {
 			return getRuleContext(ConstInitValContext.class,0);
 		}
-		public List<TerminalNode> LBracket() { return getTokens(P8Parser.LBracket); }
+		public List<TerminalNode> LBracket() { return getTokens(mdParser.LBracket); }
 		public TerminalNode LBracket(int i) {
-			return getToken(P8Parser.LBracket, i);
+			return getToken(mdParser.LBracket, i);
 		}
 		public List<ConstExpContext> constExp() {
 			return getRuleContexts(ConstExpContext.class);
@@ -2070,9 +2070,9 @@ public class P8Parser extends Parser {
 		public ConstExpContext constExp(int i) {
 			return getRuleContext(ConstExpContext.class,i);
 		}
-		public List<TerminalNode> RBracket() { return getTokens(P8Parser.RBracket); }
+		public List<TerminalNode> RBracket() { return getTokens(mdParser.RBracket); }
 		public TerminalNode RBracket(int i) {
-			return getToken(P8Parser.RBracket, i);
+			return getToken(mdParser.RBracket, i);
 		}
 		public ConstDefContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -2080,15 +2080,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_constDef; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterConstDef(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterConstDef(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitConstDef(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitConstDef(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitConstDef(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitConstDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2141,8 +2141,8 @@ public class P8Parser extends Parser {
 		public ConstExpContext constExp() {
 			return getRuleContext(ConstExpContext.class,0);
 		}
-		public TerminalNode LBrace() { return getToken(P8Parser.LBrace, 0); }
-		public TerminalNode RBrace() { return getToken(P8Parser.RBrace, 0); }
+		public TerminalNode LBrace() { return getToken(mdParser.LBrace, 0); }
+		public TerminalNode RBrace() { return getToken(mdParser.RBrace, 0); }
 		public List<ConstInitValContext> constInitVal() {
 			return getRuleContexts(ConstInitValContext.class);
 		}
@@ -2155,15 +2155,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_constInitVal; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterConstInitVal(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterConstInitVal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitConstInitVal(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitConstInitVal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitConstInitVal(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitConstInitVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2250,15 +2250,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_constExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterConstExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterConstExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitConstExp(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitConstExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitConstExp(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitConstExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2294,22 +2294,22 @@ public class P8Parser extends Parser {
 		public VarDefContext varDef(int i) {
 			return getRuleContext(VarDefContext.class,i);
 		}
-		public TerminalNode Semicolon() { return getToken(P8Parser.Semicolon, 0); }
+		public TerminalNode Semicolon() { return getToken(mdParser.Semicolon, 0); }
 		public VarDeclContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_varDecl; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterVarDecl(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterVarDecl(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitVarDecl(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitVarDecl(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitVarDecl(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitVarDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2357,10 +2357,10 @@ public class P8Parser extends Parser {
 	}
 
 	public static class VarDefContext extends ParserRuleContext {
-		public TerminalNode Ident() { return getToken(P8Parser.Ident, 0); }
-		public List<TerminalNode> LBracket() { return getTokens(P8Parser.LBracket); }
+		public TerminalNode Ident() { return getToken(mdParser.Ident, 0); }
+		public List<TerminalNode> LBracket() { return getTokens(mdParser.LBracket); }
 		public TerminalNode LBracket(int i) {
-			return getToken(P8Parser.LBracket, i);
+			return getToken(mdParser.LBracket, i);
 		}
 		public List<ConstExpContext> constExp() {
 			return getRuleContexts(ConstExpContext.class);
@@ -2368,11 +2368,11 @@ public class P8Parser extends Parser {
 		public ConstExpContext constExp(int i) {
 			return getRuleContext(ConstExpContext.class,i);
 		}
-		public List<TerminalNode> RBracket() { return getTokens(P8Parser.RBracket); }
+		public List<TerminalNode> RBracket() { return getTokens(mdParser.RBracket); }
 		public TerminalNode RBracket(int i) {
-			return getToken(P8Parser.RBracket, i);
+			return getToken(mdParser.RBracket, i);
 		}
-		public TerminalNode ASSIGN() { return getToken(P8Parser.ASSIGN, 0); }
+		public TerminalNode ASSIGN() { return getToken(mdParser.ASSIGN, 0); }
 		public InitValContext initVal() {
 			return getRuleContext(InitValContext.class,0);
 		}
@@ -2382,15 +2382,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_varDef; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterVarDef(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterVarDef(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitVarDef(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitVarDef(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitVarDef(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitVarDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2474,8 +2474,8 @@ public class P8Parser extends Parser {
 		public ExpContext exp() {
 			return getRuleContext(ExpContext.class,0);
 		}
-		public TerminalNode LBrace() { return getToken(P8Parser.LBrace, 0); }
-		public TerminalNode RBrace() { return getToken(P8Parser.RBrace, 0); }
+		public TerminalNode LBrace() { return getToken(mdParser.LBrace, 0); }
+		public TerminalNode RBrace() { return getToken(mdParser.RBrace, 0); }
 		public List<InitValContext> initVal() {
 			return getRuleContexts(InitValContext.class);
 		}
@@ -2488,15 +2488,15 @@ public class P8Parser extends Parser {
 		@Override public int getRuleIndex() { return RULE_initVal; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).enterInitVal(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).enterInitVal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof P8Listener ) ((P8Listener)listener).exitInitVal(this);
+			if ( listener instanceof mdListener ) ((mdListener)listener).exitInitVal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof P8Visitor ) return ((P8Visitor<? extends T>)visitor).visitInitVal(this);
+			if ( visitor instanceof mdVisitor ) return ((mdVisitor<? extends T>)visitor).visitInitVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}

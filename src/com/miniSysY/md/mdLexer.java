@@ -1,5 +1,5 @@
-// Generated from D:/Projects/IDEA/Compile/src\P8.g4 by ANTLR 4.9.2
-package com.miniSysY.P8;
+// Generated from D:/Projects/IDEA/Compile/src\md.g4 by ANTLR 4.9.2
+package com.miniSysY.md;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class P8Lexer extends Lexer {
+public class mdLexer extends Lexer {
 	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -97,13 +97,13 @@ public class P8Lexer extends Lexer {
 	}
 
 
-	public P8Lexer(CharStream input) {
+	public mdLexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() { return "P8.g4"; }
+	public String getGrammarFileName() { return "md.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
