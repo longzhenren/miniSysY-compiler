@@ -10,7 +10,8 @@ import java.util.HashMap;
 public class Visitor extends mdBaseVisitor<Void> {
     Integer currentReg = 0;
     int pos = 0, sid = 0;
-    HashMap<ArrayList<Integer>, String> arr_index_val = null;
+    public static HashMap<ArrayList<Integer>, String> arr_index_val = null;
+    public static HashMap<String, String> arr_pos_val = null;
     ArrayList<Integer> arrsize = null;
     public static HashMap<RuleNode, HashMap<String, Object>> node_attr_Val = new HashMap<>(); // 保存树上结点的各种属性
     public static HashMap<RuleContext, HashMap<String, Object>> block_ident_Reg = new HashMap<>();
@@ -216,14 +217,48 @@ public class Visitor extends mdBaseVisitor<Void> {
         return String.valueOf(sb);
     }
 
-    public static String getGlobalArrVal(ArrayList<Integer> size, HashMap<String, String> arr_index_val, int pos) {
+
+    public static String getRel(ArrayList<Integer> size, ArrayList<Integer> index) {//获取下标相对数组首地址的偏移量
+        int res = 0;
+        for (int i = 0; i < index.size(); i++) {
+            int mul = index.get(i);
+            for (int j = i + 1; j < size.size(); j++) {
+                mul *= size.get(j);
+            }
+            res += mul;
+        }
+        return String.valueOf(res);
+    }
+
+    public static ArrayList<Integer> getInd(ArrayList<Integer> size, int rel) {//获取下标相对数组首地址的偏移量
+        ArrayList<Integer> index = new ArrayList<>();
+        for (int i = 0; i < size.size(); i++) {
+            int mul = 1;
+            for (int j = 1; j < size.size(); j++) {
+                mul *= size.get(j);
+            }
+            index.add(rel / mul);
+            rel = rel % mul;
+        }
+        return index;
+    }
+
+    public static void getArrPosVal(ArrayList<Integer> size, HashMap<ArrayList<Integer>, String> arr_index_val) {
+        arr_pos_val = new HashMap<>();
+        for (ArrayList<Integer> ai : arr_index_val.keySet()) {
+            String pos = getRel(size, ai);
+            arr_pos_val.put(pos, arr_index_val.get(ai));
+        }
+    }
+
+    public static String getGlobalArrVal(ArrayList<Integer> size, HashMap<String, String> arr_pos_val, int pos) {
         StringBuilder sb = new StringBuilder();
         int dim = size.size();
 
         if (dim == 1) {
             boolean allzero = true;
             for (int i = pos; i < pos + size.get(0); i++) {
-                if (arr_index_val.containsKey(String.valueOf(i))) {
+                if (arr_pos_val.containsKey(String.valueOf(i))) {
                     allzero = false;
                     break;
                 }
@@ -233,8 +268,8 @@ public class Visitor extends mdBaseVisitor<Void> {
             } else {
                 sb.append("[");
                 for (int i = pos; i < pos + size.get(0); i++) {
-                    if (arr_index_val.containsKey(String.valueOf(i))) {
-                        sb.append("i32 ").append(arr_index_val.get(String.valueOf(i)));
+                    if (arr_pos_val.containsKey(String.valueOf(i))) {
+                        sb.append("i32 ").append(arr_pos_val.get(String.valueOf(i)));
                     } else {
                         sb.append("i32 0");
                     }
@@ -252,7 +287,7 @@ public class Visitor extends mdBaseVisitor<Void> {
             }
             for (int i = 0; i < size.get(0); i++) {
                 sb.append(getArrSizeString(tmp)).append(" ");
-                sb.append(getGlobalArrVal(tmp, arr_index_val, pos));
+                sb.append(getGlobalArrVal(tmp, arr_pos_val, pos));
                 if (i < size.get(0) - 1) {
                     sb.append(", ");
                 }
@@ -290,8 +325,9 @@ public class Visitor extends mdBaseVisitor<Void> {
                         sbIR.append(getArrSizeString(size)).append(" ");
                     }
                     visit(ctx.constInitVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
-                    HashMap<String, String> arr_index_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_index_val");
-                    sbIR.append(getGlobalArrVal(size, arr_index_val, 0));
+                    HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_index_val");
+                    getArrPosVal(size,arr_index_val);
+                    sbIR.append(getGlobalArrVal(size, arr_pos_val, 0));
                     sbIR.append("\n");
                     IR_List.add(String.valueOf(sbIR));
                 } else {
@@ -473,8 +509,9 @@ public class Visitor extends mdBaseVisitor<Void> {
                     StringBuilder sbIR = new StringBuilder();
                     sbIR.append(thisReg).append(" = dso_local global ").append(getArrSizeString(size)).append(" ");
                     visit(ctx.initVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
-                    HashMap<String, String> arr_index_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_index_val");
-                    sbIR.append(getGlobalArrVal(size, arr_index_val, 0));
+                    HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.initVal()).get("arr_index_val");
+                    getArrPosVal(size,arr_index_val);
+                    sbIR.append(getGlobalArrVal(size, arr_pos_val, 0));
                     sbIR.append("\n");
                     IR_List.add(String.valueOf(sbIR));
                 } else {
