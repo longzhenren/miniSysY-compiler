@@ -19,6 +19,7 @@ public class Visitor extends P8BaseVisitor<Void> {
     //    public static HashMap<String, ArrayList<String>> constArr_val = new HashMap<>();
     public static HashMap<String, HashMap<String, Object>> funcIdent_Attr = new HashMap<>();
     public static ArrayList<String> IR_List = new ArrayList<>();
+    String rtmp;
 
     public boolean ident_Check_Reg_this_Block(RuleContext ctx, String Ident) {
         RuleContext parent = ctx;
@@ -406,7 +407,9 @@ public class Visitor extends P8BaseVisitor<Void> {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
         visit(ctx.bType());
-        attr_Val.put("bType", node_attr_Val.get(ctx.bType()).get("bType"));
+        String bType = (String) node_attr_Val.get(ctx.bType()).get("bType");
+        attr_Val.put("bType", bType);
+        rtmp = null;
         if (node_attr_Val.get(ctx.parent).containsKey("global")) {
             attr_Val.put("global", "global");
         }
@@ -422,6 +425,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             }
             visit(vdf);
         }
+        if (rtmp != null && !rtmp.equals(bType)) System.exit(-1);
         return null;
     }
 
@@ -1273,6 +1277,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             StringBuilder sbIR = new StringBuilder();
             if (Main.externalFunc.containsKey(Ident)) {
                 String retType = Main.externalFunc.get(Ident);
+                rtmp = retType;
                 ArrayList<String> pTypes = Main.externalFunc_para.get(Ident);
                 sbIR.append("call ").append(retType).append(" @").append(Ident).append("(");
                 if (pTypes != null && pTypes.size() != ctx.exp().size()) {
@@ -1346,6 +1351,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                 }
             } else if (funcIdent_Attr.containsKey(Ident)) {
                 String retType = (String) funcIdent_Attr.get(Ident).get("retType");
+                rtmp = retType;
                 ArrayList<String> pTypes = (ArrayList<String>) funcIdent_Attr.get(Ident).get("pTypes");
                 if (pTypes != null && pTypes.size() != ctx.exp().size()) {
                     System.exit(-1);
