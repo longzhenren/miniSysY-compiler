@@ -1680,6 +1680,12 @@ public class Visitor extends P8BaseVisitor<Void> {
             String lAndExpReg, eqExpReg, reg1 = null, reg2 = null;
             if (node_attr_Val.get(ctx.lAndExp()).containsKey("thisReg")) {
                 lAndExpReg = (String) node_attr_Val.get(ctx.lAndExp()).get("thisReg");
+                if (reg_Type.get(lAndExpReg).equals("i32*")) {
+                    String tmpReg = "%x" + currentReg++;
+                    IR_List.add("\t" + tmpReg + " = load i32, i32* " + lAndExpReg + "\n");
+                    reg_Type.put(tmpReg, "i32");
+                    lAndExpReg = tmpReg;
+                }
                 if (reg_Type.get(lAndExpReg).equals("i1")) {
                     reg1 = lAndExpReg;
                 } else if (reg_Type.get(lAndExpReg).equals("i32")) {
@@ -1691,6 +1697,12 @@ public class Visitor extends P8BaseVisitor<Void> {
             visit(ctx.eqExp());
             if (node_attr_Val.get(ctx.eqExp()).containsKey("thisReg")) {
                 eqExpReg = (String) node_attr_Val.get(ctx.eqExp()).get("thisReg");
+                if (reg_Type.get(eqExpReg).equals("i32*")) {
+                    String tmpReg = "%x" + currentReg++;
+                    IR_List.add("\t" + tmpReg + " = load i32, i32* " + eqExpReg + "\n");
+                    reg_Type.put(tmpReg, "i32");
+                    eqExpReg = tmpReg;
+                }
                 if (reg_Type.get(eqExpReg).equals("i1")) {
                     reg2 = eqExpReg;
                 } else if (reg_Type.get(eqExpReg).equals("i32")) {
