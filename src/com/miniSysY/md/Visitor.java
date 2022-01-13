@@ -306,7 +306,7 @@ public class Visitor extends mdBaseVisitor<Void> {
                 reg_Type.put(thisReg, getArrSizeString(size) + "*");
                 arrr_size.put(thisReg, size);
                 int dim = size.size();
-                IR_List.add("\t" + thisReg + " = alloca" + getArrSizeString(size) + "\n");
+                IR_List.add("\t" + thisReg + " = alloca " + getArrSizeString(size) + "\n");
                 if (dim != 0) {
                     int memsize = 1;
                     StringBuilder sb = new StringBuilder();
@@ -322,16 +322,17 @@ public class Visitor extends mdBaseVisitor<Void> {
                 }
                 if (ctx.constInitVal() != null) {
                     visit(ctx.constInitVal());
+                    //拆到i32*进行存值
                     StringBuilder sb = new StringBuilder();
-                    String curptr = "%x" + currentReg++;
-                    reg_Type.put(curptr, "i32*");
-                    sb.append("\t").append(curptr).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg);
-                    sb.append(", i32 0".repeat(Math.max(0, dim - 1)));
+                    String arrReg = "%x" + currentReg++;
+                    reg_Type.put(arrReg, "i32*");
+                    sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
+                    sb.append(", i32 0".repeat(dim));
                     IR_List.add(sb + "\n");
                     HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_pos_val");
                     for (String pos : arr_pos_val.keySet()) {
                         String tmpReg = "%x" + currentReg++;
-                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + curptr + ", i32 " + pos + "\n");
+                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + arrReg + ", i32 " + pos + "\n");
                         IR_List.add("\tstore i32 " + arr_pos_val.get(pos) + ", i32* " + tmpReg + "\n");
                     }
                 }
@@ -920,7 +921,7 @@ public class Visitor extends mdBaseVisitor<Void> {
                     String thisReg = "%x" + currentReg++;
                     IR_List.add("\t" + thisReg + " = load " + idtype.substring(0, idtype.length() - 1) + ", " + idtype + " " + idptr + "\n");
                     idptr = thisReg;
-                    idtype = idtype.substring(0, idtype.length() - 1);
+//                    idtype = idtype.substring(0, idtype.length() - 1);
                 }
 
                 int dim = size.size();
