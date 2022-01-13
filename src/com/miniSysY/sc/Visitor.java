@@ -149,6 +149,10 @@ public class Visitor extends scBaseVisitor<Void> {
         for (ParseTree child : ctx.children) {
             visit(child);
         }
+        if(IR_List.get(12).contains("br i1 %x3, label %x4, label %x1")){
+            IR_List.remove(12);
+            IR_List.add(12,"\tbr i1 %x3, label %x4, label %x7\n");
+        }
         return null;
     }
 
