@@ -292,8 +292,8 @@ public class Visitor extends scBaseVisitor<Void> {
                     sb.append(", ");
                 }
                 int t = 1;
-                for(int j=0;j<tmp.size();j++){
-                    t*=tmp.get(j);
+                for (int j = 0; j < tmp.size(); j++) {
+                    t *= tmp.get(j);
                 }
                 pos += t;
             }
@@ -330,7 +330,7 @@ public class Visitor extends scBaseVisitor<Void> {
                     }
                     visit(ctx.constInitVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
                     HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_index_val");
-                    getArrPosVal(size,arr_index_val);
+                    getArrPosVal(size, arr_index_val);
                     System.err.println(arr_pos_val);
                     sbIR.append(getGlobalArrVal(size, arr_pos_val, 0));
                     sbIR.append("\n");
@@ -515,7 +515,7 @@ public class Visitor extends scBaseVisitor<Void> {
                     sbIR.append(thisReg).append(" = dso_local global ").append(getArrSizeString(size)).append(" ");
                     visit(ctx.initVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
                     HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.initVal()).get("arr_index_val");
-                    getArrPosVal(size,arr_index_val);
+                    getArrPosVal(size, arr_index_val);
                     System.err.println(arr_pos_val);
                     sbIR.append(getGlobalArrVal(size, arr_pos_val, 0));
                     sbIR.append("\n");
@@ -567,7 +567,6 @@ public class Visitor extends scBaseVisitor<Void> {
                 thisReg = "@" + Ident;
                 String bType = (String) node_attr_Val.get(ctx.parent).get("bType");
                 reg_Type.put(thisReg, bType + "*");
-                System.err.println("visitVarDef,global:" + Ident + " Reg:" + thisReg + " Type:" + reg_Type.get(thisReg));
                 long globalInitValue = 0;
                 if (ctx.ASSIGN() != null) {
                     if (ctx.ASSIGN().getText().equals("=")) {
@@ -584,7 +583,6 @@ public class Visitor extends scBaseVisitor<Void> {
                 String bType = (String) node_attr_Val.get(ctx.parent).get("bType");
                 reg_Type.put(thisReg, bType + "*");
                 IR_List.add("\t" + thisReg + " = alloca " + bType + "\n");
-                System.err.println("visitVarDef:" + Ident + " Reg:" + thisReg + " Type:" + reg_Type.get(thisReg));
                 ident_Put_Reg(ctx, Ident, thisReg);
                 if (ctx.ASSIGN() != null) {
                     if (ctx.ASSIGN().getText().equals("=")) {
@@ -835,8 +833,6 @@ public class Visitor extends scBaseVisitor<Void> {
                 visit(ctx.lVal());
                 String lvalReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
                 String identType = reg_Type.get(lvalReg);
-                ArrayList<Integer> size = arrr_size.get(lvalReg);
-
                 visit(ctx.exp());
                 if (node_attr_Val.get(ctx.exp()).containsKey("thisReg")) {
                     String expReg = (String) node_attr_Val.get(ctx.exp()).get("thisReg");
@@ -862,32 +858,31 @@ public class Visitor extends scBaseVisitor<Void> {
             }
         } else if (ctx.IF_KW() != null) {
             visit(ctx.cond());
-            Integer TLabel = (Integer) node_attr_Val.get(ctx.cond()).get("TLabel");
-            Integer FLabel = (Integer) node_attr_Val.get(ctx.cond()).get("FLabel");
-            String PassLabel = String.valueOf(currentReg++);
-            reg_Type.put(PassLabel, "i32");
+            String TLabel = (String) node_attr_Val.get(ctx.cond()).get("TLabel");
+            String FLabel = (String) node_attr_Val.get(ctx.cond()).get("FLabel");
+            String PassLabel = "x" + currentReg++;
             if (ctx.ELSE_KW() == null) {
-                IR_List.add("\nx" + TLabel + ":\n");
+                IR_List.add("\n" + TLabel + ":\n");
                 visit(ctx.stmt(0));
-                IR_List.add("\tbr label %x" + PassLabel + "\n");
+                IR_List.add("\tbr label %" + PassLabel + "\n");
 
-                IR_List.add("\nx" + PassLabel + ":\n");
-                IR_List.add("\tbr label %x" + FLabel + "\n");
-                IR_List.add("\nx" + FLabel + ":\n");
+                IR_List.add("\n" + PassLabel + ":\n");
+                IR_List.add("\tbr label %" + FLabel + "\n");
+                IR_List.add("\n" + FLabel + ":\n");
             } else {
-                IR_List.add("\nx" + TLabel + ":\n");
+                IR_List.add("\n" + TLabel + ":\n");
                 visit(ctx.stmt(0));
                 if (!IR_List.get(IR_List.size() - 1).contains("ret")) {
-                    IR_List.add("\tbr label %x" + PassLabel + "\n");
+                    IR_List.add("\tbr label %" + PassLabel + "\n");
                 }
-                IR_List.add("\nx" + FLabel + ":\n");
+                IR_List.add("\n" + FLabel + ":\n");
                 if (ctx.stmt().size() == 2)
                     visit(ctx.stmt(1));
 
                 if (!IR_List.get(IR_List.size() - 1).contains("ret")) {
-                    IR_List.add("\tbr label %x" + PassLabel + "\n");
+                    IR_List.add("\tbr label %" + PassLabel + "\n");
 
-                    IR_List.add("\nx" + PassLabel + ":\n");
+                    IR_List.add("\n" + PassLabel + ":\n");
                 } else {
                     IR_List.add("\n");
                 }
@@ -895,9 +890,9 @@ public class Visitor extends scBaseVisitor<Void> {
         } else if (ctx.block() != null) {
             visit(ctx.block());
         } else if (ctx.WHILE_KW() != null) {
-            String StartLabel = String.valueOf(currentReg++);
+            String StartLabel = "x"+currentReg++;
 
-            IR_List.add("\tbr label %x" + StartLabel + "\n");
+            IR_List.add("\tbr label %" + StartLabel + "\n");
 
             IR_List.add("\nx" + StartLabel + ":\n");
             visit(ctx.cond());
@@ -911,7 +906,7 @@ public class Visitor extends scBaseVisitor<Void> {
 
             IR_List.add("\nx" + TLabel + ":\n");
             visit(ctx.stmt(0));
-            IR_List.add("\tbr label %x" + StartLabel + "\n");
+            IR_List.add("\tbr label %" + StartLabel + "\n");
 
             IR_List.add("\nx" + FLabel + ":\n");
         } else if (ctx.BREAK_KW() != null) {
@@ -929,7 +924,7 @@ public class Visitor extends scBaseVisitor<Void> {
                 }
                 parent = parent.parent;
             }
-            IR_List.add("\tbr label %x" + FLabel + "\n");
+            IR_List.add("\tbr label %" + FLabel + "\n");
             if (StartLabel == null || TLabel == null || FLabel == null) {
                 System.err.println("Separate BREAK");
                 for (String IR : IR_List) {
@@ -952,7 +947,7 @@ public class Visitor extends scBaseVisitor<Void> {
                 }
                 parent = parent.parent;
             }
-            IR_List.add("\tbr label %x" + StartLabel + "\n");
+            IR_List.add("\tbr label %" + StartLabel + "\n");
             if (StartLabel == null || TLabel == null || FLabel == null) {
                 System.err.println("Separate CONTINUE");
                 for (String IR : IR_List) {
@@ -1048,6 +1043,10 @@ public class Visitor extends scBaseVisitor<Void> {
     public Void visitCond(scParser.CondContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
+        int trueLabel = currentReg++;
+        int falseLabel = currentReg++;
+        attr_Val.put("TLabel", "x" + trueLabel);
+        attr_Val.put("FLabel", "x" + falseLabel);
         visit(ctx.lOrExp());
         String lOrExpReg = (String) node_attr_Val.get(ctx.lOrExp()).get("thisReg");
         if (lOrExpReg != null && reg_Type.get(lOrExpReg).equals("i32*")) {
@@ -1058,22 +1057,18 @@ public class Visitor extends scBaseVisitor<Void> {
         }
         String thisReg = "%x" + currentReg++;
         reg_Type.put(thisReg, "i1");
-        int trueLabel = currentReg++;
-        int falseLabel = currentReg++;
         if (node_attr_Val.get(ctx.lOrExp()).containsKey("numberVal")) {
             String numberVal = (String) node_attr_Val.get(ctx.lOrExp()).get("numberVal");
             IR_List.add("\t" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
-            IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+            IR_List.add("\tbr i1 " + thisReg + ", label %" + trueLabel + ", label %" + falseLabel + "\n");
         } else if (node_attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
             if (reg_Type.get(lOrExpReg).equals("i32")) {
                 IR_List.add("\t" + thisReg + " = icmp ne i32 " + lOrExpReg + ", 0\n");
-                IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+                IR_List.add("\tbr i1 " + thisReg + ", label %" + trueLabel + ", label %" + falseLabel + "\n");
             } else if (reg_Type.get(lOrExpReg).equals("i1")) {
-                IR_List.add("\tbr i1 " + lOrExpReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
+                IR_List.add("\tbr i1 " + lOrExpReg + ", label %" + trueLabel + ", label %" + falseLabel + "\n");
             }
         }
-        attr_Val.put("TLabel", trueLabel);
-        attr_Val.put("FLabel", falseLabel);
         return null;
     }
 
@@ -1742,7 +1737,16 @@ public class Visitor extends scBaseVisitor<Void> {
     // lAndExp:eqExp | lAndExp LAND_KW eqExp
     public Void visitLAndExp(scParser.LAndExpContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
+        String FLabel = null;
         node_attr_Val.put(ctx, attr_Val);
+        if (node_attr_Val.get(ctx.parent).containsKey("FLabel")) {
+            FLabel = (String) node_attr_Val.get(ctx.parent).get("FLabel");
+            attr_Val.put("FLabel", FLabel);
+        }
+        if (node_attr_Val.get(ctx.parent).containsKey("TLabel")) {
+            String TLabel = (String) node_attr_Val.get(ctx.parent).get("TLabel");
+            attr_Val.put("TLabel", TLabel);
+        }
         if (ctx.LAND_KW() == null) { // eqExp
             visit(ctx.eqExp());
             if (node_attr_Val.get(ctx.eqExp()).containsKey("numberVal")) {
@@ -1751,6 +1755,7 @@ public class Visitor extends scBaseVisitor<Void> {
                 attr_Val.put("thisReg", node_attr_Val.get(ctx.eqExp()).get("thisReg"));
             }
         } else { // lAndExp LAND_KW eqExp
+            // AND：失败标志相同，成功标志依次分配
             visit(ctx.lAndExp());
             String lAndExpReg, eqExpReg, reg1 = null, reg2 = null;
             if (node_attr_Val.get(ctx.lAndExp()).containsKey("thisReg")) {
@@ -1769,6 +1774,9 @@ public class Visitor extends scBaseVisitor<Void> {
                     IR_List.add("\t" + reg1 + " = icmp ne i32 " + lAndExpReg + ", 0" + "\n");
                 }
             }
+            String TLabel = "x" + currentReg++;
+            IR_List.add("\tbr i1 " + reg1 + ", label %" + TLabel + ", label %" + FLabel + "\n");
+            IR_List.add("\n" + TLabel + ":\n");
             visit(ctx.eqExp());
             if (node_attr_Val.get(ctx.eqExp()).containsKey("thisReg")) {
                 eqExpReg = (String) node_attr_Val.get(ctx.eqExp()).get("thisReg");
@@ -1786,10 +1794,11 @@ public class Visitor extends scBaseVisitor<Void> {
                     IR_List.add("\t" + reg2 + " = icmp ne i32 " + eqExpReg + ", 0" + "\n");
                 }
             }
-            String thisReg = "%x" + currentReg++;
-            reg_Type.put(thisReg, "i1");
-            attr_Val.put("thisReg", thisReg);
-            IR_List.add("\t" + thisReg + " = and i1 " + reg1 + ", " + reg2 + "\n");
+//            TLabel = "x" + currentReg++;
+//            IR_List.add("\tbr i1 " + reg2 + ", label %" + TLabel + ", label %" + FLabel + "\n");
+//            IR_List.add("\n" + TLabel + ":\n");
+            attr_Val.put("thisReg",reg2);
+            attr_Val.put("TLabel",TLabel);
         }
         return null;
     }
@@ -1799,6 +1808,15 @@ public class Visitor extends scBaseVisitor<Void> {
     public Void visitLOrExp(scParser.LOrExpContext ctx) {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
+        String TLabel = null;
+        if (node_attr_Val.get(ctx.parent).containsKey("FLabel")) {
+            String FLabel = (String) node_attr_Val.get(ctx.parent).get("FLabel");
+            attr_Val.put("FLabel", FLabel);
+        }
+        if (node_attr_Val.get(ctx.parent).containsKey("TLabel")) {
+            TLabel = (String) node_attr_Val.get(ctx.parent).get("TLabel");
+            attr_Val.put("TLabel", TLabel);
+        }
         if (ctx.LOR_KW() == null) { // lAndExp
             visit(ctx.lAndExp());
             if (node_attr_Val.get(ctx.lAndExp()).containsKey("numberVal")) {
@@ -1825,6 +1843,9 @@ public class Visitor extends scBaseVisitor<Void> {
                     IR_List.add("\t" + reg1 + " = icmp ne i32 " + lOrExpReg + ", 0" + "\n");
                 }
             }
+            String FLabel = "x" + currentReg++;
+            IR_List.add("\tbr i1 " + reg1 + ", label %" + TLabel + ", label %" + FLabel + "\n");
+            IR_List.add("\n" + FLabel + ":\n");
             visit(ctx.lAndExp());
             if (node_attr_Val.get(ctx.lAndExp()).containsKey("thisReg")) {
                 lAndExpReg = (String) node_attr_Val.get(ctx.lAndExp()).get("thisReg");
@@ -1842,10 +1863,11 @@ public class Visitor extends scBaseVisitor<Void> {
                     IR_List.add("\t" + reg2 + " = icmp ne i32 " + lAndExpReg + ", 0" + "\n");
                 }
             }
-            String thisReg = "%x" + currentReg++;
-            reg_Type.put(thisReg, "i1");
-            attr_Val.put("thisReg", thisReg);
-            IR_List.add("\t" + thisReg + " = or i1 " + reg1 + ", " + reg2 + "\n");
+//            FLabel = "x" + currentReg++;
+            attr_Val.put("FLabel", FLabel);
+            attr_Val.put("thisReg",reg2);
+//            IR_List.add("\tbr i1 " + reg2 + ", label %" + TLabel + ", label %" + FLabel + "\n");
+//            IR_List.add("\n" + FLabel + ":\n");
         }
         return null;
     }
