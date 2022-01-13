@@ -323,20 +323,16 @@ public class Visitor extends mdBaseVisitor<Void> {
                 if (ctx.constInitVal() != null) {
                     visit(ctx.constInitVal());
                     //拆到i32*进行存值
-                    StringBuilder sb = new StringBuilder();
-                    String arrReg = "%x" + currentReg++;
-                    reg_Type.put(arrReg, "i32*");
-                    sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
-//                    sb.append(", i32 0".repeat(dim));
-                    IR_List.add(sb + "\n");
                     HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_index_val");
                     for (ArrayList<Integer> index : arr_index_val.keySet()) {
-                        StringBuilder nsb = new StringBuilder(sb);
+                        StringBuilder sb = new StringBuilder();
+                        String arrReg = "%x" + currentReg++;
+                        reg_Type.put(arrReg, "i32*");
+                        sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
                         for (Integer indexi : index) {
-                            nsb.append(", i32 ").append(indexi);
+                            sb.append(", i32 ").append(indexi);
                         }
-//                        System.err.print(pos + ":" + arr_index_val.get(pos) + ", ");
-                        IR_List.add(nsb + "\n");
+                        IR_List.add(sb + "\n");
                         IR_List.add("\tstore i32 " + arr_index_val.get(index) + ", i32* " + arrReg + "\n");
                     }
                 }
@@ -473,7 +469,6 @@ public class Visitor extends mdBaseVisitor<Void> {
                 arrr_size.put(thisReg, size);
                 //全局变量 全都要加*
                 reg_Type.put(thisReg, getArrSizeString(size) + "*");
-                System.err.println("visitVarDef,globalArr:" + Ident + " Reg:" + thisReg + " Type:" + reg_Type.get(thisReg));
                 if (ctx.initVal() != null) {
                     StringBuilder sbIR = new StringBuilder();
                     sbIR.append(thisReg).append(" = dso_local global ").append(getArrSizeString(size)).append(" ");
@@ -509,20 +504,16 @@ public class Visitor extends mdBaseVisitor<Void> {
                 if (ctx.initVal() != null) {
                     visit(ctx.initVal());
                     //拆到i32*进行存值
-                    StringBuilder sb = new StringBuilder();
-                    String arrReg = "%x" + currentReg++;
-                    reg_Type.put(arrReg, "i32*");
-                    sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
-//                    sb.append(", i32 0".repeat(dim));
-                    IR_List.add(sb + "\n");
                     HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.initVal()).get("arr_index_val");
                     for (ArrayList<Integer> index : arr_index_val.keySet()) {
-                        StringBuilder nsb = new StringBuilder(sb);
+                        StringBuilder sb = new StringBuilder();
+                        String arrReg = "%x" + currentReg++;
+                        reg_Type.put(arrReg, "i32*");
+                        sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
                         for (Integer indexi : index) {
-                            nsb.append(", i32 ").append(indexi);
+                            sb.append(", i32 ").append(indexi);
                         }
-//                        System.err.print(pos + ":" + arr_index_val.get(pos) + ", ");
-                        IR_List.add(nsb + "\n");
+                        IR_List.add(sb + "\n");
                         IR_List.add("\tstore i32 " + arr_index_val.get(index) + ", i32* " + arrReg + "\n");
                     }
                 }
