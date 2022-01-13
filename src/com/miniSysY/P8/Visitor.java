@@ -1275,8 +1275,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                         String bType = reg_Type.get(thisReg);
                         if (pType.equals(bType)) {
                             sbIR.append(pType).append(" ").append(thisReg);
-                        }
-                        if (arrr_size.containsKey(thisReg)) {
+                        } else if (arrr_size.containsKey(thisReg)) {
                             int pdim = 0;
                             if (pType.startsWith("[")) {
                                 ArrayList<Integer> pSize = getSizeArr(pType);
@@ -1340,8 +1339,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                         String pType = pTypes.get(i);
                         if (bType.equals(pType)) {
                             sbIR.append(pType).append(" ").append(thisReg);
-                        }
-                        if (arrr_size.containsKey(thisReg)) {
+                        } else if (arrr_size.containsKey(thisReg)) {
                             int pdim = 0;
                             if (pType.startsWith("[")) {
                                 ArrayList<Integer> pSize = getSizeArr(pType);
@@ -1360,13 +1358,12 @@ public class Visitor extends P8BaseVisitor<Void> {
                             String tmpReg = "%x" + currentReg++;
                             IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
                             reg_Type.put(tmpReg, "i32");
-                            bType = "i32";
-                            thisReg = tmpReg;
-                            sbIR.append(bType).append(" ").append(thisReg);
+                            sbIR.append(pType).append(" ").append(tmpReg);
                         }
                     } else if (node_attr_Val.get(ctx.exp(i)).containsKey("numberVal")) {
                         sbIR.append("i32 ").append(node_attr_Val.get(ctx.exp(i)).get("numberVal"));
                     }
+
                     if (i != ctx.exp().size() - 1) {
                         sbIR.append(", ");
                     }
