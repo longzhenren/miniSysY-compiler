@@ -1,0 +1,7 @@
+[jobs.short_circuit]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+  "java -cp .:../lib/* com.miniSysY.sc.Main < $input > $ir"
+]
