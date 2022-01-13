@@ -484,15 +484,15 @@ public class Visitor extends P8BaseVisitor<Void> {
                     visit(ctx.initVal());
                     //拆到i32*进行存值
                     StringBuilder sb = new StringBuilder();
-                    thisReg = "%x" + currentReg++;
-                    reg_Type.put(thisReg, "i32*");
-                    sb.append("\t").append(thisReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
+                    String arrReg = "%x" + currentReg++;
+                    reg_Type.put(arrReg, "i32*");
+                    sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
                     sb.append(", i32 0".repeat(dim));
                     IR_List.add(sb + "\n");
                     HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
                     for (String pos : arr_pos_val.keySet()) {
                         String tmpReg = "%x" + currentReg++;
-                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + thisReg + ", i32 " + pos + "\n");
+                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + arrReg + ", i32 " + pos + "\n");
                         IR_List.add("\tstore i32 " + arr_pos_val.get(pos) + ", i32* " + tmpReg + "\n");
                     }
                 }
@@ -1491,25 +1491,6 @@ public class Visitor extends P8BaseVisitor<Void> {
             attr_Val.put("expReg", thisReg);
         } else if (ctx.lVal() != null) {
             visit(ctx.lVal());
-//            if (node_attr_Val.get(ctx.lVal()).containsKey("remainSize")) {//Array
-//                if (node_attr_Val.get(ctx.lVal()).containsKey("thisReg")) {
-//                    String lvalReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
-//                    ArrayList<Integer> size = arrr_size.get(lvalReg);
-//                    String type = getArrSizeString(size);
-//                    if (type.equals("i32")) {
-//                        attr_Val.put("lValReg", lvalReg);
-//                    } else {
-//                        StringBuilder sb = new StringBuilder();
-//                        String thisReg = "%x" + currentReg++;
-//                        sb.append("\t").append(thisReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(lvalReg);
-//                        sb.append(", i32 0".repeat(size.size() + 1));
-//                        sb.append("\n");
-//                        IR_List.add(String.valueOf(sb));
-//                        attr_Val.put("lValReg", thisReg);
-//                        reg_Type.put(thisReg, "i32*");
-//                    }
-//                }
-//            } else
             if (node_attr_Val.get(ctx.lVal()).containsKey("thisReg")) {
                 String lValReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
                 attr_Val.put("lValReg", lValReg);
