@@ -1275,6 +1275,13 @@ public class Visitor extends P8BaseVisitor<Void> {
                         String bType = reg_Type.get(thisReg);
                         if (pType.equals(bType)) {
                             sbIR.append(pType).append(" ").append(thisReg);
+                        } else if (bType.equals("i32*") && pType.equals("i32")) {
+                            String tmpReg = "%x" + currentReg++;
+                            IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
+                            reg_Type.put(tmpReg, "i32");
+                            bType = "i32";
+                            thisReg = tmpReg;
+                            sbIR.append(bType).append(" ").append(thisReg);
                         } else if (arrr_size.containsKey(thisReg)) {
                             if (pType.startsWith("[")) {
                                 ArrayList<Integer> pSize = getSizeArr(pType);
@@ -1293,13 +1300,6 @@ public class Visitor extends P8BaseVisitor<Void> {
                                 IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim + 1) + "\n");
                                 sbIR.append(pType).append(" ").append(tmpReg);
                             }
-                        } else if (bType.equals("i32*") && pType.equals("i32")) {
-                            String tmpReg = "%x" + currentReg++;
-                            IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
-                            reg_Type.put(tmpReg, "i32");
-                            bType = "i32";
-                            thisReg = tmpReg;
-                            sbIR.append(bType).append(" ").append(thisReg);
                         }
                     } else if (node_attr_Val.get(ctx.exp(i)).containsKey("numberVal")) {
                         sbIR.append("i32 ").append(node_attr_Val.get(ctx.exp(i)).get("numberVal"));
@@ -1342,6 +1342,13 @@ public class Visitor extends P8BaseVisitor<Void> {
                         String pType = pTypes.get(i);
                         if (pType.equals(bType)) {
                             sbIR.append(pType).append(" ").append(thisReg);
+                        } else if (bType.equals("i32*") && pType.equals("i32")) {
+                            String tmpReg = "%x" + currentReg++;
+                            IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
+                            reg_Type.put(tmpReg, "i32");
+                            bType = "i32";
+                            thisReg = tmpReg;
+                            sbIR.append(bType).append(" ").append(thisReg);
                         } else if (arrr_size.containsKey(thisReg)) {
                             if (pType.startsWith("[")) {
                                 ArrayList<Integer> pSize = getSizeArr(pType);
@@ -1360,13 +1367,6 @@ public class Visitor extends P8BaseVisitor<Void> {
                                 IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim + 1) + "\n");
                                 sbIR.append(pType).append(" ").append(tmpReg);
                             }
-                        } else if (bType.equals("i32*") && pType.equals("i32")) {
-                            String tmpReg = "%x" + currentReg++;
-                            IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
-                            reg_Type.put(tmpReg, "i32");
-                            bType = "i32";
-                            thisReg = tmpReg;
-                            sbIR.append(bType).append(" ").append(thisReg);
                         }
                     } else if (node_attr_Val.get(ctx.exp(i)).containsKey("numberVal")) {
                         sbIR.append("i32 ").append(node_attr_Val.get(ctx.exp(i)).get("numberVal"));
