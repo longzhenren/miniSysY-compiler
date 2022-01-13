@@ -1276,19 +1276,23 @@ public class Visitor extends P8BaseVisitor<Void> {
                         if (pType.equals(bType)) {
                             sbIR.append(pType).append(" ").append(thisReg);
                         } else if (arrr_size.containsKey(thisReg)) {
-                            int pdim = 0;
                             if (pType.startsWith("[")) {
                                 ArrayList<Integer> pSize = getSizeArr(pType);
-                                pdim = pSize.size();
+                                int pdim = pSize.size();
+                                ArrayList<Integer> size = arrr_size.get(thisReg);
+                                int dim = size.size();
+                                String tmpReg = "%x" + currentReg++;
+                                reg_Type.put(tmpReg, "i32*");
+                                IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim - pdim + 1) + "\n");
+                                sbIR.append(pType).append(" ").append(tmpReg);
                             } else if (pType.equals("i32*")) {
-                                pdim = 0;
+                                ArrayList<Integer> size = arrr_size.get(thisReg);
+                                int dim = size.size();
+                                String tmpReg = "%x" + currentReg++;
+                                reg_Type.put(tmpReg, "i32*");
+                                IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim + 1) + "\n");
+                                sbIR.append(pType).append(" ").append(tmpReg);
                             }
-                            ArrayList<Integer> size = arrr_size.get(thisReg);
-                            int dim = size.size();
-                            String tmpReg = "%x" + currentReg++;
-                            reg_Type.put(tmpReg, "i32*");
-                            IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim - pdim + 1) + "\n");
-                            sbIR.append(pType).append(" ").append(tmpReg);
                         } else if (bType.equals("i32*") && pType.equals("i32")) {
                             String tmpReg = "%x" + currentReg++;
                             IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
@@ -1336,27 +1340,33 @@ public class Visitor extends P8BaseVisitor<Void> {
                         String thisReg = (String) node_attr_Val.get(ctx.exp(i)).get("thisReg");
                         String bType = reg_Type.get(thisReg);
                         String pType = pTypes.get(i);
-                        if (bType.equals(pType)) {
+                        if (pType.equals(bType)) {
                             sbIR.append(pType).append(" ").append(thisReg);
                         } else if (arrr_size.containsKey(thisReg)) {
-                            int pdim = 0;
                             if (pType.startsWith("[")) {
                                 ArrayList<Integer> pSize = getSizeArr(pType);
-                                pdim = pSize.size();
+                                int pdim = pSize.size();
+                                ArrayList<Integer> size = arrr_size.get(thisReg);
+                                int dim = size.size();
+                                String tmpReg = "%x" + currentReg++;
+                                reg_Type.put(tmpReg, "i32*");
+                                IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim - pdim + 1) + "\n");
+                                sbIR.append(pType).append(" ").append(tmpReg);
                             } else if (pType.equals("i32*")) {
-                                pdim = 0;
+                                ArrayList<Integer> size = arrr_size.get(thisReg);
+                                int dim = size.size();
+                                String tmpReg = "%x" + currentReg++;
+                                reg_Type.put(tmpReg, "i32*");
+                                IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim + 1) + "\n");
+                                sbIR.append(pType).append(" ").append(tmpReg);
                             }
-                            ArrayList<Integer> size = arrr_size.get(thisReg);
-                            int dim = size.size();
-                            String tmpReg = "%x" + currentReg++;
-                            reg_Type.put(tmpReg, "i32*");
-                            IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim - pdim + 1) + "\n");
-                            sbIR.append(pType).append(" ").append(tmpReg);
                         } else if (bType.equals("i32*") && pType.equals("i32")) {
                             String tmpReg = "%x" + currentReg++;
                             IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
                             reg_Type.put(tmpReg, "i32");
-                            sbIR.append(pType).append(" ").append(tmpReg);
+                            bType = "i32";
+                            thisReg = tmpReg;
+                            sbIR.append(bType).append(" ").append(thisReg);
                         }
                     } else if (node_attr_Val.get(ctx.exp(i)).containsKey("numberVal")) {
                         sbIR.append("i32 ").append(node_attr_Val.get(ctx.exp(i)).get("numberVal"));
