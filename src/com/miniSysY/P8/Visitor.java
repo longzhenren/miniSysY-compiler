@@ -912,7 +912,7 @@ public class Visitor extends P8BaseVisitor<Void> {
             if (arrr_size.containsKey(idptr)) {//Array
                 ArrayList<Integer> size = arrr_size.get(idptr);
                 String idtype = reg_Type.get(idptr);
-                if (idtype.endsWith("*")) {
+                if (idtype.startsWith("i32") && idtype.endsWith("*") || idtype.endsWith("**")) {
                     String thisReg = "%x" + currentReg++;
                     IR_List.add("\t" + thisReg + " = load " + idtype.substring(0, idtype.length() - 1) + ", " + idtype + " " + idptr + "\n");
                     idptr = thisReg;
