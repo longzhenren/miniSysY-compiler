@@ -985,6 +985,13 @@ public class Visitor extends P8BaseVisitor<Void> {
         HashMap<String, Object> attr_Val = new HashMap<>();
         node_attr_Val.put(ctx, attr_Val);
         visit(ctx.lOrExp());
+        String lOrExpReg = (String) node_attr_Val.get(ctx.lOrExp()).get("thisReg");
+        if (lOrExpReg != null && reg_Type.get(lOrExpReg).equals("i32*")) {
+            String tmpReg = "%x" + currentReg++;
+            IR_List.add("\t" + tmpReg + " = load i32, i32* " + lOrExpReg + "\n");
+            reg_Type.put(tmpReg, "i32");
+            lOrExpReg = tmpReg;
+        }
         String thisReg = "%x" + currentReg++;
         reg_Type.put(thisReg, "i1");
         int trueLabel = currentReg++;
@@ -994,7 +1001,6 @@ public class Visitor extends P8BaseVisitor<Void> {
             IR_List.add("\t" + thisReg + " = icmp ne i32 " + numberVal + ", 0\n");
             IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
         } else if (node_attr_Val.get(ctx.lOrExp()).containsKey("thisReg")) {
-            String lOrExpReg = (String) node_attr_Val.get(ctx.lOrExp()).get("thisReg");
             if (reg_Type.get(lOrExpReg).equals("i32")) {
                 IR_List.add("\t" + thisReg + " = icmp ne i32 " + lOrExpReg + ", 0\n");
                 IR_List.add("\tbr i1 " + thisReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
