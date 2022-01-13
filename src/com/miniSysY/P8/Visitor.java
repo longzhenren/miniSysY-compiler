@@ -1275,6 +1275,9 @@ public class Visitor extends P8BaseVisitor<Void> {
                 String retType = Main.externalFunc.get(Ident);
                 ArrayList<String> pTypes = Main.externalFunc_para.get(Ident);
                 sbIR.append("call ").append(retType).append(" @").append(Ident).append("(");
+                if (pTypes != null && pTypes.size() != ctx.exp().size()) {
+                    System.exit(-1);
+                }
                 for (int i = 0; i < ctx.exp().size(); i++) {
                     visit(ctx.exp(i));
                     String pType = Main.externalFunc_para.get(Ident).get(i);
@@ -1303,6 +1306,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                             } else if (pType.equals("i32*")) {
                                 ArrayList<Integer> size = arrr_size.get(thisReg);
                                 int dim = size.size();
+                                if (dim > 1) System.exit(-1);
                                 String tmpReg = "%x" + currentReg++;
                                 reg_Type.put(tmpReg, "i32*");
                                 IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim + 1) + "\n");
@@ -1317,8 +1321,10 @@ public class Visitor extends P8BaseVisitor<Void> {
                     }
                 }
                 StringBuilder psb = new StringBuilder();
-                for (String s : pTypes) {
-                    psb.append(s).append(", ");
+                if (pTypes != null) {
+                    for (String s : pTypes) {
+                        psb.append(s).append(", ");
+                    }
                 }
                 if (psb.length() >= 2) psb.delete(psb.length() - 2, psb.length());
                 String para = String.valueOf(psb);
@@ -1341,6 +1347,9 @@ public class Visitor extends P8BaseVisitor<Void> {
             } else if (funcIdent_Attr.containsKey(Ident)) {
                 String retType = (String) funcIdent_Attr.get(Ident).get("retType");
                 ArrayList<String> pTypes = (ArrayList<String>) funcIdent_Attr.get(Ident).get("pTypes");
+                if (pTypes != null && pTypes.size() != ctx.exp().size()) {
+                    System.exit(-1);
+                }
                 sbIR.append("call ").append(retType).append(" @").append(Ident).append("(");
                 for (int i = 0; i < ctx.exp().size(); i++) {
                     visit(ctx.exp(i));
@@ -1370,6 +1379,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                             } else if (pType.equals("i32*")) {
                                 ArrayList<Integer> size = arrr_size.get(thisReg);
                                 int dim = size.size();
+                                if (dim > 1) System.exit(-1);
                                 String tmpReg = "%x" + currentReg++;
                                 reg_Type.put(tmpReg, "i32*");
                                 IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim + 1) + "\n");
