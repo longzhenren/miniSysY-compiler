@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class Visitor extends mdBaseVisitor<Void> {
     Integer currentReg = 0;
     int pos = 0, sid = 0;
-    HashMap<String, String> arr_pos_val = null;
+    HashMap<ArrayList<Integer>, String> arr_index_val = null;
     ArrayList<Integer> arrsize = null;
     public static HashMap<RuleNode, HashMap<String, Object>> node_attr_Val = new HashMap<>(); // 保存树上结点的各种属性
     public static HashMap<RuleContext, HashMap<String, Object>> block_ident_Reg = new HashMap<>();
@@ -216,14 +216,14 @@ public class Visitor extends mdBaseVisitor<Void> {
         return String.valueOf(sb);
     }
 
-    public static String getGlobalArrVal(ArrayList<Integer> size, HashMap<String, String> arr_pos_val, int pos) {
+    public static String getGlobalArrVal(ArrayList<Integer> size, HashMap<String, String> arr_index_val, int pos) {
         StringBuilder sb = new StringBuilder();
         int dim = size.size();
 
         if (dim == 1) {
             boolean allzero = true;
             for (int i = pos; i < pos + size.get(0); i++) {
-                if (arr_pos_val.containsKey(String.valueOf(i))) {
+                if (arr_index_val.containsKey(String.valueOf(i))) {
                     allzero = false;
                     break;
                 }
@@ -233,8 +233,8 @@ public class Visitor extends mdBaseVisitor<Void> {
             } else {
                 sb.append("[");
                 for (int i = pos; i < pos + size.get(0); i++) {
-                    if (arr_pos_val.containsKey(String.valueOf(i))) {
-                        sb.append("i32 ").append(arr_pos_val.get(String.valueOf(i)));
+                    if (arr_index_val.containsKey(String.valueOf(i))) {
+                        sb.append("i32 ").append(arr_index_val.get(String.valueOf(i)));
                     } else {
                         sb.append("i32 0");
                     }
@@ -252,7 +252,7 @@ public class Visitor extends mdBaseVisitor<Void> {
             }
             for (int i = 0; i < size.get(0); i++) {
                 sb.append(getArrSizeString(tmp)).append(" ");
-                sb.append(getGlobalArrVal(tmp, arr_pos_val, pos));
+                sb.append(getGlobalArrVal(tmp, arr_index_val, pos));
                 if (i < size.get(0) - 1) {
                     sb.append(", ");
                 }
@@ -290,8 +290,8 @@ public class Visitor extends mdBaseVisitor<Void> {
                         sbIR.append(getArrSizeString(size)).append(" ");
                     }
                     visit(ctx.constInitVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
-                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_pos_val");
-                    sbIR.append(getGlobalArrVal(size, arr_pos_val, 0));
+                    HashMap<String, String> arr_index_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_index_val");
+                    sbIR.append(getGlobalArrVal(size, arr_index_val, 0));
                     sbIR.append("\n");
                     IR_List.add(String.valueOf(sbIR));
                 } else {
@@ -327,13 +327,17 @@ public class Visitor extends mdBaseVisitor<Void> {
                     String arrReg = "%x" + currentReg++;
                     reg_Type.put(arrReg, "i32*");
                     sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
-                    sb.append(", i32 0".repeat(dim));
+//                    sb.append(", i32 0".repeat(dim));
                     IR_List.add(sb + "\n");
-                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_pos_val");
-                    for (String pos : arr_pos_val.keySet()) {
-                        String tmpReg = "%x" + currentReg++;
-                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + arrReg + ", i32 " + pos + "\n");
-                        IR_List.add("\tstore i32 " + arr_pos_val.get(pos) + ", i32* " + tmpReg + "\n");
+                    HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.constInitVal()).get("arr_index_val");
+                    for (ArrayList<Integer> index : arr_index_val.keySet()) {
+                        StringBuilder nsb = new StringBuilder(sb);
+                        for (Integer indexi : index) {
+                            nsb.append(", i32 ").append(indexi);
+                        }
+//                        System.err.print(pos + ":" + arr_index_val.get(pos) + ", ");
+                        IR_List.add(nsb + "\n");
+                        IR_List.add("\tstore i32 " + arr_index_val.get(index) + ", i32* " + arrReg + "\n");
                     }
                 }
             }
@@ -382,22 +386,40 @@ public class Visitor extends mdBaseVisitor<Void> {
             attr_Val.put("constExpVal", node_attr_Val.get(ctx.constExp()).get("constExpVal"));
         } else if (ctx.constInitVal() != null) {
             if (ctx.parent instanceof mdParser.ConstDefContext) {
-                arr_pos_val = new HashMap<>();
+                arr_index_val = new HashMap<>();
                 arrsize = (ArrayList<Integer>) node_attr_Val.get(ctx.parent).get("size");
-                attr_Val.put("arr_pos_val", arr_pos_val);
-                pos = 0;
-                sid = 1;
+                arr_index_val = new HashMap<>();
+                attr_Val.put("arr_index_val", arr_index_val);
+                index = new ArrayList<>();
             }
-            for (mdParser.ConstInitValContext ci : ctx.constInitVal()) {//一个括号内部
-                visit(ci);
-                if (ci.constExp() != null) {
-                    String expval = (String) node_attr_Val.get(ci.constExp()).get("constExpVal");
-                    arr_pos_val.put(String.valueOf(pos++), expval);
-                } else {
-                    sid++;
+            for (int i = 0; i < ctx.constInitVal().size(); i++) {
+                index.add(i);
+//            for (mdParser.InitValContext i : ctx.initVal()) {//一个括号内部
+                visit(ctx.constInitVal(i));
+                if (ctx.constInitVal(i).constExp() != null) {//最底层
+                    if (node_attr_Val.get(ctx.constInitVal(i)).containsKey("constExpVal")) {//直接就是一个数字
+                        String expval = (String) node_attr_Val.get(ctx.constInitVal(i)).get("constExpVal");
+                        ArrayList<Integer> tmp = new ArrayList<>(index);
+                        arr_index_val.put(tmp, expval);
+                    } else if (node_attr_Val.get(ctx.constInitVal(i)).containsKey("thisReg")) {
+                        String expval = (String) node_attr_Val.get(ctx.constInitVal(i)).get("thisReg");
+                        String exptype = reg_Type.get(expval);
+                        //TODO:Need?
+                        if (exptype.endsWith("*")) {
+                            String tmpReg = "%x" + currentReg++;
+                            String tmptype = exptype.substring(0, exptype.length() - 1);
+                            reg_Type.put(tmpReg, tmptype);
+                            IR_List.add("\t" + tmpReg + " = load " + tmptype + ", " + exptype + " " + expval + "\n");
+                            expval = tmpReg;
+                        }
+                        ArrayList<Integer> tmp = new ArrayList<>(index);
+                        arr_index_val.put(tmp, expval);
+//                        arr_index_val.put(String.valueOf(pos++), expval);
+                    }
                 }
+                index.remove(index.size() - 1);
             }
-            pos = arrsize.get(arrsize.size() - 1) * sid;
+
         }
         return null;
     }
@@ -456,8 +478,8 @@ public class Visitor extends mdBaseVisitor<Void> {
                     StringBuilder sbIR = new StringBuilder();
                     sbIR.append(thisReg).append(" = dso_local global ").append(getArrSizeString(size)).append(" ");
                     visit(ctx.initVal());//TODO:访问initval时候也要注意有没有IR输出（对于全局变量）
-                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
-                    sbIR.append(getGlobalArrVal(size, arr_pos_val, 0));
+                    HashMap<String, String> arr_index_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_index_val");
+                    sbIR.append(getGlobalArrVal(size, arr_index_val, 0));
                     sbIR.append("\n");
                     IR_List.add(String.valueOf(sbIR));
                 } else {
@@ -471,7 +493,6 @@ public class Visitor extends mdBaseVisitor<Void> {
                 int dim = size.size();
                 IR_List.add("\t" + thisReg + " = alloca " + getArrSizeString(size) + "\n");
                 reg_Type.put(thisReg, getArrSizeString(size) + "*");
-                System.err.println("visitVarDef,arr:" + Ident + " Reg:" + thisReg + " Type:" + reg_Type.get(thisReg));
                 if (dim != 0) {
                     int memsize = 1;
                     StringBuilder sb = new StringBuilder();
@@ -492,13 +513,17 @@ public class Visitor extends mdBaseVisitor<Void> {
                     String arrReg = "%x" + currentReg++;
                     reg_Type.put(arrReg, "i32*");
                     sb.append("\t").append(arrReg).append(" = getelementptr ").append(getArrSizeString(size)).append(", ").append(getArrSizeString(size)).append("* ").append(thisReg).append(", i32 0");
-                    sb.append(", i32 0".repeat(dim));
+//                    sb.append(", i32 0".repeat(dim));
                     IR_List.add(sb + "\n");
-                    HashMap<String, String> arr_pos_val = (HashMap<String, String>) node_attr_Val.get(ctx.initVal()).get("arr_pos_val");
-                    for (String pos : arr_pos_val.keySet()) {
-                        String tmpReg = "%x" + currentReg++;
-                        IR_List.add("\t" + tmpReg + " = getelementptr i32, i32* " + arrReg + ", i32 " + pos + "\n");
-                        IR_List.add("\tstore i32 " + arr_pos_val.get(pos) + ", i32* " + tmpReg + "\n");
+                    HashMap<ArrayList<Integer>, String> arr_index_val = (HashMap<ArrayList<Integer>, String>) node_attr_Val.get(ctx.initVal()).get("arr_index_val");
+                    for (ArrayList<Integer> index : arr_index_val.keySet()) {
+                        StringBuilder nsb = new StringBuilder(sb);
+                        for (Integer indexi : index) {
+                            nsb.append(", i32 ").append(indexi);
+                        }
+//                        System.err.print(pos + ":" + arr_index_val.get(pos) + ", ");
+                        IR_List.add(nsb + "\n");
+                        IR_List.add("\tstore i32 " + arr_index_val.get(index) + ", i32* " + arrReg + "\n");
                     }
                 }
             }
@@ -558,6 +583,8 @@ public class Visitor extends mdBaseVisitor<Void> {
         return null;
     }
 
+    ArrayList<Integer> index;
+
     @Override
     // exp | LBrace ( initVal ( ',' initVal )* )? RBrace;
     public Void visitInitVal(mdParser.InitValContext ctx) {
@@ -575,20 +602,23 @@ public class Visitor extends mdBaseVisitor<Void> {
             }
         } else if (ctx.initVal() != null) {
             if (ctx.parent instanceof mdParser.VarDefContext) {
-                arr_pos_val = new HashMap<>();
+                arr_index_val = new HashMap<>();
                 arrsize = (ArrayList<Integer>) node_attr_Val.get(ctx.parent).get("size");
-                attr_Val.put("arr_pos_val", arr_pos_val);
-                pos = 0;
-                sid = 1;
+                arr_index_val = new HashMap<>();
+                attr_Val.put("arr_index_val", arr_index_val);
+                index = new ArrayList<>();
             }
-            for (mdParser.InitValContext i : ctx.initVal()) {//一个括号内部
-                visit(i);
-                if (i.exp() != null) {
-                    if (node_attr_Val.get(i).containsKey("numberVal")) {//直接就是一个数字
-                        String expval = (String) node_attr_Val.get(i).get("numberVal");
-                        arr_pos_val.put(String.valueOf(pos++), expval);
-                    } else if (node_attr_Val.get(i).containsKey("thisReg")) {
-                        String expval = (String) node_attr_Val.get(i).get("thisReg");
+            for (int i = 0; i < ctx.initVal().size(); i++) {
+                index.add(i);
+//            for (mdParser.InitValContext i : ctx.initVal()) {//一个括号内部
+                visit(ctx.initVal(i));
+                if (ctx.initVal(i).exp() != null) {//最底层
+                    if (node_attr_Val.get(ctx.initVal(i)).containsKey("numberVal")) {//直接就是一个数字
+                        String expval = (String) node_attr_Val.get(ctx.initVal(i)).get("numberVal");
+                        ArrayList<Integer> tmp = new ArrayList<>(index);
+                        arr_index_val.put(tmp, expval);
+                    } else if (node_attr_Val.get(ctx.initVal(i)).containsKey("thisReg")) {
+                        String expval = (String) node_attr_Val.get(ctx.initVal(i)).get("thisReg");
                         String exptype = reg_Type.get(expval);
                         //TODO:Need?
                         if (exptype.endsWith("*")) {
@@ -598,13 +628,14 @@ public class Visitor extends mdBaseVisitor<Void> {
                             IR_List.add("\t" + tmpReg + " = load " + tmptype + ", " + exptype + " " + expval + "\n");
                             expval = tmpReg;
                         }
-                        arr_pos_val.put(String.valueOf(pos++), expval);
+                        ArrayList<Integer> tmp = new ArrayList<>(index);
+                        arr_index_val.put(tmp, expval);
+//                        arr_index_val.put(String.valueOf(pos++), expval);
                     }
-                } else {
-                    sid++;
                 }
+                index.remove(index.size() - 1);
             }
-            pos = arrsize.get(arrsize.size() - 1) * sid;
+
         }
         return null;
     }
@@ -771,10 +802,6 @@ public class Visitor extends mdBaseVisitor<Void> {
                 String lvalReg = (String) node_attr_Val.get(ctx.lVal()).get("thisReg");
                 String identType = reg_Type.get(lvalReg);
                 ArrayList<Integer> size = arrr_size.get(lvalReg);
-
-                if (size != null) { // Array
-                    System.err.println(size);
-                }
 
                 visit(ctx.exp());
                 if (node_attr_Val.get(ctx.exp()).containsKey("thisReg")) {
@@ -1011,7 +1038,6 @@ public class Visitor extends mdBaseVisitor<Void> {
                 IR_List.add("\tbr i1 " + lOrExpReg + ", label %x" + trueLabel + ", label %x" + falseLabel + "\n");
             }
         }
-
         attr_Val.put("TLabel", trueLabel);
         attr_Val.put("FLabel", falseLabel);
         return null;
