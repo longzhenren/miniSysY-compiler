@@ -1289,8 +1289,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                             reg_Type.put(tmpReg, "i32*");
                             IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim - pdim + 1) + "\n");
                             sbIR.append(pType).append(" ").append(tmpReg);
-                        }
-                        if (bType.equals("i32*") && pType.equals("i32")) {
+                        } else if (bType.equals("i32*") && pType.equals("i32")) {
                             String tmpReg = "%x" + currentReg++;
                             IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
                             reg_Type.put(tmpReg, "i32");
@@ -1353,8 +1352,7 @@ public class Visitor extends P8BaseVisitor<Void> {
                             reg_Type.put(tmpReg, "i32*");
                             IR_List.add("\t" + tmpReg + " = getelementptr " + getArrSizeString(size) + ", " + getArrSizeString(size) + "* " + thisReg + ", i32 0".repeat(dim - pdim + 1) + "\n");
                             sbIR.append(pType).append(" ").append(tmpReg);
-                        }
-                        if (bType.equals("i32*") && pType.equals("i32")) {
+                        } else if (bType.equals("i32*") && pType.equals("i32")) {
                             String tmpReg = "%x" + currentReg++;
                             IR_List.add("\t" + tmpReg + " = load i32, i32* " + thisReg + "\n");
                             reg_Type.put(tmpReg, "i32");
