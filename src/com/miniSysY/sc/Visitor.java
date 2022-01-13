@@ -894,21 +894,21 @@ public class Visitor extends scBaseVisitor<Void> {
 
             IR_List.add("\tbr label %" + StartLabel + "\n");
 
-            IR_List.add("\nx" + StartLabel + ":\n");
+            IR_List.add("\n" + StartLabel + ":\n");
             visit(ctx.cond());
 
-            Integer TLabel = (Integer) node_attr_Val.get(ctx.cond()).get("TLabel");
-            Integer FLabel = (Integer) node_attr_Val.get(ctx.cond()).get("FLabel");
+            String TLabel = (String) node_attr_Val.get(ctx.cond()).get("TLabel");
+            String FLabel = (String) node_attr_Val.get(ctx.cond()).get("FLabel");
 
             attr_Val.put("StartLabel", StartLabel);
             attr_Val.put("FLabel", FLabel);
             attr_Val.put("TLabel", TLabel);
 
-            IR_List.add("\nx" + TLabel + ":\n");
+            IR_List.add("\n" + TLabel + ":\n");
             visit(ctx.stmt(0));
             IR_List.add("\tbr label %" + StartLabel + "\n");
 
-            IR_List.add("\nx" + FLabel + ":\n");
+            IR_List.add("\n" + FLabel + ":\n");
         } else if (ctx.BREAK_KW() != null) {
             RuleContext parent = ctx;
             String StartLabel = null;
