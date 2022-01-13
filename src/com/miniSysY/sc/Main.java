@@ -14,10 +14,6 @@ public class Main {
     public static ArrayList<String> funcUsed = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-        Scanner sc = new Scanner(System.in);
-        while (sc.hasNextLine()){
-            System.err.println(sc.nextLine());
-        }
         CharStream inputStream = CharStreams.fromStream(System.in);
 //        CharStream inputStream = CharStreams.fromString("");
         scLexer lexer = new scLexer(inputStream);
